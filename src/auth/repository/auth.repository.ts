@@ -8,7 +8,6 @@ export class AuthRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async createUser(name: string, email: string, hashedPassword: string) {
-    console.log(name, email, hashedPassword);
     return await this.prisma.user.create({
       data: {
         name: name,
@@ -22,9 +21,16 @@ export class AuthRepository {
     return this.prisma.user.findUnique({ where: { id: userId } });
   }
 
-  async getUserByEmail(email: string) {
+  async getUserByEmail(email: string): Promise<User> {
     return await this.prisma.user.findUnique({
       where: { email: email },
+    });
+  }
+
+  async saveToken(userId: string, accessToken: string, refreshToken: string) {
+    return await this.prisma.user.update({
+      where: { id: userId },
+      data: { accessToken: accessToken, refreshToken: refreshToken },
     });
   }
 }

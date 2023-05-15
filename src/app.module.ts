@@ -4,7 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { loggingMiddleware, PrismaModule } from 'nestjs-prisma';
 import { LoggerModule } from 'nestjs-pino';
 
-import config from './config/config';
+import config from './common/config/config';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 

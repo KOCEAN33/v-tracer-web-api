@@ -5,7 +5,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Logger, LoggerErrorInterceptor } from 'nestjs-pino';
 import { PrismaService } from 'nestjs-prisma';
 
-import { SwaggerConfig } from './config/config.interface';
+import { SwaggerConfig } from './common/config/config.interface';
 import { AppModule } from './app.module';
 
 async function bootstrap() {

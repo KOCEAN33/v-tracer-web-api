@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 
-import { SecurityConfig } from '../config/config.interface';
+import { SecurityConfig } from '../common/config/config.interface';
 
 export interface Token {
   accessToken: string;

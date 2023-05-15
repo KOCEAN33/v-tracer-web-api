@@ -4,16 +4,35 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
 
-import { SecurityConfig } from '../config/config.interface';
+import { SecurityConfig } from '../common/config/config.interface';
 import { AuthController } from './auth.controller';
-import { JwtStrategy } from './jwt.strategy';
-import { PasswordService } from './password.service';
-import { TokenService } from './token.service';
-import { UserSignUpHandler } from './commands/create-user.handler';
-import { UserLoginHandler } from './commands/login.handler';
+
+import { JwtStrategy } from './strategies/jwt.strategy';
+import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
+
 import { AuthRepository } from './repository/auth.repository';
 
-const commandHandlers = [UserSignUpHandler, UserLoginHandler];
+import { PasswordService } from './password.service';
+import { TokenService } from './token.service';
+
+import { UserSignUpHandler } from './commands/create-user.handler';
+import { UserLoginHandler } from './commands/login.handler';
+import { RefreshTokenHandler } from './commands/refresh-token.handler';
+import { GetUserFromTokenHandler } from './queries/get-user.handler';
+import { SaveTokenHandler } from './events/save-token.handler';
+
+import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { JwtRefreshGuard } from '../common/guards/jwt-refresh.guard';
+
+const commandHandlers = [
+  UserSignUpHandler,
+  UserLoginHandler,
+  RefreshTokenHandler,
+];
+
+const queryHandlers = [GetUserFromTokenHandler];
+
+const eventHandlers = [SaveTokenHandler];
 
 @Module({
   imports: [
@@ -38,8 +57,13 @@ const commandHandlers = [UserSignUpHandler, UserLoginHandler];
     TokenService,
     PasswordService,
     JwtStrategy,
+    JwtAuthGuard,
+    JwtRefreshStrategy,
+    JwtRefreshGuard,
     ...commandHandlers,
+    ...queryHandlers,
+    ...eventHandlers,
   ],
-  exports: [],
+  exports: [JwtAuthGuard],
 })
 export class AuthModule {}
