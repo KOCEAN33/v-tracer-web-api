@@ -23,15 +23,17 @@ async function bootstrap() {
   // Swagger Api
   if (swaggerConfig.enabled) {
     const options = new DocumentBuilder()
-      .setTitle(swaggerConfig.title || 'Nestjs')
-      .setDescription(swaggerConfig.description || 'The nestjs API description')
-      .setVersion(swaggerConfig.version || '1.0')
+      .setTitle(swaggerConfig.title)
+      .setDescription(swaggerConfig.description)
+      .setVersion(swaggerConfig.version)
+      .addBearerAuth()
       .build();
     const document = SwaggerModule.createDocument(app, options);
 
-    SwaggerModule.setup(swaggerConfig.path || 'api', app, document);
+    SwaggerModule.setup(swaggerConfig.path, app, document);
   }
 
   await app.listen(8000);
+  console.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap();

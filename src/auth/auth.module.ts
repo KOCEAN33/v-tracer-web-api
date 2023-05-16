@@ -15,7 +15,7 @@ import { AuthRepository } from './repository/auth.repository';
 import { PasswordService } from './password.service';
 import { TokenService } from './token.service';
 
-import { UserSignUpHandler } from './commands/create-user.handler';
+import { UserSignUpHandler } from './commands/signup.handler';
 import { UserLoginHandler } from './commands/login.handler';
 import { RefreshTokenHandler } from './commands/refresh-token.handler';
 import { GetUserFromTokenHandler } from './queries/get-user.handler';

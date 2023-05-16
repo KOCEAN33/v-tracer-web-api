@@ -1,10 +1,8 @@
 import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import { ForbiddenException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
 
 import { AuthRepository } from '../repository/auth.repository';
-import { PasswordService } from '../password.service';
+
 import { Token, TokenService } from '../token.service';
 
 import { RefreshTokenCommand } from './refresh-token.command';
@@ -15,10 +13,7 @@ export class RefreshTokenHandler
   implements ICommandHandler<RefreshTokenCommand>
 {
   constructor(
-    private readonly repository: AuthRepository,
-    private readonly jwtService: JwtService,
-    private readonly passwordService: PasswordService,
-    private readonly configService: ConfigService,
+    private readonly authRepository: AuthRepository,
     private readonly tokenService: TokenService,
     private readonly eventBus: EventBus,
   ) {}
@@ -26,8 +21,8 @@ export class RefreshTokenHandler
   async execute(command: RefreshTokenCommand): Promise<Token> {
     const { userId, receiveRefreshToken } = command;
 
-    const user = await this.repository.getUserById(userId);
-    console.log(user);
+    const user = await this.authRepository.getUserById(userId);
+
     if (!user || !user.refreshToken) {
       throw new ForbiddenException('Access Denied');
     }

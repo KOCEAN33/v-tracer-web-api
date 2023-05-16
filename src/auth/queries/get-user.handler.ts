@@ -8,11 +8,11 @@ import { AuthRepository } from '../repository/auth.repository';
 export class GetUserFromTokenHandler
   implements IQueryHandler<GetUserFromTokenQuery>
 {
-  constructor(private readonly repository: AuthRepository) {}
+  constructor(private readonly authRepository: AuthRepository) {}
 
   async execute(query: GetUserFromTokenQuery): Promise<User> {
     const { userId } = query;
 
-    return await this.repository.getUserById(userId);
+    return await this.authRepository.getUserById(userId);
   }
 }

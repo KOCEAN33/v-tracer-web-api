@@ -1,12 +1,5 @@
-import {
-  CommandHandler,
-  EventBus,
-  EventPublisher,
-  ICommandHandler,
-} from '@nestjs/cqrs';
+import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import { BadRequestException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
 
 import { PasswordService } from '../password.service';
 import { Token, TokenService } from '../token.service';
@@ -17,10 +10,8 @@ import { SaveTokenEvent } from '../events/save-token.event';
 @CommandHandler(UserLoginCommand)
 export class UserLoginHandler implements ICommandHandler<UserLoginCommand> {
   constructor(
-    private readonly repository: AuthRepository,
-    private readonly jwtService: JwtService,
+    private readonly authRepository: AuthRepository,
     private readonly passwordService: PasswordService,
-    private readonly configService: ConfigService,
     private readonly tokenService: TokenService,
     private readonly eventBus: EventBus,
   ) {}
@@ -28,7 +19,7 @@ export class UserLoginHandler implements ICommandHandler<UserLoginCommand> {
   async execute(command: UserLoginCommand): Promise<Token> {
     const { email, password } = command;
 
-    const user = await this.repository.getUserByEmail(email);
+    const user = await this.authRepository.getUserByEmail(email);
     if (!user) {
       throw new BadRequestException('Invalid Username or Password');
     }
@@ -40,7 +31,7 @@ export class UserLoginHandler implements ICommandHandler<UserLoginCommand> {
     if (!passwordValid) {
       throw new BadRequestException('Invalid Username or Password');
     }
-    console.log();
+
     const { accessToken, refreshToken } =
       await this.tokenService.generateTokens({ userId: user.id });
     this.eventBus.publish(

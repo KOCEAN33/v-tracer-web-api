@@ -22,9 +22,13 @@ export class AuthRepository {
   }
 
   async getUserByEmail(email: string): Promise<User> {
-    return await this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: { email: email },
     });
+    if (!user) {
+      return null;
+    }
+    return user;
   }
 
   async saveToken(userId: string, accessToken: string, refreshToken: string) {

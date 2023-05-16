@@ -3,10 +3,10 @@ import type { Config } from './config.interface';
 const config: Config = {
   swagger: {
     enabled: true,
-    title: 'Nestjs FTW',
-    description: 'The nestjs API description',
-    version: '1.5',
-    path: 'api',
+    title: 'SaaS Community Backend API',
+    description: 'Backend API for SaaS Community',
+    version: '1.0',
+    path: 'api-docs',
   },
   security: {
     expiresIn: '10m',
