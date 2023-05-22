@@ -11,36 +11,81 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  accessToken   String?
-  refreshToken  String?
-  image         String?
-  password      String?
-  verifyToken   String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  handle    String?  @unique
+  email     String?  @unique
+  password  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  accounts Account[]
+  authToken AuthToken?
+  review    Review[]
+  question  Question[]
+  proCon    ProCon[]
 }
 
-model Account {
-  id                String  @id @default(auto()) @map("_id") @db.ObjectId
-  userId            String  @db.ObjectId
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String? @db.String
-  access_token      String? @db.String
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.String
-  session_state     String?
+model Profile {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String?
+  image     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AuthToken {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String   @unique @db.ObjectId
+  accessToken  String   @db.String
+  refreshToken String   @db.String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
 
-  @@unique([provider, providerAccountId])
+model Product {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  ownerId   String?  @db.ObjectId
+  url       String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  alternativeReviews Review[] @relation("AlternativeReviews")
+  switchedReviews    Review[] @relation("switchedReviews")
+  review             Review[]
+  proCon             ProCon[]
+}
+
+model Review {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  productId       String   @db.ObjectId
+  authorId        String   @db.ObjectId
+  title           String
+  body            String
+  alternativeId   String[] @db.ObjectId
+  alternativeBody String?
+  switchedId      String[] @db.ObjectId
+  switchedBody    String?
+
+  alternative Product  @relation("AlternativeReviews", fields: [alternativeId], references: [id], onDelete: Cascade)
+  switched    Product  @relation("switchedReviews", fields: [switchedId], references: [id], onDelete: Cascade)
+  Product     Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+}
+
+model ProCon {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  authorId  String @db.ObjectId
+  productId String @db.ObjectId
+
+  user    User    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Question {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  authorId String @db.ObjectId
+
+  user User @relation(fields: [authorId], references: [id], onDelete: Cascade)
 }
