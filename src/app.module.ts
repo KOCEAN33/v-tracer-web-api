@@ -8,7 +8,8 @@ import config from './common/config/config';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ReviewsController } from './reviews/reviews.controller';
-import { ProductsController } from './products/products.controller';
+import { ProductController } from './products/product.controller';
+import { ProductModule } from './products/product.module';
 
 // TODO 1. import prisma module for root and logger
 // TODO 2. connect logger by pino
@@ -45,8 +46,9 @@ import { ProductsController } from './products/products.controller';
     }),
     UsersModule,
     AuthModule,
+    ProductModule,
   ],
-  controllers: [ReviewsController, ProductsController],
+  controllers: [],
   providers: [],
 })
 export class AppModule {}
