@@ -15,11 +15,12 @@ import { AuthRepository } from './repository/auth.repository';
 import { PasswordService } from './password.service';
 import { TokenService } from './token.service';
 
-import { UserSignUpHandler } from './commands/signup.handler';
-import { UserLoginHandler } from './commands/login.handler';
-import { RefreshTokenHandler } from './commands/refresh-token.handler';
-import { GetUserFromTokenHandler } from './queries/get-user.handler';
-import { SaveTokenHandler } from './events/save-token.handler';
+import { UserSignUpHandler } from './commands/handler/signup.handler';
+import { UserLoginHandler } from './commands/handler/login.handler';
+import { RefreshTokenHandler } from './commands/handler/refresh-token.handler';
+import { GetUserFromTokenHandler } from './queries/handler/get-user.handler';
+import { UpdateTokenHandler } from './events/handler/update-token.handler';
+import { CreateNewTokenHandler } from './events/handler/create-token.handler';
 
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { JwtRefreshGuard } from '../common/guards/jwt-refresh.guard';
@@ -32,7 +33,7 @@ const commandHandlers = [
 
 const queryHandlers = [GetUserFromTokenHandler];
 
-const eventHandlers = [SaveTokenHandler];
+const eventHandlers = [UpdateTokenHandler, CreateNewTokenHandler];
 
 @Module({
   imports: [

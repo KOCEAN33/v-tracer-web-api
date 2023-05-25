@@ -1,11 +1,11 @@
 import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import { BadRequestException } from '@nestjs/common';
 
-import { PasswordService } from '../password.service';
-import { Token, TokenService } from '../token.service';
-import { AuthRepository } from '../repository/auth.repository';
-import { UserLoginCommand } from './login.command';
-import { SaveTokenEvent } from '../events/save-token.event';
+import { PasswordService } from '../../password.service';
+import { Token, TokenService } from '../../token.service';
+import { AuthRepository } from '../../repository/auth.repository';
+import { UserLoginCommand } from '../login.command';
+import { UpdateTokenEvent } from '../../events/update-token.event';
 
 @CommandHandler(UserLoginCommand)
 export class UserLoginHandler implements ICommandHandler<UserLoginCommand> {
@@ -35,7 +35,7 @@ export class UserLoginHandler implements ICommandHandler<UserLoginCommand> {
     const { accessToken, refreshToken } =
       await this.tokenService.generateTokens({ userId: user.id });
     this.eventBus.publish(
-      new SaveTokenEvent(user.id, accessToken, refreshToken),
+      new UpdateTokenEvent(user.id, accessToken, refreshToken),
     );
 
     return { accessToken, refreshToken };

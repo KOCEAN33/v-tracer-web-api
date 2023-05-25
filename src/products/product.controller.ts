@@ -1,12 +1,12 @@
 import { Controller, Post, Body } from '@nestjs/common';
-import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { CommandBus } from '@nestjs/cqrs';
 import { CreateProductDto } from './dtos/create-product.dto';
 
 import { CreateProductCommand } from './commands/create-product.command';
 
 @Controller('products')
 export class ProductController {
-  constructor(private commandBus: CommandBus, private queryBus: QueryBus) {}
+  constructor(private commandBus: CommandBus) {}
 
   @Post('/create')
   async createProduct(@Body() dto: CreateProductDto) {

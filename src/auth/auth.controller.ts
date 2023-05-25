@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post, UseGuards, Req } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
-import { UserSignupDto } from './dto/signup.dto';
+import { UserSignUpDto } from './dto/signup.dto';
 import { UserLoginDto } from './dto/login.dto';
 
 import { UserSignUpCommand } from './commands/signup.command';
@@ -34,11 +34,11 @@ export class AuthController {
   @Post('/signup')
   @ApiOperation({ summary: 'User Signup' })
   @ApiTags('Auth')
-  @ApiCreatedResponse({ description: '유저 생성', type: UserSignupDto })
-  async signUp(@Body() dto: UserSignupDto) {
+  @ApiCreatedResponse({ description: '유저 생성', type: UserSignUpDto })
+  async signUp(@Body() dto: UserSignUpDto) {
     dto.email = dto.email.toLowerCase();
-    const { name, email, password } = dto;
-    const command = new UserSignUpCommand(name, email, password);
+    const { name, handle, email, password } = dto;
+    const command = new UserSignUpCommand(name, handle, email, password);
     return this.commandBus.execute(command);
   }
 

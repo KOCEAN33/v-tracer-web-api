@@ -1,12 +1,12 @@
 import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import { ForbiddenException } from '@nestjs/common';
 
-import { AuthRepository } from '../repository/auth.repository';
+import { AuthRepository } from '../../repository/auth.repository';
 
-import { Token, TokenService } from '../token.service';
+import { Token, TokenService } from '../../token.service';
 
-import { RefreshTokenCommand } from './refresh-token.command';
-import { SaveTokenEvent } from '../events/save-token.event';
+import { RefreshTokenCommand } from '../refresh-token.command';
+import { UpdateTokenEvent } from '../../events/update-token.event';
 
 @CommandHandler(RefreshTokenCommand)
 export class RefreshTokenHandler
@@ -21,24 +21,25 @@ export class RefreshTokenHandler
   async execute(command: RefreshTokenCommand): Promise<Token> {
     const { userId, receiveRefreshToken } = command;
 
-    const user = await this.authRepository.getUserById(userId);
+    const token = await this.authRepository.getTokenByUserId(userId);
 
-    if (!user || !user.refreshToken) {
+    if (!token) {
       throw new ForbiddenException('Access Denied');
     }
+
     const refreshTokenMatches = await this.isRefreshTokenMatches(
       receiveRefreshToken,
-      user.refreshToken,
+      token.refreshToken,
     );
 
     if (!refreshTokenMatches) {
       throw new ForbiddenException('Access Denied');
     }
     const { accessToken, refreshToken } =
-      await this.tokenService.generateTokens({ userId: user.id });
+      await this.tokenService.generateTokens({ userId: userId });
 
     this.eventBus.publish(
-      new SaveTokenEvent(user.id, accessToken, refreshToken),
+      new UpdateTokenEvent(userId, accessToken, refreshToken),
     );
 
     return { accessToken, refreshToken };

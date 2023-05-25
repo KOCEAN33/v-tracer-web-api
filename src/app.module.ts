@@ -7,8 +7,6 @@ import { LoggerModule } from 'nestjs-pino';
 import config from './common/config/config';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
-import { ReviewsController } from './reviews/reviews.controller';
-import { ProductController } from './products/product.controller';
 import { ProductModule } from './products/product.module';
 
 // TODO 1. import prisma module for root and logger

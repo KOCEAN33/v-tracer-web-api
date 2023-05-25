@@ -12,8 +12,9 @@ datasource db {
 
 model User {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  handle    String?  @unique
-  email     String?  @unique
+  name      String?
+  handle    String   @unique
+  email     String   @unique
   password  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -22,14 +23,6 @@ model User {
   review    Review[]
   question  Question[]
   proCon    ProCon[]
-}
-
-model Profile {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  name      String?
-  image     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 model AuthToken {

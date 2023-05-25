@@ -2,7 +2,7 @@ import { Test } from '@nestjs/testing';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
 import { AuthController } from './auth.controller';
-import { UserSignupDto } from './dto/signup.dto';
+import { UserSignUpDto } from './dto/signup.dto';
 import { UserLoginDto } from './dto/login.dto';
 import { UserSignUpCommand } from './commands/signup.command';
 import { UserLoginCommand } from './commands/login.command';
@@ -39,19 +39,21 @@ describe('AuthController', () => {
   });
 
   it('should sign up a user', async () => {
-    const createUserDto: UserSignupDto = {
+    const userSignUpDto: UserSignUpDto = {
       name: 'John Doe',
+      handle: '@johndoe',
       email: 'john.doe@example.com',
       password: 'password123',
     };
 
-    await authController.signUp(createUserDto);
+    await authController.signUp(userSignUpDto);
 
     expect(commandBus.execute).toHaveBeenCalledWith(
       new UserSignUpCommand(
-        createUserDto.name,
-        createUserDto.email.toLowerCase(),
-        createUserDto.password,
+        userSignUpDto.name,
+        userSignUpDto.handle,
+        userSignUpDto.email.toLowerCase(),
+        userSignUpDto.password,
       ),
     );
   });

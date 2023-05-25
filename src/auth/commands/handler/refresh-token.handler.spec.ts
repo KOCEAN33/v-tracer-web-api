@@ -2,11 +2,11 @@ import { Test } from '@nestjs/testing';
 import { ForbiddenException } from '@nestjs/common';
 import { EventBus } from '@nestjs/cqrs';
 
-import { RefreshTokenCommand } from './refresh-token.command';
+import { RefreshTokenCommand } from '../refresh-token.command';
 import { RefreshTokenHandler } from './refresh-token.handler';
-import { AuthRepository } from '../repository/auth.repository';
-import { TokenService } from '../token.service';
-import { SaveTokenEvent } from '../events/save-token.event';
+import { AuthRepository } from '../../repository/auth.repository';
+import { TokenService } from '../../token.service';
+import { UpdateTokenEvent } from '../../events/update-token.event';
 
 describe('RefreshTokenHandler', () => {
   let refreshTokenHandler: RefreshTokenHandler;
@@ -31,7 +31,7 @@ describe('RefreshTokenHandler', () => {
     eventBus = moduleRef.get<EventBus>(EventBus);
   });
 
-  it('should refresh access and refresh tokens and publish SaveTokenEvent', async () => {
+  it('should refresh access and refresh tokens and publish UpdateTokenEvent', async () => {
     const command = new RefreshTokenCommand('1', 'valid_refresh_token');
     const user = { id: '1', refreshToken: 'valid_refresh_token' };
     const tokens = {
@@ -39,42 +39,44 @@ describe('RefreshTokenHandler', () => {
       refreshToken: 'new_refresh_token',
     };
 
-    authRepository.getUserById = jest.fn().mockResolvedValue(user);
+    authRepository.getTokenByUserId = jest.fn().mockResolvedValue(user);
     tokenService.generateTokens = jest.fn().mockResolvedValue(tokens);
     eventBus.publish = jest.fn();
 
     const result = await refreshTokenHandler.execute(command);
 
     expect(result).toEqual(tokens);
-    expect(authRepository.getUserById).toHaveBeenCalledWith('1');
+    expect(authRepository.getTokenByUserId).toHaveBeenCalledWith(
+      command.userId,
+    );
     expect(tokenService.generateTokens).toHaveBeenCalledWith({
-      userId: user.id,
+      userId: command.userId,
     });
     expect(eventBus.publish).toHaveBeenCalledWith(
-      new SaveTokenEvent(user.id, tokens.accessToken, tokens.refreshToken),
+      new UpdateTokenEvent(user.id, tokens.accessToken, tokens.refreshToken),
     );
   });
 
   it('should throw ForbiddenException if user does not exist or user does not have a refresh token', async () => {
     const command = new RefreshTokenCommand('1', 'valid_refresh_token');
 
-    authRepository.getUserById = jest.fn().mockResolvedValue(null);
+    authRepository.getTokenByUserId = jest.fn().mockResolvedValue(null);
 
     await expect(refreshTokenHandler.execute(command)).rejects.toThrow(
       ForbiddenException,
     );
-    expect(authRepository.getUserById).toHaveBeenCalledWith('1');
+    expect(authRepository.getTokenByUserId).toHaveBeenCalledWith('1');
   });
 
   it('should throw ForbiddenException if received refresh token does not match user refresh token', async () => {
     const command = new RefreshTokenCommand('1', 'invalid_refresh_token');
     const user = { id: '1', refreshToken: 'valid_refresh_token' };
 
-    authRepository.getUserById = jest.fn().mockResolvedValue(user);
+    authRepository.getTokenByUserId = jest.fn().mockResolvedValue(user);
 
     await expect(refreshTokenHandler.execute(command)).rejects.toThrow(
       ForbiddenException,
     );
-    expect(authRepository.getUserById).toHaveBeenCalledWith('1');
+    expect(authRepository.getTokenByUserId).toHaveBeenCalledWith('1');
   });
 });

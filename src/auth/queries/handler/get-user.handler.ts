@@ -1,8 +1,8 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { User } from '@prisma/client';
 
-import { GetUserFromTokenQuery } from './get-user.query';
-import { AuthRepository } from '../repository/auth.repository';
+import { GetUserFromTokenQuery } from '../get-user.query';
+import { AuthRepository } from '../../repository/auth.repository';
 
 @QueryHandler(GetUserFromTokenQuery)
 export class GetUserFromTokenHandler

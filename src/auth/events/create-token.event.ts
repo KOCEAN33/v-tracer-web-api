@@ -1,6 +1,6 @@
 import { IEvent } from '@nestjs/cqrs';
 
-export class SaveTokenEvent implements IEvent {
+export class CreateNewTokenEvent implements IEvent {
   constructor(
     readonly userId: string,
     readonly accessToken: string,

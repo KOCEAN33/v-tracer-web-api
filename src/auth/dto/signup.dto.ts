@@ -9,7 +9,7 @@ import { Transform } from 'class-transformer';
 import { NotIn } from '../../common/decorators/not-in';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class UserSignupDto {
+export class UserSignUpDto {
   @Transform((params) => params.value.trim())
   @NotIn('password', { message: 'password는 name과 달라야 합니다' })
   @IsString()
@@ -17,6 +17,12 @@ export class UserSignupDto {
   @MaxLength(30)
   @ApiProperty({ example: 'asashi', description: 'name' })
   name: string;
+
+  @IsString()
+  @MinLength(2)
+  @MaxLength(30)
+  @ApiProperty({ example: '@asashi', description: 'Callable ID' })
+  handle: string;
 
   @IsEmail()
   @MaxLength(60)

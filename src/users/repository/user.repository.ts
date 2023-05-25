@@ -7,18 +7,8 @@ import { User } from '@prisma/client';
 export class UserRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async saveUser(name: string, email: string, password: string): Promise<User> {
-    return await this.prisma.user.create({
-      data: {
-        name: name,
-        email: email,
-        password: password,
-      },
-    });
-  }
-
   async checkUserExists(emailAddress: string) {
-    const user = await this.prisma.user.findUnique({
+    const user = await this.prisma.user.findFirst({
       where: { email: emailAddress },
     });
     return user !== null;

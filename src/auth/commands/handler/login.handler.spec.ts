@@ -2,12 +2,12 @@ import { Test } from '@nestjs/testing';
 import { EventBus } from '@nestjs/cqrs';
 import { BadRequestException } from '@nestjs/common';
 
-import { UserLoginCommand } from './login.command';
+import { UserLoginCommand } from '../login.command';
 import { UserLoginHandler } from './login.handler';
-import { AuthRepository } from '../repository/auth.repository';
-import { PasswordService } from '../password.service';
-import { TokenService } from '../token.service';
-import { SaveTokenEvent } from '../events/save-token.event';
+import { AuthRepository } from '../../repository/auth.repository';
+import { PasswordService } from '../../password.service';
+import { TokenService } from '../../token.service';
+import { UpdateTokenEvent } from '../../events/update-token.event';
 
 describe('UserLoginHandler', () => {
   let userLoginHandler: UserLoginHandler;
@@ -34,7 +34,7 @@ describe('UserLoginHandler', () => {
     eventBus = moduleRef.get<EventBus>(EventBus);
   });
 
-  it('should log in user, generate tokens, and publish SaveTokenEvent', async () => {
+  it('should log in user, generate tokens, and publish UpdateTokenEvent', async () => {
     const command = new UserLoginCommand('test@email.com', 'password');
     const user = { id: '1', email: command.email, password: 'hashed_password' };
     const tokens = {
@@ -59,7 +59,7 @@ describe('UserLoginHandler', () => {
       userId: user.id,
     });
     expect(eventBus.publish).toHaveBeenCalledWith(
-      new SaveTokenEvent(user.id, tokens.accessToken, tokens.refreshToken),
+      new UpdateTokenEvent(user.id, tokens.accessToken, tokens.refreshToken),
     );
   });
 
