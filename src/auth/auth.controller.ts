@@ -20,12 +20,6 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-// TODO: 헤더에서 토큰을 추출하는 Function 으로 데이터 구조 개전
-// private extractTokenFromHeader(request: Request): string | undefined {
-//   const [type, token] = request.headers.authorization?.split(' ') ?? [];
-//   return type === 'Bearer' ? token : undefined;
-// }
-
 @ApiTags('Auth API')
 @Controller('auth')
 export class AuthController {

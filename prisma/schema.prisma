@@ -61,9 +61,9 @@ model Review {
   switchedId      String[] @db.ObjectId
   switchedBody    String?
 
-  alternative Product  @relation("AlternativeReviews", fields: [alternativeId], references: [id], onDelete: Cascade)
-  switched    Product  @relation("switchedReviews", fields: [switchedId], references: [id], onDelete: Cascade)
-  Product     Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+  alternative Product? @relation("AlternativeReviews", fields: [alternativeId], references: [id], onDelete: Cascade)
+  switched    Product? @relation("switchedReviews", fields: [switchedId], references: [id], onDelete: Cascade)
+  product     Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
   user        User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
 }
 

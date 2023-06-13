@@ -5,9 +5,21 @@ import { PrismaService } from 'nestjs-prisma';
 export class ProductRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createProduct(name: string, url: string) {
+  async createProduct(handle, name, url) {
     return await this.prisma.product.create({
-      data: { name, url },
+      data: { handle, name, url },
     });
+  }
+
+  async updateProduct(handle, name, ownerId, url) {
+    return await this.prisma.product.update({
+      where: { handle: handle },
+      data: { name, ownerId, url },
+    });
+  }
+
+  // Query
+  async getProductByProductHandle(handle) {
+    return await this.prisma.product.findUnique({ where: { handle: handle } });
   }
 }
