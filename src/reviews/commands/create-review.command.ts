@@ -1,9 +1,9 @@
 import { ICommand } from '@nestjs/cqrs';
 
-export class CreateReviewByProductHandleCommand implements ICommand {
+export class CreateReviewCommand implements ICommand {
   constructor(
     readonly authorId,
-    readonly productHandle,
+    readonly productId,
     readonly title,
     readonly body,
     readonly published,

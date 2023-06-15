@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
-import { Review } from '@prisma/client';
+import { Prisma, Review } from '@prisma/client';
 
 @Injectable()
 export class ReviewRepository {
@@ -18,9 +18,26 @@ export class ReviewRepository {
     });
   }
 
+  async patchReview(reviewId, title?, body?, published?) {
+    return await this.prisma.review.update({
+      where: { id: reviewId },
+      data: { title: title, body: body, published: published },
+    });
+  }
+
   // Query
-  async getProductByProductHandle(handle) {
-    return await this.prisma.product.findUnique({ where: { handle: handle } });
+  async getReviewById(reviewId) {
+    try {
+      return await this.prisma.review.findUnique({
+        where: { id: reviewId },
+      });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        throw new NotFoundException(`Requested review does not exist`);
+        // PrismaClientKnownRequestError 처리 코드 작성
+        // ...
+      }
+    }
   }
 
   async getReviewsByProductHandle(handle): Promise<Review[]> {
