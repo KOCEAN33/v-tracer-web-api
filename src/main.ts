@@ -17,6 +17,9 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
   const prismaService: PrismaService = app.get(PrismaService);
+  prismaService.$on('query', (event) => {
+    console.log(event);
+  });
   await prismaService.enableShutdownHooks(app);
 
   const configService = app.get(ConfigService);

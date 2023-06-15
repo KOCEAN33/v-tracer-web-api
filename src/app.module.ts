@@ -22,6 +22,14 @@ import { ReviewModule } from './reviews/review.module';
     PrismaModule.forRoot({
       isGlobal: true,
       prismaServiceOptions: {
+        prismaOptions: {
+          log: [
+            {
+              emit: 'event',
+              level: 'query',
+            },
+          ],
+        },
         middlewares: [
           // TODO config prisma middleware
           loggingMiddleware({

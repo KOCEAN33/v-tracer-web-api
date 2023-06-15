@@ -32,11 +32,12 @@ export class PatchReviewCommandHandler
 
   private async checkReviewAuthor(authorId: string, reviewId: string) {
     const review = await this.reviewRepository.getReviewById(reviewId);
+    console.log('review', review);
 
     if (review == null) {
       return false;
     }
 
-    return review.id === authorId;
+    return review.authorId === authorId;
   }
 }

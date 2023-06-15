@@ -30,6 +30,7 @@ export class ReviewRepository {
     try {
       return await this.prisma.review.findUnique({
         where: { id: reviewId },
+        select: { authorId: true },
       });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
