@@ -16,6 +16,7 @@ async function bootstrap() {
   app.useGlobalInterceptors(new LoggerErrorInterceptor());
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
+  // Prisma service
   const prismaService: PrismaService = app.get(PrismaService);
   prismaService.$on('query', (event) => {
     console.log(event);
