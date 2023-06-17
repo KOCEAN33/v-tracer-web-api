@@ -5,7 +5,7 @@ import { PrismaService } from 'nestjs-prisma';
 export class ProductRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createProduct(handle, name, url) {
+  async createProduct(handle, name, url?) {
     return await this.prisma.product.create({
       data: { handle, name, url },
     });

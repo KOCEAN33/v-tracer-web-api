@@ -38,6 +38,7 @@ model AuthToken {
 
 model Product {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  handle    String   @unique
   name      String
   ownerId   String?  @db.ObjectId
   url       String?
@@ -60,6 +61,7 @@ model Review {
   alternativeBody String?
   switchedId      String[] @db.ObjectId
   switchedBody    String?
+  publishedAt     DateTime
 
   alternative Product? @relation("AlternativeReviews", fields: [alternativeId], references: [id], onDelete: Cascade)
   switched    Product? @relation("switchedReviews", fields: [switchedId], references: [id], onDelete: Cascade)

@@ -6,22 +6,22 @@ import { Prisma, Review } from '@prisma/client';
 export class ReviewRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createReview(authorId, productId, title, body, published?) {
+  async createReview(authorId, productId, title, body) {
     return await this.prisma.review.create({
       data: {
         authorId: authorId,
         productId: productId,
         title: title,
         body: body,
-        published: published,
+        publishedAt: new Date(),
       },
     });
   }
 
-  async patchReview(reviewId, title?, body?, published?) {
+  async patchReview(reviewId, title?, body?) {
     return await this.prisma.review.update({
       where: { id: reviewId },
-      data: { title: title, body: body, published: published },
+      data: { title: title, body: body },
     });
   }
 
@@ -44,7 +44,7 @@ export class ReviewRepository {
   async getReviewsByProductHandle(handle): Promise<Review[]> {
     const data = await this.prisma.product.findMany({
       where: { handle: handle },
-      include: { review: { take: 3, where: { published: true } } },
+      include: { review: { take: 3, where: { publishedAt: { not: null } } } },
     });
     return data[0].review;
   }

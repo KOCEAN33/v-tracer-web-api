@@ -12,15 +12,9 @@ export class CreateReviewCommandHandler
   constructor(readonly reviewRepository: ReviewRepository) {}
 
   async execute(command: CreateReviewCommand) {
-    const { authorId, productId, title, body, published } = command;
+    const { authorId, productId, title, body } = command;
 
-    await this.reviewRepository.createReview(
-      authorId,
-      productId,
-      title,
-      body,
-      published,
-    );
+    await this.reviewRepository.createReview(authorId, productId, title, body);
 
     return 'success';
   }

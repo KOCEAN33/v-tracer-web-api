@@ -1,5 +1,5 @@
-import { IsBoolean, IsString } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { IsBoolean, IsOptional, IsString } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class PatchReviewBodyDto {
   @IsString()
@@ -10,23 +10,26 @@ export class PatchReviewBodyDto {
   reviewId: string;
 
   @IsString()
-  @ApiProperty({
+  @IsOptional()
+  @ApiPropertyOptional({
     description: 'review Title',
     example: 'Best note application',
   })
-  title?: string;
+  title: string;
 
   @IsString()
-  @ApiProperty({
+  @IsOptional()
+  @ApiPropertyOptional({
     description: 'review Description',
     example: 'AI and database system is best...',
   })
-  body?: string;
+  body: string;
 
   @IsBoolean()
-  @ApiProperty({
+  @IsOptional()
+  @ApiPropertyOptional({
     description: 'Is ready to publish?',
     example: 'true & false',
   })
-  published?: boolean;
+  published: boolean;
 }

@@ -2,6 +2,7 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
@@ -16,16 +17,24 @@ export class PatchReviewCommandHandler
   constructor(readonly reviewRepository: ReviewRepository) {}
 
   async execute(command: PatchReviewCommand) {
-    const { authorId, reviewId, title, body, published } = command;
+    const { authorId, reviewId, title, body } = command;
+
+    if ((title && body) == undefined) {
+      console.log('is undefined');
+      throw new UnprocessableEntityException(
+        'At least one of title or body are required',
+      );
+    }
+
+    console.log(title, body);
 
     const isAuthor = await this.checkReviewAuthor(authorId, reviewId);
-    console.log('is author', isAuthor);
 
     if (!isAuthor) {
       throw new ForbiddenException(`Author doesn't match`);
     }
 
-    await this.reviewRepository.patchReview(reviewId, title, body, published);
+    await this.reviewRepository.patchReview(reviewId, title, body);
 
     return 'success';
   }
