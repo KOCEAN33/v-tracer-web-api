@@ -6,10 +6,29 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { SwaggerConfig } from './common/config/config.interface';
 import { AppModule } from './app.module';
 import { PrismaService } from './database/prisma.service';
+
+import {
+  utilities as nestWinstonModuleUtilities,
+  WinstonModule,
+} from 'nest-winston';
+import * as winston from 'winston';
 import { winstonLogger } from './common/logger/winston.util';
-import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 async function bootstrap() {
+  // const app = await NestFactory.create(AppModule, {
+  //   bufferLogs: true,
+  //   logger: WinstonModule.createLogger({
+  //     transports: [
+  //       new winston.transports.Console({
+  //         format: winston.format.combine(
+  //           winston.format.timestamp(),
+  //           nestWinstonModuleUtilities.format.nestLike(),
+  //         ),
+  //       }),
+  //     ],
+  //   }),
+  // });
+
   const app = await NestFactory.create(AppModule, {
     bufferLogs: true,
     logger: winstonLogger,

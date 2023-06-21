@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Logger, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
 import config from './common/config/config';
@@ -6,9 +6,8 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ProductModule } from './products/product.module';
 import { ReviewModule } from './reviews/review.module';
-import { utilities, WinstonModule } from 'nest-winston';
-import * as winstonDaily from 'winston-daily-rotate-file';
-import * as winston from 'winston';
+
+import { LoggerMiddleware } from './common/middleware/logger.middleware';
 
 @Module({
   imports: [
@@ -31,23 +30,27 @@ import * as winston from 'winston';
     //         : undefined,
     //   },
     // }),
-    WinstonModule.forRoot({
-      transports: [
-        new winston.transports.Console({
-          level: process.env.NODE_ENV !== 'production' ? 'silly' : 'info',
-          format: winston.format.combine(
-            winston.format.timestamp(),
-            utilities.format.nestLike('saas-api', { prettyPrint: true }),
-          ),
-        }),
-      ],
-    }),
+    // WinstonModule.forRoot({
+    //   transports: [
+    //     new winston.transports.Console({
+    //       level: process.env.NODE_ENV !== 'production' ? 'silly' : 'info',
+    //       format: winston.format.combine(
+    //         winston.format.timestamp(),
+    //         utilities.format.nestLike('saas-api', { prettyPrint: true }),
+    //       ),
+    //     }),
+    //   ],
+    // }),
     AuthModule,
     UsersModule,
     ProductModule,
     ReviewModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [Logger],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): any {
+    consumer.apply(LoggerMiddleware).forRoutes('*');
+  }
+}
