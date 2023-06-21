@@ -1,19 +1,20 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'nestjs-prisma';
+
 import { Prisma, Review } from '@prisma/client';
+import { PrismaService } from '../../database/prisma.service';
 
 @Injectable()
 export class ReviewRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createReview(authorId, productId, title, body) {
+  async createReview(authorId, productId, title, body, publishedAt) {
     return await this.prisma.review.create({
       data: {
         authorId: authorId,
         productId: productId,
         title: title,
         body: body,
-        publishedAt: new Date(),
+        publishedAt: publishedAt,
       },
     });
   }
@@ -41,17 +42,23 @@ export class ReviewRepository {
     }
   }
 
-  async getReviewsByProductHandle(handle): Promise<Review[]> {
-    const data = await this.prisma.product.findMany({
-      where: { handle: handle },
+  async getReviewsByProduct(handle?, productId?) {
+    return await this.prisma.product.findMany({
+      where: { id: productId, handle: handle },
       include: { review: { take: 3, where: { publishedAt: { not: null } } } },
     });
-    return data[0].review;
   }
 
   async getReviewsByUserId(userId) {
     return await this.prisma.review.findMany({
       where: { authorId: userId },
+    });
+  }
+
+  async getReviewAuthorByID(authorId, reviewId) {
+    return await this.prisma.review.findUnique({
+      where: { id: reviewId },
+      select: { authorId: true },
     });
   }
 }

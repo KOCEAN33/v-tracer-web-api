@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
 import { ReviewRepository } from '../../repositories/review.repository';
-import { GetReviewsByUserIdQuery } from '../by-userid.query';
+import { GetReviewsByUserIdQuery } from '../get-reviews-by-userid.query';
 
 @Injectable()
 @QueryHandler(GetReviewsByUserIdQuery)

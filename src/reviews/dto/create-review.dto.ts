@@ -21,8 +21,8 @@ export class CreateReviewDto {
 
   @IsBoolean()
   @ApiProperty({
-    description: 'Is ready to publish?',
+    description: 'publish status',
     example: 'true & false',
   })
-  published?: boolean;
+  publish: boolean;
 }

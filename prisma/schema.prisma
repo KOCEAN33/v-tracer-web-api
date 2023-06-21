@@ -27,13 +27,12 @@ model User {
 
 model AuthToken {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId       String   @unique @db.ObjectId
   accessToken  String   @db.String
   refreshToken String   @db.String
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Product {
@@ -45,42 +44,50 @@ model Product {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  alternativeReviews Review[] @relation("AlternativeReviews")
+  alternativeReviews Review[] @relation("alternativeReviews")
   switchedReviews    Review[] @relation("switchedReviews")
   review             Review[]
   proCon             ProCon[]
 }
 
 model Review {
-  id              String   @id @default(auto()) @map("_id") @db.ObjectId
-  productId       String   @db.ObjectId
-  authorId        String   @db.ObjectId
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  product         Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId       String    @db.ObjectId
+  user            User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId        String    @db.ObjectId
   title           String
   body            String
-  alternativeId   String[] @db.ObjectId
+  alternative     Product?  @relation("alternativeReviews", fields: [alternativeId], references: [id], onDelete: Cascade)
+  alternativeId   String[]  @db.ObjectId
   alternativeBody String?
-  switchedId      String[] @db.ObjectId
+  switched        Product?  @relation("switchedReviews", fields: [switchedId], references: [id], onDelete: Cascade)
+  switchedId      String[]  @db.ObjectId
   switchedBody    String?
-  publishedAt     DateTime
-
-  alternative Product? @relation("AlternativeReviews", fields: [alternativeId], references: [id], onDelete: Cascade)
-  switched    Product? @relation("switchedReviews", fields: [switchedId], references: [id], onDelete: Cascade)
-  product     Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
-  user        User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  publishedAt     DateTime?
+  deletedAt       DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 }
 
 model ProCon {
-  id        String @id @default(auto()) @map("_id") @db.ObjectId
-  authorId  String @db.ObjectId
-  productId String @db.ObjectId
-
-  user    User    @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  user      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  String   @db.ObjectId
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String   @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Question {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
-  authorId String @db.ObjectId
-
-  user User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  user        User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId    String    @db.ObjectId
+  title       String
+  body        String
+  publishedAt DateTime?
+  deletedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }

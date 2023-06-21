@@ -17,18 +17,20 @@ export class PatchReviewCommandHandler
   constructor(readonly reviewRepository: ReviewRepository) {}
 
   async execute(command: PatchReviewCommand) {
-    const { authorId, reviewId, title, body } = command;
+    const { authorId, reviewId, title, body, publish } = command;
 
-    if ((title && body) == undefined) {
-      console.log('is undefined');
+    if (Object.is(title, undefined) && Object.is(body, undefined)) {
       throw new UnprocessableEntityException(
         'At least one of title or body are required',
       );
     }
 
-    console.log(title, body);
+    const isAuthor = await this.reviewRepository.getReviewAuthorByID(
+      authorId,
+      reviewId,
+    );
 
-    const isAuthor = await this.checkReviewAuthor(authorId, reviewId);
+    console.log(isAuthor);
 
     if (!isAuthor) {
       throw new ForbiddenException(`Author doesn't match`);
@@ -39,14 +41,14 @@ export class PatchReviewCommandHandler
     return 'success';
   }
 
-  private async checkReviewAuthor(authorId: string, reviewId: string) {
-    const review = await this.reviewRepository.getReviewById(reviewId);
-    console.log('review', review);
-
-    if (review == null) {
-      return false;
-    }
-
-    return review.authorId === authorId;
-  }
+  // private async checkReviewAuthor(authorId: string, reviewId: string) {
+  //   const review = await this.reviewRepository.getReviewById(reviewId);
+  //   console.log('review', review);
+  //
+  //   if (review == null) {
+  //     return false;
+  //   }
+  //
+  //   return review.authorId === authorId;
+  // }
 }

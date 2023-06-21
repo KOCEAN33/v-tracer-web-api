@@ -6,6 +6,6 @@ export class CreateReviewCommand implements ICommand {
     readonly productId,
     readonly title,
     readonly body,
-    readonly published,
+    readonly publish,
   ) {}
 }

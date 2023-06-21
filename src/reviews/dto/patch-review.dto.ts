@@ -1,7 +1,7 @@
 import { IsBoolean, IsOptional, IsString } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-export class PatchReviewBodyDto {
+export class PatchReviewDto {
   @IsString()
   @ApiProperty({
     description: 'review ID',
@@ -31,5 +31,5 @@ export class PatchReviewBodyDto {
     description: 'Is ready to publish?',
     example: 'true & false',
   })
-  published: boolean;
+  publish: boolean;
 }

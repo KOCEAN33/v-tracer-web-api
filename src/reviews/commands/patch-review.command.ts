@@ -6,6 +6,6 @@ export class PatchReviewCommand implements ICommand {
     readonly reviewId,
     readonly title,
     readonly body,
-    readonly published,
+    readonly publish,
   ) {}
 }

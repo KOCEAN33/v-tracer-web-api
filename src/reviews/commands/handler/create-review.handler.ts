@@ -12,10 +12,22 @@ export class CreateReviewCommandHandler
   constructor(readonly reviewRepository: ReviewRepository) {}
 
   async execute(command: CreateReviewCommand) {
-    const { authorId, productId, title, body } = command;
+    const { authorId, productId, title, body, publish } = command;
 
-    await this.reviewRepository.createReview(authorId, productId, title, body);
+    const publishedAt = this.publishing(publish);
 
-    return 'success';
+    return await this.reviewRepository.createReview(
+      authorId,
+      productId,
+      title,
+      body,
+      publishedAt,
+    );
+  }
+
+  private publishing(publish) {
+    if (publish) {
+      return new Date();
+    }
   }
 }
