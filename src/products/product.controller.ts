@@ -1,6 +1,6 @@
 import { Controller, Post, Body } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
-import { CreateProductDto } from './dtos/create-product.dto';
+import { CreateProductDto } from './dto/create-product.dto';
 
 import { CreateProductCommand } from './commands/create-product.command';
 

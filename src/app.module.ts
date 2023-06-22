@@ -1,5 +1,5 @@
 import { Logger, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import config from './common/config/config';
 import { AuthModule } from './auth/auth.module';
@@ -18,29 +18,6 @@ import { LoggerMiddleware } from './common/middleware/logger.middleware';
       load: [config],
       isGlobal: true,
     }),
-    // LoggerModule.forRoot({
-    //   pinoHttp: {
-    //     customProps: (req, res) => ({
-    //       context: 'HTTP',
-    //     }),
-    //     level: process.env.NODE_ENV !== 'production' ? 'debug' : 'info',
-    //     transport:
-    //       process.env.NODE_ENV !== 'production'
-    //         ? { target: 'pino-pretty', options: { singleLine: true } }
-    //         : undefined,
-    //   },
-    // }),
-    // WinstonModule.forRoot({
-    //   transports: [
-    //     new winston.transports.Console({
-    //       level: process.env.NODE_ENV !== 'production' ? 'silly' : 'info',
-    //       format: winston.format.combine(
-    //         winston.format.timestamp(),
-    //         utilities.format.nestLike('saas-api', { prettyPrint: true }),
-    //       ),
-    //     }),
-    //   ],
-    // }),
     AuthModule,
     UsersModule,
     ProductModule,

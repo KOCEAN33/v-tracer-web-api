@@ -6,20 +6,23 @@ import * as winstonDaily from 'winston-daily-rotate-file';
 import * as winston from 'winston';
 
 const env = process.env.NODE_ENV;
-const logDir = __dirname + '../../../../../logs'; // log 파일을 관리할 폴더
+const logDir = __dirname + '../../../../../logs';
 
 const dailyOptions = (level: string) => {
   return {
     level,
+    format: winston.format.combine(
+      winston.format.timestamp(),
+      winston.format.json(),
+    ),
     datePattern: 'YYYY-MM-DD',
     dirname: logDir + `/${level}`,
     filename: `%DATE%.${level}.log`,
-    maxFiles: 30, //30일치 로그파일 저장
-    zippedArchive: true, // 로그가 쌓이면 압축하여 관리
+    maxFiles: 30,
+    zippedArchive: false,
   };
 };
 
-// rfc5424를 따르는 winston만의 log level
 // error: 0, warn: 1, info: 2, http: 3, verbose: 4, debug: 5, silly: 6
 export const winstonLogger = WinstonModule.createLogger({
   transports: [
@@ -29,12 +32,17 @@ export const winstonLogger = WinstonModule.createLogger({
         env === 'production'
           ? winston.format.simple()
           : winston.format.combine(
-              winston.format.timestamp(),
-              nestWinstonModuleUtilities.format.nestLike(),
+              winston.format.cli(),
+              winston.format.splat(),
+              winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+              winston.format.colorize({ all: true }),
+              nestWinstonModuleUtilities.format.nestLike('saas-api', {
+                prettyPrint: true,
+              }),
             ),
     }),
 
-    // info, warn, error 로그는 파일로 관리
+    // info, warn, error logs to file
     new winstonDaily(dailyOptions('info')),
     new winstonDaily(dailyOptions('warn')),
     new winstonDaily(dailyOptions('error')),

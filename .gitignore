@@ -400,3 +400,5 @@ Temporary Items
 dist
 .webpack
 .serverless/**/*.zip
+logs/**/*.json
+logs/**/*.log

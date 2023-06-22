@@ -17,24 +17,24 @@ export class PrismaService
 
   constructor(private readonly configService: ConfigService) {
     super({
-      log: [
-        {
-          emit: 'event',
-          level: 'query',
-        },
-        {
-          emit: 'event',
-          level: 'error',
-        },
-        {
-          emit: 'event',
-          level: 'info',
-        },
-        {
-          emit: 'event',
-          level: 'warn',
-        },
-      ],
+      // log: [
+      //   {
+      //     emit: 'event',
+      //     level: 'query',
+      //   },
+      //   {
+      //     emit: 'event',
+      //     level: 'error',
+      //   },
+      //   {
+      //     emit: 'event',
+      //     level: 'info',
+      //   },
+      //   {
+      //     emit: 'event',
+      //     level: 'warn',
+      //   },
+      // ],
       datasources: {
         db: {
           url: configService.get<string>('DATABASE_URL'),
@@ -45,7 +45,6 @@ export class PrismaService
   async onModuleInit() {
     this.$on('error', (event) => {
       this.logger.error(event);
-      console.log(event);
     });
     this.$on('warn', (event) => {
       this.logger.warn(event);

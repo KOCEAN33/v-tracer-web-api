@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Logger,
   Patch,
   Post,
   Query,
@@ -11,19 +12,24 @@ import {
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
-import { CreateReviewDto } from './dto/create-review.dto';
 
 import { CreateReviewCommand } from './commands/create-review.command';
-import { PublicGetReviewsQuery } from './queries/get-reviews-product-handle.query';
 import { PatchReviewCommand } from './commands/patch-review.command';
+import { DeleteReviewCommand } from './commands/delete-review.command';
+import { PublicGetReviewsQuery } from './queries/get-reviews-product-handle.query';
+
+import { CreateReviewDto } from './dto/create-review.dto';
 import { PatchReviewDto } from './dto/patch-review.dto';
 import { DeleteReviewDto } from './dto/delete-review.dto';
-import { DeleteReviewCommand } from './commands/delete-review.command';
 import { QueryParamsDto } from './dto/query-params.dto';
 
 @Controller('review')
 export class ReviewController {
-  constructor(private commandBus: CommandBus, private queryBus: QueryBus) {}
+  constructor(
+    private commandBus: CommandBus,
+    private queryBus: QueryBus,
+    private readonly logger: Logger,
+  ) {}
 
   @UseGuards(JwtAuthGuard)
   @Post('/product')
@@ -69,6 +75,14 @@ export class ReviewController {
   async getReviewsByProductHandle(@Query() params: QueryParamsDto) {
     const { handle, productId } = params;
     const query = new PublicGetReviewsQuery(handle, productId);
+    return this.queryBus.execute(query);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/user')
+  async getReviewsByUser(@Query() params: QueryParamsDto) {
+    const { handle } = params;
+    const query = new PublicGetReviewsQuery(handle, null);
     return this.queryBus.execute(query);
   }
 }
