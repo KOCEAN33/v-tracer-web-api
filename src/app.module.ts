@@ -9,7 +9,6 @@ import { ReviewModule } from './reviews/review.module';
 
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { ExceptionModule } from './common/exception/exception.module';
-import { winstonLoggerAsync } from './common/config/winston.config';
 
 @Module({
   imports: [
@@ -20,7 +19,6 @@ import { winstonLoggerAsync } from './common/config/winston.config';
       load: [config],
       isGlobal: true,
     }),
-    winstonLoggerAsync,
     AuthModule,
     UsersModule,
     ProductModule,

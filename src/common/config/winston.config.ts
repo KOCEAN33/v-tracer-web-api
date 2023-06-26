@@ -24,54 +24,27 @@ const dailyOptions = (level: string) => {
 };
 
 // error: 0, warn: 1, info: 2, http: 3, verbose: 4, debug: 5, silly: 6
-// export const winstonLogger = WinstonModule.createLogger({
-//   transports: [
-//     new winston.transports.Console({
-//       level: env === 'production' ? 'http' : 'silly',
-//       format:
-//         env === 'production'
-//           ? winston.format.simple()
-//           : winston.format.combine(
-//               winston.format.cli(),
-//               winston.format.splat(),
-//               winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-//               winston.format.colorize({ all: true }),
-//               nestWinstonModuleUtilities.format.nestLike('saas-api', {
-//                 prettyPrint: true,
-//               }),
-//             ),
-//     }),
-//
-//     // info, warn, error logs to file
-//     new winstonDaily(dailyOptions('info')),
-//     new winstonDaily(dailyOptions('warn')),
-//     new winstonDaily(dailyOptions('error')),
-//   ],
-// });
+export const winstonLogger = WinstonModule.createLogger({
+  transports: [
+    new winston.transports.Console({
+      level: env === 'production' ? 'http' : 'silly',
+      format:
+        env === 'production'
+          ? winston.format.simple()
+          : winston.format.combine(
+              winston.format.cli(),
+              winston.format.splat(),
+              winston.format.colorize({ all: true }),
+              winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+              nestWinstonModuleUtilities.format.nestLike('saas-api', {
+                prettyPrint: true,
+              }),
+            ),
+    }),
 
-export const winstonLoggerAsync = WinstonModule.forRootAsync({
-  useFactory: () => ({
-    transports: [
-      new winston.transports.Console({
-        level: env === 'production' ? 'http' : 'silly',
-        format:
-          env === 'production'
-            ? winston.format.simple()
-            : winston.format.combine(
-                winston.format.cli(),
-                winston.format.splat(),
-                winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-                winston.format.colorize({ all: true }),
-                nestWinstonModuleUtilities.format.nestLike('saas-api', {
-                  prettyPrint: true,
-                }),
-              ),
-      }),
-
-      // info, warn, error logs to file
-      new winstonDaily(dailyOptions('info')),
-      new winstonDaily(dailyOptions('warn')),
-      new winstonDaily(dailyOptions('error')),
-    ],
-  }),
+    // info, warn, error logs to file
+    new winstonDaily(dailyOptions('info')),
+    new winstonDaily(dailyOptions('warn')),
+    new winstonDaily(dailyOptions('error')),
+  ],
 });
