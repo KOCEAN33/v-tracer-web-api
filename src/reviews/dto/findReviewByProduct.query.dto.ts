@@ -1,17 +1,18 @@
-import { IsBoolean, IsOptional, IsString } from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsMongoId, IsOptional, IsString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
-export class QueryParamsDto {
+export class FindReviewByProductQueryStringDTO {
   @IsString()
   @IsOptional()
   @ApiProperty({
     description: 'product unique name(handle)',
     example: 'notion',
   })
-  handle: string;
+  product: string;
 
   @IsString()
   @IsOptional()
+  @IsMongoId()
   @ApiProperty({
     description: 'product unique ID',
     example: '647101ecac3218877849412b',

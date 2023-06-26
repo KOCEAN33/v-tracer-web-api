@@ -1,8 +1,9 @@
-import { IsBoolean, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsMongoId, IsOptional, IsString } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-export class PatchReviewDto {
+export class PatchReviewBodyDTO {
   @IsString()
+  @IsMongoId()
   @ApiProperty({
     description: 'review ID',
     example: '932052fnla9340',

@@ -1,8 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { CreateReviewCommand } from '../create-review.command';
-import { ReviewRepository } from '../../repositories/review.repository';
+import { CreateReviewCommand } from './createReview.command';
+import { ReviewRepository } from '../repositories/review.repository';
 
 @Injectable()
 @CommandHandler(CreateReviewCommand)
@@ -11,12 +11,12 @@ export class CreateReviewCommandHandler
 {
   constructor(readonly reviewRepository: ReviewRepository) {}
 
-  async execute(command: CreateReviewCommand) {
+  async execute(command: CreateReviewCommand): Promise<void> {
     const { authorId, productId, title, body, publish } = command;
 
     const publishedAt = this.publishing(publish);
 
-    return await this.reviewRepository.createReview(
+    await this.reviewRepository.createReview(
       authorId,
       productId,
       title,
@@ -28,6 +28,8 @@ export class CreateReviewCommandHandler
   private publishing(publish) {
     if (publish) {
       return new Date();
+    } else {
+      return null;
     }
   }
 }

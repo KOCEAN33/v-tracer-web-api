@@ -17,24 +17,24 @@ export class PrismaService
 
   constructor(private readonly configService: ConfigService) {
     super({
-      // log: [
-      //   {
-      //     emit: 'event',
-      //     level: 'query',
-      //   },
-      //   {
-      //     emit: 'event',
-      //     level: 'error',
-      //   },
-      //   {
-      //     emit: 'event',
-      //     level: 'info',
-      //   },
-      //   {
-      //     emit: 'event',
-      //     level: 'warn',
-      //   },
-      // ],
+      log: [
+        {
+          emit: 'event',
+          level: 'query',
+        },
+        {
+          emit: 'event',
+          level: 'error',
+        },
+        {
+          emit: 'event',
+          level: 'info',
+        },
+        {
+          emit: 'event',
+          level: 'warn',
+        },
+      ],
       datasources: {
         db: {
           url: configService.get<string>('DATABASE_URL'),
@@ -52,8 +52,9 @@ export class PrismaService
     this.$on('info', (event) => {
       this.logger.verbose(event);
     });
-    this.$on('query', (event) => {
-      this.logger.log(event);
+    this.$on('query', (e) => {
+      //console.log(e);
+      console.log(`Duration: ${e.duration}ms`);
     });
     await this.$connect();
   }

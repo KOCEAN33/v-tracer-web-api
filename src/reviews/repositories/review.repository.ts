@@ -1,5 +1,5 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma, Review } from '@prisma/client';
+import { Injectable } from '@nestjs/common';
+import { Review } from '@prisma/client';
 
 import { PrismaService } from '../../database/prisma.service';
 
@@ -7,7 +7,13 @@ import { PrismaService } from '../../database/prisma.service';
 export class ReviewRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createReview(authorId, productId, title, body, publishedAt) {
+  async createReview(
+    authorId,
+    productId,
+    title,
+    body,
+    publishedAt,
+  ): Promise<Review> {
     return await this.prisma.review.create({
       data: {
         authorId: authorId,
@@ -15,50 +21,52 @@ export class ReviewRepository {
         title: title,
         body: body,
         publishedAt: publishedAt,
+        deletedAt: null,
       },
     });
   }
 
-  async patchReview(reviewId, title?, body?) {
-    return await this.prisma.review.update({
-      where: { id: reviewId },
+  async patchReview(reviewId, title?, body?): Promise<void> {
+    await this.prisma.review.updateMany({
+      where: { id: reviewId, deletedAt: null },
       data: { title: title, body: body },
     });
   }
 
-  // Query
-  async getReviewById(reviewId) {
-    try {
-      return await this.prisma.review.findUnique({
-        where: { id: reviewId },
-        select: { authorId: true },
-      });
-    } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        throw new NotFoundException(`Requested review does not exist`);
-        // PrismaClientKnownRequestError 처리 코드 작성
-        // ...
-      }
-    }
-  }
-
-  async getReviewsByProduct(handle?, productId?) {
-    return await this.prisma.product.findMany({
-      where: { id: productId, handle: handle },
-      include: { review: { take: 3, where: { publishedAt: { not: null } } } },
-    });
-  }
-
-  async getReviewsByUserId(userId) {
+  async getReviewsByProduct(product?, productId?): Promise<Review[]> {
     return await this.prisma.review.findMany({
-      where: { authorId: userId },
+      where: {
+        product: { id: productId, handle: product },
+        deletedAt: null,
+        publishedAt: { not: null },
+      },
     });
   }
 
-  async getReviewAuthorByID(authorId, reviewId) {
+  async getReviewsByUserIdProductId(userId, productId): Promise<Review[]> {
+    return await this.prisma.review.findMany({
+      where: {
+        authorId: userId,
+        productId: productId,
+        deletedAt: null,
+        publishedAt: { not: null },
+      },
+    });
+  }
+
+  async getAuthorIdByReviewId(
+    reviewId,
+  ): Promise<{ authorId: string; deletedAt: null | Date }> {
     return await this.prisma.review.findUnique({
       where: { id: reviewId },
-      select: { authorId: true },
+      select: { authorId: true, deletedAt: true },
+    });
+  }
+
+  async deleteSoftReview(reviewId): Promise<void> {
+    await this.prisma.review.update({
+      where: { id: reviewId },
+      data: { deletedAt: new Date() },
     });
   }
 }

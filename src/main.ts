@@ -6,16 +6,15 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { SwaggerConfig } from './common/config/config.interface';
 import { PrismaService } from './database/prisma.service';
-import { winstonLogger } from './common/logger/winston.util';
+import { TransformInterceptor } from './common/interceptor/transform.interceptor';
+import { HttpExceptionFilter } from './common/exception/http-exception.filter';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    bufferLogs: true,
-    logger: winstonLogger,
-  });
+  const app = await NestFactory.create(AppModule);
 
-  app.useGlobalPipes(new ValidationPipe({ transform: true }));
   const configService = app.get(ConfigService);
+  app.useGlobalPipes(new ValidationPipe());
+  // app.useGlobalInterceptors(new TransformInterceptor());
 
   // Prisma service
   const prismaService: PrismaService = app.get(PrismaService);
