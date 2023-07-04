@@ -7,7 +7,7 @@ import {
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import { ReviewRepository } from '../repositories/review.repository';
-import { PatchReviewCommand } from './patchReview.command';
+import { PatchReviewCommand } from './patch-review.command';
 
 @Injectable()
 @CommandHandler(PatchReviewCommand)

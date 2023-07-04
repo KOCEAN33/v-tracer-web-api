@@ -7,7 +7,7 @@ import {
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import { ReviewRepository } from '../repositories/review.repository';
-import { DeleteReviewCommand } from './deleteReview.command';
+import { DeleteReviewCommand } from './delete-review.command';
 
 @Injectable()
 @CommandHandler(DeleteReviewCommand)

@@ -3,16 +3,16 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { Review } from '@prisma/client';
 
 import { ReviewRepository } from '../repositories/review.repository';
-import { FindReviewByProductQuery } from './findReviewByProduct.query';
+import { ByProductQuery } from './by-product.query';
 
 @Injectable()
-@QueryHandler(FindReviewByProductQuery)
+@QueryHandler(ByProductQuery)
 export class FindReviewByProductQueryHandler
-  implements IQueryHandler<FindReviewByProductQuery>
+  implements IQueryHandler<ByProductQuery>
 {
   constructor(readonly reviewRepository: ReviewRepository) {}
 
-  async execute(query: FindReviewByProductQuery): Promise<Review[]> {
+  async execute(query: ByProductQuery): Promise<Review[]> {
     const { product, productId } = query;
     if (product == undefined && productId == undefined) {
       throw new BadRequestException('product handle or productId is required');

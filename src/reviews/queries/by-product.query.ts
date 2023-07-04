@@ -1,5 +1,5 @@
 import { IQuery } from '@nestjs/cqrs';
 
-export class FindReviewByProductQuery implements IQuery {
+export class ByProductQuery implements IQuery {
   constructor(readonly product: string, readonly productId: string) {}
 }

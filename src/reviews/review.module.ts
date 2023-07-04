@@ -4,21 +4,18 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { ReviewController } from './review.controller';
 import { ReviewRepository } from './repositories/review.repository';
 
-import { CreateReviewCommandHandler } from './commands/createReview.handler';
-import { PatchReviewCommandHandler } from './commands/patchReview.handler';
-import { DeleteReviewCommandHandler } from './commands/deleteReview.handler';
-import { FindReviewByProductQueryHandler } from './queries/findReviewByProduct.handler';
-import { FindReviewsByUserIdHandler } from './queries/findReviewsByUserId.handler';
+import { CreateReviewCommandHandler } from './commands/create-review.handler';
+import { PatchReviewCommandHandler } from './commands/patch-review.handler';
+import { DeleteReviewCommandHandler } from './commands/delete-review.handler';
+import { FindReviewByProductQueryHandler } from './queries/by-product.handler';
+import { ByUserHandler } from './queries/by-user.handler';
 
 const commandHandlers = [
   CreateReviewCommandHandler,
   PatchReviewCommandHandler,
   DeleteReviewCommandHandler,
 ];
-const queryHandlers = [
-  FindReviewByProductQueryHandler,
-  FindReviewsByUserIdHandler,
-];
+const queryHandlers = [FindReviewByProductQueryHandler, ByUserHandler];
 
 @Module({
   imports: [CqrsModule],

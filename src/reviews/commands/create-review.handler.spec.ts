@@ -1,8 +1,8 @@
 import { Test } from '@nestjs/testing';
-import { CreateReviewCommand } from './createReview.command';
+import { CreateReviewCommand } from './create-review.command';
 
 import { ReviewRepository } from '../repositories/review.repository';
-import { CreateReviewCommandHandler } from './createReview.handler';
+import { CreateReviewCommandHandler } from './create-review.handler';
 import { UnauthorizedException } from '@nestjs/common';
 
 describe('CreateReviewCommandHandler', () => {

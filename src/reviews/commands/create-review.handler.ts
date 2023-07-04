@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { CreateReviewCommand } from './createReview.command';
+import { CreateReviewCommand } from './create-review.command';
 import { ReviewRepository } from '../repositories/review.repository';
 
 @Injectable()

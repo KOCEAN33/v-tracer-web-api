@@ -1,7 +1,7 @@
 import { IsBoolean, IsMongoId, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class CreateReviewBodyDTO {
+export class CreateReviewBodyDto {
   @IsString()
   @IsMongoId()
   productId: string;

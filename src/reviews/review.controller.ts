@@ -14,17 +14,17 @@ import { Review } from '@prisma/client';
 
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 
-import { CreateReviewCommand } from './commands/createReview.command';
-import { PatchReviewCommand } from './commands/patchReview.command';
-import { DeleteReviewCommand } from './commands/deleteReview.command';
-import { FindReviewByProductQuery } from './queries/findReviewByProduct.query';
-import { FindReviewsByUserQuery } from './queries/findReviewsByUserId.query';
+import { CreateReviewCommand } from './commands/create-review.command';
+import { PatchReviewCommand } from './commands/patch-review.command';
+import { DeleteReviewCommand } from './commands/delete-review.command';
+import { ByProductQuery } from './queries/by-product.query';
+import { FindReviewsByUserQuery } from './queries/by-user.query';
 
-import { CreateReviewBodyDTO } from './dto/createReview.body.dto';
-import { PatchReviewBodyDTO } from './dto/patchReview.body.dto';
-import { DeleteReviewQueryStringDTO } from './dto/deleteReview.query.dto';
-import { FindReviewByProductQueryStringDTO } from './dto/findReviewByProduct.query.dto';
-import { FindReviewsByUserQueryStringDTO } from './dto/findReviewsByUser.query.dto';
+import { CreateReviewBodyDto } from './dto/create-review.body.dto';
+import { PatchReviewBodyDto } from './dto/patch-review.body.dto';
+import { DeleteReviewQueryStringDTO } from './dto/delete-review.query.dto';
+import { FindReviewByProductQueryStringDTO } from './dto/find-product.query.dto';
+import { FindReviewsByUserQueryStringDTO } from './dto/find-user.query.dto';
 
 @Controller()
 export class ReviewController {
@@ -34,7 +34,7 @@ export class ReviewController {
   @Post('/review/product')
   async createReview(
     @Req() req,
-    @Body() dto: CreateReviewBodyDTO,
+    @Body() dto: CreateReviewBodyDto,
   ): Promise<void> {
     const authorId = req.user;
     const { productId, title, body, publish } = dto;
@@ -52,7 +52,7 @@ export class ReviewController {
   @Patch('/review/product')
   async patchReview(
     @Req() req,
-    @Body() dto: PatchReviewBodyDTO,
+    @Body() dto: PatchReviewBodyDto,
   ): Promise<void> {
     const authorId = req.user;
     const { reviewId, title, body, publish } = dto;
@@ -84,7 +84,7 @@ export class ReviewController {
     @Query() queryString: FindReviewByProductQueryStringDTO,
   ): Promise<Review[]> {
     const { product, productId } = queryString;
-    const query = new FindReviewByProductQuery(product, productId);
+    const query = new ByProductQuery(product, productId);
     return await this.queryBus.execute(query);
   }
 
