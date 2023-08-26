@@ -1,9 +1,9 @@
 import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
-import { ForbiddenException } from '@nestjs/common';
+import { ForbiddenException, UnauthorizedException } from '@nestjs/common';
 
 import { AuthRepository } from '../../repository/auth.repository';
 
-import { Token, TokenService } from '../../token.service';
+import { TokenService } from '../../token.service';
 
 import { RefreshTokenCommand } from '../refresh-token.command';
 import { UpdateTokenEvent } from '../../events/update-token.event';
@@ -18,10 +18,20 @@ export class RefreshTokenHandler
     private readonly eventBus: EventBus,
   ) {}
 
-  async execute(command: RefreshTokenCommand): Promise<Token> {
-    const { userId, receiveRefreshToken } = command;
+  async execute(command: RefreshTokenCommand) {
+    const { receiveRefreshToken, response } = command;
 
-    const token = await this.authRepository.getTokenByUserId(userId);
+    const payload =
+      this.tokenService.extractUserIdFromToken(receiveRefreshToken);
+
+    if (!payload) {
+      // refresh token expired
+      throw new UnauthorizedException({
+        message: 'Failed renewal access-token ',
+      });
+    }
+
+    const token = await this.authRepository.getTokenByUserId(payload.userId);
 
     if (!token) {
       throw new ForbiddenException('Access Denied');
@@ -35,14 +45,24 @@ export class RefreshTokenHandler
     if (!refreshTokenMatches) {
       throw new ForbiddenException('Access Denied');
     }
+
     const { accessToken, refreshToken } =
-      await this.tokenService.generateTokens({ userId: userId });
+      await this.tokenService.generateTokens({
+        userId: payload.userId,
+      });
 
     this.eventBus.publish(
-      new UpdateTokenEvent(userId, accessToken, refreshToken),
+      new UpdateTokenEvent(payload.userId, accessToken, refreshToken),
     );
 
-    return { accessToken, refreshToken };
+    response.clearCookie('token');
+    response.cookie('token', refreshToken, {
+      httpOnly: true,
+      sameSite: true,
+      secure: process.env.NODE_ENV !== 'development',
+    });
+
+    return { accessToken };
   }
 
   private async isRefreshTokenMatches(

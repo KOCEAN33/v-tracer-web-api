@@ -1,13 +1,13 @@
 import { Test } from '@nestjs/testing';
 import { UnprocessableEntityException } from '@nestjs/common';
 
-import { UserSignUpCommand } from '../signup.command';
+import { UserSignUpCommand } from './signup.command';
 import { UserSignUpHandler } from './signup.handler';
-import { AuthRepository } from '../../repository/auth.repository';
-import { PasswordService } from '../../password.service';
-import { TokenService } from '../../token.service';
+import { AuthRepository } from '../repository/auth.repository';
+import { PasswordService } from '../password.service';
+import { TokenService } from '../token.service';
 import { EventBus } from '@nestjs/cqrs';
-import { CreateNewTokenEvent } from '../../events/create-token.event';
+import { CreateNewTokenEvent } from '../events/create-token.event';
 
 describe('UserSignUpHandler', () => {
   let userSignUpHandler: UserSignUpHandler;

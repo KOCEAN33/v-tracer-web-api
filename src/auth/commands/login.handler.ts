@@ -2,10 +2,15 @@ import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import { BadRequestException } from '@nestjs/common';
 
 import { PasswordService } from '../../password.service';
-import { Token, TokenService } from '../../token.service';
+import { TokenService } from '../../token.service';
 import { AuthRepository } from '../../repository/auth.repository';
 import { UserLoginCommand } from '../login.command';
 import { UpdateTokenEvent } from '../../events/update-token.event';
+
+interface LoginResponse {
+  accessToken: string;
+  userData: { id: string; name: string };
+}
 
 @CommandHandler(UserLoginCommand)
 export class UserLoginHandler implements ICommandHandler<UserLoginCommand> {
@@ -16,10 +21,11 @@ export class UserLoginHandler implements ICommandHandler<UserLoginCommand> {
     private readonly eventBus: EventBus,
   ) {}
 
-  async execute(command: UserLoginCommand): Promise<Token> {
-    const { email, password } = command;
+  async execute(command: UserLoginCommand): Promise<LoginResponse> {
+    const { email, password, response } = command;
 
     const user = await this.authRepository.getUserByEmail(email);
+
     if (!user) {
       throw new BadRequestException('Invalid Username or Password');
     }
@@ -32,12 +38,26 @@ export class UserLoginHandler implements ICommandHandler<UserLoginCommand> {
       throw new BadRequestException('Invalid Username or Password');
     }
 
-    const { accessToken, refreshToken } =
-      await this.tokenService.generateTokens({ userId: user.id });
+    const { accessToken, refreshToken } = this.tokenService.generateTokens({
+      userId: user.id,
+    });
+
+    response.clearCookie('token');
+    response.cookie('token', refreshToken, {
+      httpOnly: true,
+      sameSite: true,
+      secure: process.env.NODE_ENV !== 'development',
+    });
+
+    const userData = {
+      id: user.id,
+      name: user.name,
+    };
+
     this.eventBus.publish(
       new UpdateTokenEvent(user.id, accessToken, refreshToken),
     );
 
-    return { accessToken, refreshToken };
+    return { accessToken, userData };
   }
 }

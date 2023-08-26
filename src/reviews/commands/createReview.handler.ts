@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import { CreateReviewCommand } from './createReview.command';
@@ -13,6 +13,10 @@ export class CreateReviewCommandHandler
 
   async execute(command: CreateReviewCommand): Promise<void> {
     const { authorId, productId, title, body, publish } = command;
+
+    if (!authorId) {
+      throw new UnauthorizedException('Unauthorized');
+    }
 
     const publishedAt = this.publishing(publish);
 

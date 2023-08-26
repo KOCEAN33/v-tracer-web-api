@@ -1,6 +1,6 @@
 import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
-import { UpdateTokenEvent } from '../update-token.event';
-import { AuthRepository } from '../../repository/auth.repository';
+import { UpdateTokenEvent } from './update-token.event';
+import { AuthRepository } from '../repository/auth.repository';
 
 @EventsHandler(UpdateTokenEvent)
 export class UpdateTokenHandler implements IEventHandler<UpdateTokenEvent> {

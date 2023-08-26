@@ -19,6 +19,10 @@ export class DeleteReviewCommandHandler
   async execute(command: DeleteReviewCommand): Promise<void> {
     const { userId, reviewId } = command;
 
+    if (!userId) {
+      throw new UnauthorizedException('Unauthorized');
+    }
+
     const review = await this.reviewRepository.getAuthorIdByReviewId(reviewId);
 
     if (review === null) {

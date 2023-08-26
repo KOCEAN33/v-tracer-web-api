@@ -10,6 +10,8 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { Review } from '@prisma/client';
+
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 
 import { CreateReviewCommand } from './commands/createReview.command';
@@ -23,19 +25,18 @@ import { PatchReviewBodyDTO } from './dto/patchReview.body.dto';
 import { DeleteReviewQueryStringDTO } from './dto/deleteReview.query.dto';
 import { FindReviewByProductQueryStringDTO } from './dto/findReviewByProduct.query.dto';
 import { FindReviewsByUserQueryStringDTO } from './dto/findReviewsByUser.query.dto';
-import { Review } from '@prisma/client';
 
-@Controller('review')
+@Controller()
 export class ReviewController {
   constructor(private commandBus: CommandBus, private queryBus: QueryBus) {}
 
   @UseGuards(JwtAuthGuard)
-  @Post('/product')
+  @Post('/review/product')
   async createReview(
     @Req() req,
     @Body() dto: CreateReviewBodyDTO,
   ): Promise<void> {
-    const authorId = req.user.userId;
+    const authorId = req.user;
     const { productId, title, body, publish } = dto;
     const command = new CreateReviewCommand(
       authorId,
@@ -48,12 +49,12 @@ export class ReviewController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Patch('/product')
+  @Patch('/review/product')
   async patchReview(
     @Req() req,
     @Body() dto: PatchReviewBodyDTO,
   ): Promise<void> {
-    const authorId = req.user.userId;
+    const authorId = req.user;
     const { reviewId, title, body, publish } = dto;
     const command = new PatchReviewCommand(
       authorId,
@@ -66,19 +67,19 @@ export class ReviewController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Delete('/product')
+  @Delete('/review/product')
   async deleteReview(
     @Req() req,
     @Query() queryString: DeleteReviewQueryStringDTO,
   ): Promise<void> {
-    const userId = req.user.userId;
+    const userId = req.user;
     const { reviewId } = queryString;
     const command = new DeleteReviewCommand(userId, reviewId);
     return await this.commandBus.execute(command);
   }
 
   // Query
-  @Get()
+  @Get('/review')
   async findReviewByProduct(
     @Query() queryString: FindReviewByProductQueryStringDTO,
   ): Promise<Review[]> {
@@ -88,12 +89,12 @@ export class ReviewController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('/user')
+  @Get('/review/user')
   async findReviewsByUser(
     @Req() req,
     @Query() queryString: FindReviewsByUserQueryStringDTO,
   ): Promise<Review[]> {
-    const userId = req.user.userId;
+    const userId = req.user;
     const { productId } = queryString;
     const query = new FindReviewsByUserQuery(userId, productId);
     return this.queryBus.execute(query);

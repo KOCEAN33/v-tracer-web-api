@@ -75,14 +75,12 @@ describe('AuthController', () => {
   });
 
   it('should get user from token', async () => {
-    const req = {
-      user: { userId: 'testUserId' },
-    };
+    const req = { user: 'testUserId' };
 
     await authController.getUserFromToken(req);
 
     expect(queryBus.execute).toHaveBeenCalledWith(
-      new GetUserFromTokenQuery(req.user.userId),
+      new GetUserFromTokenQuery(req.user),
     );
   });
 

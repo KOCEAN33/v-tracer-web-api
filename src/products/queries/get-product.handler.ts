@@ -1,8 +1,8 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { Product } from '@prisma/client';
 
-import { GetProductByHandleQuery } from '../get-product.query';
-import { ProductRepository } from '../../repositories/product.repository';
+import { GetProductByHandleQuery } from './get-product.query';
+import { ProductRepository } from '../repositories/product.repository';
 
 @QueryHandler(GetProductByHandleQuery)
 export class GetProductByHandleHandler

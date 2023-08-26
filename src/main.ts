@@ -7,14 +7,23 @@ import { AppModule } from './app.module';
 import { SwaggerConfig } from './common/config/config.interface';
 import { PrismaService } from './database/prisma.service';
 import { winstonLogger } from './common/config/winston.config';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: winstonLogger,
+    cors: {
+      credentials: true,
+      origin: process.env.CLIENT_URL,
+    },
   });
 
   const configService = app.get(ConfigService);
   app.useGlobalPipes(new ValidationPipe());
+  app.use(cookieParser());
+
+  // Interceptor
+  // app.useGlobalInterceptors(new ResponseInterceptor());
 
   // Prisma service
   const prismaService: PrismaService = app.get(PrismaService);

@@ -1,8 +1,8 @@
 import { Test } from '@nestjs/testing';
 
 import { UpdateTokenHandler } from './update-token.handler';
-import { UpdateTokenEvent } from '../update-token.event';
-import { AuthRepository } from '../../repository/auth.repository';
+import { UpdateTokenEvent } from './update-token.event';
+import { AuthRepository } from '../repository/auth.repository';
 
 describe('UpdateTokenHandler', () => {
   let updateTokenHandler: UpdateTokenHandler;

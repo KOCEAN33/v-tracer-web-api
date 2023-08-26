@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
 import { ReviewRepository } from '../repositories/review.repository';
@@ -14,6 +14,10 @@ export class FindReviewsByUserIdHandler
 
   async execute(query: FindReviewsByUserQuery): Promise<Review[]> {
     const { userId, productId } = query;
+
+    if (!userId) {
+      throw new UnauthorizedException('Unauthorized');
+    }
 
     return this.reviewRepository.getReviewsByUserIdProductId(userId, productId);
   }

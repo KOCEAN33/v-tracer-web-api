@@ -11,11 +11,12 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  name      String?
-  handle    String   @unique
-  email     String   @unique
-  password  String?
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  name     String?
+  handle   String  @unique
+  email    String  @unique
+  password String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -26,23 +27,30 @@ model User {
 }
 
 model AuthToken {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId       String   @unique @db.ObjectId
-  accessToken  String   @db.String
-  refreshToken String   @db.String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id           String @id @default(auto()) @map("_id") @db.ObjectId
+  user         User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String @unique @db.ObjectId
+  accessToken  String @db.String
+  refreshToken String @db.String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Product {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   handle    String   @unique
   name      String
-  ownerId   String?  @db.ObjectId
   url       String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  language  String[]
+  price     Price[]
+  company   Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId String?  @db.ObjectId
+  ownerId   String?  @db.ObjectId
+
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   alternativeReviews Review[] @relation("alternativeReviews")
   switchedReviews    Review[] @relation("switchedReviews")
@@ -50,42 +58,61 @@ model Product {
   proCon             ProCon[]
 }
 
+type Price {
+  period String
+}
+
+model Company {
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+  url  String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Product Product[]
+}
+
 model Review {
-  id              String    @id @default(auto()) @map("_id") @db.ObjectId
-  product         Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productId       String    @db.ObjectId
-  user            User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  authorId        String    @db.ObjectId
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  product         Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId       String   @db.ObjectId
+  user            User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId        String   @db.ObjectId
   title           String
   body            String
-  alternative     Product?  @relation("alternativeReviews", fields: [alternativeId], references: [id], onDelete: Cascade)
-  alternativeId   String[]  @db.ObjectId
+  alternative     Product? @relation("alternativeReviews", fields: [alternativeId], references: [id], onDelete: Cascade)
+  alternativeId   String[] @db.ObjectId
   alternativeBody String?
-  switched        Product?  @relation("switchedReviews", fields: [switchedId], references: [id], onDelete: Cascade)
-  switchedId      String[]  @db.ObjectId
+  switched        Product? @relation("switchedReviews", fields: [switchedId], references: [id], onDelete: Cascade)
+  switchedId      String[] @db.ObjectId
   switchedBody    String?
-  publishedAt     DateTime?
-  deletedAt       DateTime?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+
+  publishedAt DateTime?
+  deletedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model ProCon {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  user      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  authorId  String   @db.ObjectId
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productId String   @db.ObjectId
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  user      User    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  String  @db.ObjectId
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String  @db.ObjectId
+
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model Question {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
-  user        User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  authorId    String    @db.ObjectId
-  title       String
-  body        String
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  user     User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId String @db.ObjectId
+  title    String
+  body     String
+
   publishedAt DateTime?
   deletedAt   DateTime?
   createdAt   DateTime  @default(now())

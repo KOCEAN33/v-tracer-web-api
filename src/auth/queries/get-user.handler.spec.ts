@@ -1,8 +1,8 @@
 import { Test } from '@nestjs/testing';
 
 import { GetUserFromTokenHandler } from './get-user.handler';
-import { GetUserFromTokenQuery } from '../get-user.query';
-import { AuthRepository } from '../../repository/auth.repository';
+import { GetUserFromTokenQuery } from './get-user.query';
+import { AuthRepository } from '../repository/auth.repository';
 
 describe('GetUserFromTokenHandler', () => {
   let getUserFromTokenHandler: GetUserFromTokenHandler;

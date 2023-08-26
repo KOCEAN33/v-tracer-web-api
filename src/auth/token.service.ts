@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { TokenExpiredError } from 'jsonwebtoken';
 
 import { SecurityConfig } from '../common/config/config.interface';
 
@@ -21,6 +22,18 @@ export class TokenService {
       accessToken: this.generateAccessToken(payload),
       refreshToken: this.generateRefreshToken(payload),
     };
+  }
+
+  extractUserIdFromToken(token: string) {
+    try {
+      return this.jwtService.verify(token, {
+        secret: this.configService.get('JWT_REFRESH_SECRET'),
+      });
+    } catch (e) {
+      if (e instanceof TokenExpiredError) {
+        return false;
+      }
+    }
   }
 
   private generateAccessToken(payload: { userId: string }): string {

@@ -19,6 +19,10 @@ export class PatchReviewCommandHandler
   async execute(command: PatchReviewCommand): Promise<void> {
     const { authorId, reviewId, title, body } = command;
 
+    if (!authorId) {
+      throw new UnauthorizedException('Unauthorized');
+    }
+
     if (title == undefined && body == undefined) {
       throw new UnprocessableEntityException(
         'At least one of title or body are required',

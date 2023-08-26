@@ -1,11 +1,11 @@
 import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 
-import { AuthRepository } from '../../repository/auth.repository';
-import { PasswordService } from '../../password.service';
-import { Token, TokenService } from '../../token.service';
-import { UserSignUpCommand } from '../signup.command';
-import { CreateNewTokenEvent } from '../../events/create-token.event';
+import { AuthRepository } from '../repository/auth.repository';
+import { PasswordService } from '../password.service';
+import { Token, TokenService } from '../token.service';
+import { UserSignUpCommand } from './signup.command';
+import { CreateNewTokenEvent } from '../events/create-token.event';
 
 @Injectable()
 @CommandHandler(UserSignUpCommand)

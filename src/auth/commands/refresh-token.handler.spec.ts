@@ -2,11 +2,11 @@ import { Test } from '@nestjs/testing';
 import { ForbiddenException } from '@nestjs/common';
 import { EventBus } from '@nestjs/cqrs';
 
-import { RefreshTokenCommand } from '../refresh-token.command';
+import { RefreshTokenCommand } from './refresh-token.command';
 import { RefreshTokenHandler } from './refresh-token.handler';
-import { AuthRepository } from '../../repository/auth.repository';
-import { TokenService } from '../../token.service';
-import { UpdateTokenEvent } from '../../events/update-token.event';
+import { AuthRepository } from '../repository/auth.repository';
+import { TokenService } from '../token.service';
+import { UpdateTokenEvent } from '../events/update-token.event';
 
 describe('RefreshTokenHandler', () => {
   let refreshTokenHandler: RefreshTokenHandler;

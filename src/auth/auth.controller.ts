@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, UseGuards, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  UseGuards,
+  Req,
+  Res,
+} from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
 import { UserSignUpDto } from './dto/signup.dto';
@@ -8,10 +16,11 @@ import { UserSignUpCommand } from './commands/signup.command';
 import { UserLoginCommand } from './commands/login.command';
 
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
-import { JwtRefreshGuard } from '../common/guards/jwt-refresh.guard';
 
 import { RefreshTokenCommand } from './commands/refresh-token.command';
 import { GetUserFromTokenQuery } from './queries/get-user.query';
+
+import { Request, Response } from 'express';
 
 import {
   ApiBearerAuth,
@@ -21,9 +30,22 @@ import {
 } from '@nestjs/swagger';
 
 @ApiTags('Auth API')
-@Controller('auth')
+@Controller('/api/auth')
 export class AuthController {
   constructor(private commandBus: CommandBus, private queryBus: QueryBus) {}
+
+  @ApiOperation({ summary: 'User Login' })
+  @ApiCreatedResponse({ description: 'User Login', type: UserLoginDto })
+  @Post('/login')
+  async login(
+    @Body() dto: UserLoginDto,
+    @Res({ passthrough: true }) response: any,
+  ) {
+    dto.email = dto.email.toLowerCase();
+    const { email, password } = dto;
+    const command = new UserLoginCommand(email, password, response);
+    return this.commandBus.execute(command);
+  }
 
   @Post('/signup')
   @ApiOperation({ summary: 'User Signup' })
@@ -38,31 +60,28 @@ export class AuthController {
 
   @ApiOperation({ summary: 'User Login' })
   @ApiCreatedResponse({ description: 'User Login', type: UserLoginDto })
-  @Post('/login')
-  async login(@Body() dto: UserLoginDto) {
-    dto.email = dto.email.toLowerCase();
-    const { email, password } = dto;
-    const command = new UserLoginCommand(email, password);
-    return this.commandBus.execute(command);
-  }
-
-  @ApiOperation({ summary: 'User Login' })
-  @ApiCreatedResponse({ description: 'User Login', type: UserLoginDto })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get('/get')
   async getUserFromToken(@Req() req) {
-    const userId = req.user.userId;
+    const userId = req.user;
     const getUserFromToken = new GetUserFromTokenQuery(userId);
     return this.queryBus.execute(getUserFromToken);
   }
 
-  @UseGuards(JwtRefreshGuard)
-  @Post('/refresh')
-  async refreshToken(@Req() req) {
-    const userId = req.user['userId'];
-    const refreshToken = req.user['refreshToken'];
-    const command = new RefreshTokenCommand(userId, refreshToken);
+  @UseGuards(JwtAuthGuard)
+  @Get('test')
+  async ping() {
+    return 'pong';
+  }
+
+  @Get('/refresh')
+  async refreshToken(
+    @Req() req: Request,
+    @Res({ passthrough: true }) response,
+  ) {
+    const refreshToken = req.cookies['token'];
+    const command = new RefreshTokenCommand(refreshToken, response);
     return this.commandBus.execute(command);
   }
 }
