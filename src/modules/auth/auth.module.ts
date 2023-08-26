@@ -4,11 +4,9 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
 
-import { SecurityConfig } from '../common/config/config.interface';
 import { AuthController } from './auth.controller';
 
 import { JwtStrategy } from './strategies/jwt.strategy';
-import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 
 import { AuthRepository } from './repository/auth.repository';
 
@@ -21,9 +19,9 @@ import { RefreshTokenHandler } from './commands/refresh-token.handler';
 import { GetUserFromTokenHandler } from './queries/get-user.handler';
 import { UpdateTokenHandler } from './events/update-token.handler';
 import { CreateNewTokenHandler } from './events/create-token.handler';
-
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
-import { JwtRefreshGuard } from '../common/guards/jwt-refresh.guard';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { SecurityConfig } from '../../common/config/config.interface';
+import { JwtRefreshGuard } from '../../common/guards/jwt-refresh.guard';
 
 const commandHandlers = [
   UserSignUpHandler,
@@ -59,7 +57,7 @@ const eventHandlers = [UpdateTokenHandler, CreateNewTokenHandler];
     PasswordService,
     JwtStrategy,
     JwtAuthGuard,
-    JwtRefreshStrategy,
+
     JwtRefreshGuard,
     ...commandHandlers,
     ...queryHandlers,

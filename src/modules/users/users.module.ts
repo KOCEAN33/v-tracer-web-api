@@ -3,7 +3,7 @@ import { Module } from '@nestjs/common';
 
 import { UsersController } from './users.controller';
 import { UserRepository } from './repository/user.repository';
-import { PrismaModule } from '../database/prisma.module';
+import { PrismaModule } from '../../database/prisma.module';
 
 const commandHandlers = [];
 

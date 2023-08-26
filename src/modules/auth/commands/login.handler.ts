@@ -1,11 +1,11 @@
 import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import { BadRequestException } from '@nestjs/common';
 
-import { PasswordService } from '../../password.service';
-import { TokenService } from '../../token.service';
-import { AuthRepository } from '../../repository/auth.repository';
-import { UserLoginCommand } from '../login.command';
-import { UpdateTokenEvent } from '../../events/update-token.event';
+import { TokenService } from '../token.service';
+import { UserLoginCommand } from './login.command';
+import { AuthRepository } from '../repository/auth.repository';
+import { PasswordService } from '../password.service';
+import { UpdateTokenEvent } from '../events/update-token.event';
 
 interface LoginResponse {
   accessToken: string;

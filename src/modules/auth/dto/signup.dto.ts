@@ -6,8 +6,9 @@ import {
   MinLength,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
-import { NotIn } from '../../common/decorators/not-in';
+
 import { ApiProperty } from '@nestjs/swagger';
+import { NotIn } from '../../../common/decorators/not-in';
 
 export class UserSignUpDto {
   @Transform((params) => params.value.trim())

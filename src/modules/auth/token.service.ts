@@ -2,8 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { TokenExpiredError } from 'jsonwebtoken';
-
-import { SecurityConfig } from '../common/config/config.interface';
+import { SecurityConfig } from '../../common/config/config.interface';
 
 export interface Token {
   accessToken: string;

@@ -15,8 +15,6 @@ import { UserLoginDto } from './dto/login.dto';
 import { UserSignUpCommand } from './commands/signup.command';
 import { UserLoginCommand } from './commands/login.command';
 
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
-
 import { RefreshTokenCommand } from './commands/refresh-token.command';
 import { GetUserFromTokenQuery } from './queries/get-user.query';
 
@@ -28,6 +26,7 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 
 @ApiTags('Auth API')
 @Controller('/api/auth')
@@ -78,7 +77,7 @@ export class AuthController {
   @Get('/refresh')
   async refreshToken(
     @Req() req: Request,
-    @Res({ passthrough: true }) response,
+    @Res({ passthrough: true }) response: Response,
   ) {
     const refreshToken = req.cookies['token'];
     const command = new RefreshTokenCommand(refreshToken, response);

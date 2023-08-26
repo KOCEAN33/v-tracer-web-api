@@ -1,12 +1,9 @@
 import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import { ForbiddenException, UnauthorizedException } from '@nestjs/common';
-
-import { AuthRepository } from '../../repository/auth.repository';
-
-import { TokenService } from '../../token.service';
-
-import { RefreshTokenCommand } from '../refresh-token.command';
-import { UpdateTokenEvent } from '../../events/update-token.event';
+import { RefreshTokenCommand } from './refresh-token.command';
+import { AuthRepository } from '../repository/auth.repository';
+import { TokenService } from '../token.service';
+import { UpdateTokenEvent } from '../events/update-token.event';
 
 @CommandHandler(RefreshTokenCommand)
 export class RefreshTokenHandler
@@ -25,7 +22,6 @@ export class RefreshTokenHandler
       this.tokenService.extractUserIdFromToken(receiveRefreshToken);
 
     if (!payload) {
-      // refresh token expired
       throw new UnauthorizedException({
         message: 'Failed renewal access-token ',
       });

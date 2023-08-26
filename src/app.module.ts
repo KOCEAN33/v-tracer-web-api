@@ -2,10 +2,10 @@ import { Logger, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import config from './common/config/config';
-import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './users/users.module';
-import { ProductModule } from './products/product.module';
-import { ReviewModule } from './reviews/review.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { UsersModule } from './modules/users/users.module';
+import { ProductModule } from './modules/products/product.module';
+import { ReviewModule } from './modules/reviews/review.module';
 
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { ExceptionModule } from './common/exception/exception.module';

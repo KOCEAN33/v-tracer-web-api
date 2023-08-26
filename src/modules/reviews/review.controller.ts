@@ -12,8 +12,6 @@ import {
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { Review } from '@prisma/client';
 
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
-
 import { CreateReviewCommand } from './commands/create-review.command';
 import { PatchReviewCommand } from './commands/patch-review.command';
 import { DeleteReviewCommand } from './commands/delete-review.command';
@@ -25,6 +23,7 @@ import { PatchReviewBodyDto } from './dto/patch-review.body.dto';
 import { DeleteReviewQueryStringDTO } from './dto/delete-review.query.dto';
 import { FindReviewByProductQueryStringDTO } from './dto/find-product.query.dto';
 import { FindReviewsByUserQueryStringDTO } from './dto/find-user.query.dto';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 
 @Controller()
 export class ReviewController {
