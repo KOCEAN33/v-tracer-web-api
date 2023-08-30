@@ -17,11 +17,10 @@ import { UserSignUpHandler } from './commands/signup.handler';
 import { UserLoginHandler } from './commands/login.handler';
 import { RefreshTokenHandler } from './commands/refresh-token.handler';
 import { GetUserFromTokenHandler } from './queries/get-user.handler';
-import { UpdateTokenHandler } from './events/update-token.handler';
-import { CreateNewTokenHandler } from './events/create-token.handler';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { SecurityConfig } from '../../common/config/config.interface';
-import { JwtRefreshGuard } from '../../common/guards/jwt-refresh.guard';
+import { SaveTokenEventHandler } from './events/save-token.event.handler';
+import { UpdateTokenEventHandler } from './events/update-token.event.handler';
 
 const commandHandlers = [
   UserSignUpHandler,
@@ -31,7 +30,7 @@ const commandHandlers = [
 
 const queryHandlers = [GetUserFromTokenHandler];
 
-const eventHandlers = [UpdateTokenHandler, CreateNewTokenHandler];
+const eventHandlers = [SaveTokenEventHandler, UpdateTokenEventHandler];
 
 @Module({
   imports: [
@@ -58,7 +57,6 @@ const eventHandlers = [UpdateTokenHandler, CreateNewTokenHandler];
     JwtStrategy,
     JwtAuthGuard,
 
-    JwtRefreshGuard,
     ...commandHandlers,
     ...queryHandlers,
     ...eventHandlers,

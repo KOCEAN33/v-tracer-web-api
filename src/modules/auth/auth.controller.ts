@@ -6,6 +6,7 @@ import {
   UseGuards,
   Req,
   Res,
+  Ip,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
@@ -27,22 +28,56 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { CustomRequest } from '../../common/interface/custom-request.interface';
 
 @ApiTags('Auth API')
 @Controller('/api/auth')
 export class AuthController {
-  constructor(private commandBus: CommandBus, private queryBus: QueryBus) {}
+  constructor(
+    private commandBus: CommandBus,
+    private queryBus: QueryBus,
+  ) {}
 
   @ApiOperation({ summary: 'User Login' })
   @ApiCreatedResponse({ description: 'User Login', type: UserLoginDto })
   @Post('/login')
   async login(
+    @Ip() ip: string,
+    @Req() req: CustomRequest,
+    @Res({ passthrough: true }) response: Response,
     @Body() dto: UserLoginDto,
-    @Res({ passthrough: true }) response: any,
   ) {
     dto.email = dto.email.toLowerCase();
+    const fingerprint = req.headers['fingerprint'] as string;
+    const userAgent = req.headers['user-agent'];
     const { email, password } = dto;
-    const command = new UserLoginCommand(email, password, response);
+    const command = new UserLoginCommand(
+      email,
+      password,
+      response,
+      ip,
+      userAgent,
+      fingerprint,
+    );
+    return this.commandBus.execute(command);
+  }
+
+  @Get('/refresh')
+  async refreshToken(
+    @Ip() ip: string,
+    @Req() req: Request,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const fingerprint = req.headers['fingerprint'] as string;
+    const userAgent = req.headers['user-agent'];
+    const refreshToken = req.cookies['token'];
+    const command = new RefreshTokenCommand(
+      refreshToken,
+      response,
+      ip,
+      userAgent,
+      fingerprint,
+    );
     return this.commandBus.execute(command);
   }
 
@@ -69,18 +104,10 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('test')
-  async ping() {
+  @Get('/test')
+  async ping(@Req() req, @Ip() ip) {
+    const fingerprint = req.headers['fingerprint'] as string;
+    console.log(fingerprint);
     return 'pong';
-  }
-
-  @Get('/refresh')
-  async refreshToken(
-    @Req() req: Request,
-    @Res({ passthrough: true }) response: Response,
-  ) {
-    const refreshToken = req.cookies['token'];
-    const command = new RefreshTokenCommand(refreshToken, response);
-    return this.commandBus.execute(command);
   }
 }

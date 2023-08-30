@@ -1,22 +1,20 @@
 import { Injectable } from '@nestjs/common';
 
-import { User } from '@prisma/client';
+import { User, AuthToken } from '@prisma/client';
 import { PrismaService } from '../../../database/prisma.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly configService: ConfigService,
+  ) {}
 
-  async createUser(
-    name: string,
-    handle: string,
-    email: string,
-    hashedPassword: string,
-  ) {
+  async createUser(name: string, email: string, hashedPassword: string) {
     return await this.prisma.user.create({
       data: {
         name: name,
-        handle: handle,
         email: email,
         password: hashedPassword,
       },
@@ -25,10 +23,6 @@ export class AuthRepository {
 
   async getUserById(userId: string): Promise<User> {
     return this.prisma.user.findUnique({ where: { id: userId } });
-  }
-
-  async getUserByHandle(handle: string): Promise<User> {
-    return this.prisma.user.findUnique({ where: { handle: handle } });
   }
 
   async getUserByEmail(email: string): Promise<User> {
@@ -41,35 +35,51 @@ export class AuthRepository {
     return user;
   }
 
-  async createNewToken(
-    userId: string,
-    accessToken: string,
-    refreshToken: string,
-  ) {
-    return await this.prisma.authToken.create({
-      data: {
-        userId: userId,
-        accessToken: accessToken,
+  async getUserIdbyRefreshToken(refreshToken: string): Promise<AuthToken> {
+    return await this.prisma.authToken.findUnique({
+      where: {
         refreshToken: refreshToken,
       },
     });
   }
 
-  async updateToken(userId: string, accessToken: string, refreshToken: string) {
-    return await this.prisma.authToken.update({
-      where: { userId: userId },
-      data: { accessToken: accessToken, refreshToken: refreshToken },
+  async saveRefreshToken(
+    userId: string,
+    refreshToken: string,
+    ip: string,
+    os: string,
+    fingerprint: string,
+    expiresIn: Date,
+  ) {
+    return await this.prisma.authToken.create({
+      data: {
+        userId: userId,
+        fingerprint: fingerprint,
+        ip: ip,
+        os: os,
+        refreshToken: refreshToken,
+        expiresIn: expiresIn,
+      },
     });
   }
 
-  async getTokenByUserId(userId: string) {
-    const token = await this.prisma.authToken.findUnique({
-      where: { userId: userId },
+  async updateRefreshToken(
+    id: string,
+    refreshToken: string,
+    ip: string,
+    os: string,
+    fingerprint: string,
+    expiresIn: Date,
+  ) {
+    return await this.prisma.authToken.update({
+      where: { id: id },
+      data: {
+        refreshToken: refreshToken,
+        ip: ip,
+        os: os,
+        fingerprint: fingerprint,
+        expiresIn: expiresIn,
+      },
     });
-
-    if (!token) {
-      return null;
-    }
-    return token;
   }
 }

@@ -3,7 +3,10 @@ import { Response } from 'express';
 
 export class RefreshTokenCommand implements ICommand {
   constructor(
-    readonly receiveRefreshToken: string,
+    readonly receivedRefreshToken: string,
     readonly response: Response,
+    readonly ip: string,
+    readonly userAgent: string,
+    readonly fingerprint: string,
   ) {}
 }

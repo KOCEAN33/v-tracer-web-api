@@ -27,7 +27,10 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 
 @Controller()
 export class ReviewController {
-  constructor(private commandBus: CommandBus, private queryBus: QueryBus) {}
+  constructor(
+    private commandBus: CommandBus,
+    private queryBus: QueryBus,
+  ) {}
 
   @UseGuards(JwtAuthGuard)
   @Post('/review/product')
