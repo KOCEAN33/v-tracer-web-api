@@ -9,6 +9,13 @@ import {
   Ip,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import type { Request, Response } from 'express';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 
 import { UserSignUpDto } from './dto/signup.dto';
 import { UserLoginDto } from './dto/login.dto';
@@ -19,14 +26,6 @@ import { UserLoginCommand } from './commands/login.command';
 import { RefreshTokenCommand } from './commands/refresh-token.command';
 import { GetUserFromTokenQuery } from './queries/get-user.query';
 
-import { Request, Response } from 'express';
-
-import {
-  ApiBearerAuth,
-  ApiCreatedResponse,
-  ApiOperation,
-  ApiTags,
-} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { CustomRequest } from '../../common/interface/custom-request.interface';
 
@@ -97,17 +96,24 @@ export class AuthController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get('/get')
-  async getUserFromToken(@Req() req) {
-    const userId = req.user;
-    const getUserFromToken = new GetUserFromTokenQuery(userId);
-    return this.queryBus.execute(getUserFromToken);
+  async getUserFromToken(@Req() req: Request) {
+    // const getUserFromToken = new GetUserFromTokenQuery(userId);
+    // return this.queryBus.execute(getUserFromToken);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('/test')
   async ping(@Req() req, @Ip() ip) {
-    const fingerprint = req.headers['fingerprint'] as string;
-    console.log(fingerprint);
-    return 'pong';
+    return ip;
+  }
+
+  @Post('/logout')
+  async logout() {
+    return;
+  }
+
+  @Post('/purge-token')
+  async purgeToken() {
+    return;
   }
 }

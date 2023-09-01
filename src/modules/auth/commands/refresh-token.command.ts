@@ -1,5 +1,5 @@
 import { ICommand } from '@nestjs/cqrs';
-import { Response } from 'express';
+import type { Response } from 'express';
 
 export class RefreshTokenCommand implements ICommand {
   constructor(

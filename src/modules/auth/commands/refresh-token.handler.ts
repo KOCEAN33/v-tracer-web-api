@@ -1,12 +1,11 @@
 import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import { ForbiddenException, UnauthorizedException } from '@nestjs/common';
-
-import { RefreshTokenCommand } from './refresh-token.command';
-import { AuthRepository } from '../repository/auth.repository';
-import { TokenService } from '../token.service';
-
 import { JwtService } from '@nestjs/jwt';
 import { UAParser } from 'ua-parser-js';
+
+import { RefreshTokenCommand } from './refresh-token.command';
+import { TokenService } from '../token.service';
+import { AuthRepository } from '../repository/auth.repository';
 import { UpdateTokenEvent } from '../events/update-token.event';
 
 @CommandHandler(RefreshTokenCommand)
@@ -29,9 +28,9 @@ export class RefreshTokenHandler
 
     // If token is not valid or expired, trigger ERROR
     if (!payload) {
-      console.log('No Payload', payload);
+      console.log('No Payload or invalid ', payload);
       throw new UnauthorizedException({
-        message: 'Failed renewal access-token ',
+        message: 'Failed renewal access-token',
       });
     }
 

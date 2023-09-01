@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { BadRequestException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { EventBus } from '@nestjs/cqrs';
 
 import { AuthRepository } from '../repository/auth.repository';
 import { PasswordService } from '../password.service';
 import { TokenService } from '../token.service';
-import { JwtService } from '@nestjs/jwt';
-import { EventBus } from '@nestjs/cqrs';
-import { BadRequestException } from '@nestjs/common';
 
 import { UserLoginHandler } from './login.handler';
 import { UserLoginCommand } from './login.command';

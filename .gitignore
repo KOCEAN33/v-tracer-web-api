@@ -403,3 +403,5 @@ dist
 .serverless/**/*.zip
 logs/**/*.json
 logs/**/*.log
+
+sonarqube-scanner.js
