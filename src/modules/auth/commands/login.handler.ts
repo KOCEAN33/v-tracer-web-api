@@ -1,5 +1,6 @@
-import { BadRequestException } from '@nestjs/common';
 import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
+import { BadRequestException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { UAParser } from 'ua-parser-js';
 
 import { PasswordService } from '../password.service';
@@ -7,8 +8,6 @@ import { AuthRepository } from '../repository/auth.repository';
 import { TokenService } from '../token.service';
 import { UserLoginCommand } from './login.command';
 import { SaveTokenEvent } from '../events/save-token.event';
-
-import { JwtService } from '@nestjs/jwt';
 
 interface LoginResponse {
   accessToken: string;
@@ -27,9 +26,6 @@ export class UserLoginHandler implements ICommandHandler<UserLoginCommand> {
 
   async execute(command: UserLoginCommand): Promise<LoginResponse> {
     const { email, password, response, ip, userAgent, fingerprint } = command;
-
-    const parser = new UAParser(userAgent);
-    const os = parser.getOS().name;
 
     const user = await this.authRepository.getUserByEmail(email);
 
@@ -54,6 +50,9 @@ export class UserLoginHandler implements ICommandHandler<UserLoginCommand> {
     const expiresIn = new Date(decodeJWT['exp'] * 1000);
 
     // save refreshToken
+    const parser = new UAParser(userAgent);
+    const os = parser.getOS().name;
+
     this.eventBus.publish(
       new SaveTokenEvent(user.id, refreshToken, ip, os, fingerprint, expiresIn),
     );
@@ -61,10 +60,10 @@ export class UserLoginHandler implements ICommandHandler<UserLoginCommand> {
     response.clearCookie('token');
     response.cookie('token', refreshToken, {
       httpOnly: true,
-      sameSite: true,
+      sameSite: 'strict',
       secure: process.env.NODE_ENV !== 'development',
     });
-    console.log(accessToken, refreshToken);
+
     const userData = {
       id: user.id,
       name: user.name,

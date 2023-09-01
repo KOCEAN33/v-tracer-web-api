@@ -35,7 +35,7 @@ export class AuthRepository {
     return user;
   }
 
-  async getUserIdbyRefreshToken(refreshToken: string): Promise<AuthToken> {
+  async getUserByRefreshToken(refreshToken: string): Promise<AuthToken> {
     return await this.prisma.authToken.findUnique({
       where: {
         refreshToken: refreshToken,

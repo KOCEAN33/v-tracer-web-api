@@ -1,93 +1,131 @@
-import { Test } from '@nestjs/testing';
-import { EventBus } from '@nestjs/cqrs';
-import { BadRequestException } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 
-import { UserLoginCommand } from './login.command';
-import { UserLoginHandler } from './login.handler';
 import { AuthRepository } from '../repository/auth.repository';
 import { PasswordService } from '../password.service';
 import { TokenService } from '../token.service';
-import { UpdateTokenEvent } from '../events/update-token.event';
+import { JwtService } from '@nestjs/jwt';
+import { EventBus } from '@nestjs/cqrs';
+import { BadRequestException } from '@nestjs/common';
+
+import { UserLoginHandler } from './login.handler';
+import { UserLoginCommand } from './login.command';
+import { SaveTokenEvent } from '../events/save-token.event';
+
+const commandData = [
+  'test@example.com',
+  'password',
+  { clearCookie: jest.fn(), cookie: jest.fn() } as any,
+  '127.0.0.1',
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/117.0',
+  'fingerprint',
+] as const;
 
 describe('UserLoginHandler', () => {
   let userLoginHandler: UserLoginHandler;
   let authRepository: AuthRepository;
   let passwordService: PasswordService;
-  let tokenService: TokenService;
   let eventBus: EventBus;
 
   beforeEach(async () => {
-    const moduleRef = await Test.createTestingModule({
+    const module: TestingModule = await Test.createTestingModule({
       providers: [
         UserLoginHandler,
-        { provide: AuthRepository, useValue: {} },
-        { provide: PasswordService, useValue: {} },
-        { provide: TokenService, useValue: {} },
-        { provide: EventBus, useValue: {} },
+        {
+          provide: AuthRepository,
+          useValue: {
+            getUserByEmail: jest.fn(),
+          },
+        },
+        {
+          provide: PasswordService,
+          useValue: {
+            validatePassword: jest.fn(),
+          },
+        },
+        {
+          provide: TokenService,
+          useValue: {
+            generateTokens: jest.fn(() => ({
+              accessToken: 'fakeAccessToken',
+              refreshToken: 'fakeRefreshToken',
+            })),
+          },
+        },
+        {
+          provide: JwtService,
+          useValue: {
+            decode: jest.fn(() => ({
+              exp: Math.floor(1693479600),
+            })),
+          },
+        },
+        {
+          provide: EventBus,
+          useValue: {
+            publish: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
-    userLoginHandler = moduleRef.get<UserLoginHandler>(UserLoginHandler);
-    authRepository = moduleRef.get<AuthRepository>(AuthRepository);
-    passwordService = moduleRef.get<PasswordService>(PasswordService);
-    tokenService = moduleRef.get<TokenService>(TokenService);
-    eventBus = moduleRef.get<EventBus>(EventBus);
+    userLoginHandler = module.get<UserLoginHandler>(UserLoginHandler);
+    authRepository = module.get<AuthRepository>(AuthRepository);
+    passwordService = module.get<PasswordService>(PasswordService);
+    eventBus = module.get<EventBus>(EventBus);
   });
 
-  it('should log in user, generate tokens, and publish UpdateTokenEvent', async () => {
-    const command = new UserLoginCommand('test@email.com', 'password');
-    const user = { id: '1', email: command.email, password: 'hashed_password' };
-    const tokens = {
-      accessToken: 'access_token',
-      refreshToken: 'refresh_token',
+  it('should be an instanceof UserLoginHandler', () => {
+    expect(userLoginHandler).toBeInstanceOf(UserLoginHandler);
+  });
+
+  it('should return access token and user data on successful login', async () => {
+    const mockUser = {
+      id: 'userId',
+      name: 'John',
+      password: 'hashedPassword',
     };
-
-    authRepository.getUserByEmail = jest.fn().mockResolvedValue(user);
+    authRepository.getUserByEmail = jest.fn().mockResolvedValue(mockUser);
     passwordService.validatePassword = jest.fn().mockResolvedValue(true);
-    tokenService.generateTokens = jest.fn().mockResolvedValue(tokens);
-    eventBus.publish = jest.fn();
 
-    const result = await userLoginHandler.execute(command);
-
-    expect(result).toEqual(tokens);
-    expect(authRepository.getUserByEmail).toHaveBeenCalledWith(command.email);
-    expect(passwordService.validatePassword).toHaveBeenCalledWith(
-      command.password,
-      user.password,
+    const result = await userLoginHandler.execute(
+      new UserLoginCommand(...commandData),
     );
-    expect(tokenService.generateTokens).toHaveBeenCalledWith({
-      userId: user.id,
+
+    expect(result).toEqual({
+      accessToken: 'fakeAccessToken',
+      userData: { id: 'userId', name: 'John' },
     });
     expect(eventBus.publish).toHaveBeenCalledWith(
-      new UpdateTokenEvent(user.id, tokens.accessToken, tokens.refreshToken),
+      new SaveTokenEvent(
+        'userId',
+        'fakeRefreshToken',
+        '127.0.0.1',
+        'Windows',
+        'fingerprint',
+        new Date(1693479600 * 1000),
+      ),
     );
   });
 
   it('should throw BadRequestException if user does not exist', async () => {
-    const command = new UserLoginCommand('test@email.com', 'password');
+    authRepository.getUserByEmail = jest.fn(() => null);
 
-    authRepository.getUserByEmail = jest.fn().mockResolvedValue(null);
-
-    await expect(userLoginHandler.execute(command)).rejects.toThrow(
-      BadRequestException,
-    );
-    expect(authRepository.getUserByEmail).toHaveBeenCalledWith(command.email);
+    await expect(
+      userLoginHandler.execute(new UserLoginCommand(...commandData)),
+    ).rejects.toThrow(BadRequestException);
   });
 
   it('should throw BadRequestException if password is invalid', async () => {
-    const command = new UserLoginCommand('test@email.com', 'password');
-    const user = { id: '1', email: command.email, password: 'hashed_password' };
-
-    authRepository.getUserByEmail = jest.fn().mockResolvedValue(user);
+    const mockUser = {
+      id: 'userId',
+      name: 'John',
+      password: 'hashedPassword',
+    };
+    authRepository.getUserByEmail = jest.fn().mockResolvedValue(mockUser);
     passwordService.validatePassword = jest.fn().mockResolvedValue(false);
 
-    await expect(userLoginHandler.execute(command)).rejects.toThrow(
-      BadRequestException,
-    );
-    expect(authRepository.getUserByEmail).toHaveBeenCalledWith(command.email);
-    expect(passwordService.validatePassword).toHaveBeenCalledWith(
-      command.password,
-      user.password,
-    );
+    await expect(
+      userLoginHandler.execute(new UserLoginCommand(...commandData)),
+    ).rejects.toThrow(BadRequestException);
   });
 });

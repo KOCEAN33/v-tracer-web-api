@@ -7,18 +7,19 @@ import { ConfigService } from '@nestjs/config';
 import { AuthController } from './auth.controller';
 
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 
 import { AuthRepository } from './repository/auth.repository';
 
 import { PasswordService } from './password.service';
 import { TokenService } from './token.service';
 
+import { SecurityConfig } from '../../common/config/config.interface';
+
 import { UserSignUpHandler } from './commands/signup.handler';
 import { UserLoginHandler } from './commands/login.handler';
 import { RefreshTokenHandler } from './commands/refresh-token.handler';
 import { GetUserFromTokenHandler } from './queries/get-user.handler';
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
-import { SecurityConfig } from '../../common/config/config.interface';
 import { SaveTokenEventHandler } from './events/save-token.event.handler';
 import { UpdateTokenEventHandler } from './events/update-token.event.handler';
 
@@ -42,6 +43,10 @@ const eventHandlers = [SaveTokenEventHandler, UpdateTokenEventHandler];
           secret: configService.get<string>('JWT_ACCESS_SECRET'),
           signOptions: {
             expiresIn: securityConfig.expiresIn,
+            algorithm: 'HS384',
+          },
+          verifyOptions: {
+            algorithms: ['HS384'],
           },
         };
       },
