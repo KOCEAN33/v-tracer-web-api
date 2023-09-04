@@ -1,7 +1,6 @@
 {
   "name": "saas-community-api",
   "private": true,
-  "type": "module",
   "version": "1.0.0",
   "description": "Backend API for saas-community",
   "scripts": {
@@ -106,5 +105,5 @@
   "volta": {
     "node": "18.17.0"
   },
-  "packageManager": "^pnpm@8.6.0"
+  "packageManager": "^pnpm@8.7.0"
 }
