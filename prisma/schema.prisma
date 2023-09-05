@@ -11,18 +11,20 @@ datasource db {
 }
 
 model User {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
   name     String
-  email    String @unique
+  email    String  @unique
   password String
+  verified Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  authToken AuthToken[]
-  review    Review[]
-  question  Question[]
-  proCon    ProCon[]
+  authToken   AuthToken[]
+  review      Review[]
+  question    Question[]
+  proCon      ProCon[]
+  verifyEmail VerifyEmail[]
 }
 
 model AuthToken {
@@ -119,4 +121,25 @@ model Question {
   deletedAt   DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+}
+
+enum VerifyEmailType {
+  NEWACCOUNT
+  DELETEACCOUNT
+}
+
+model VerifyEmail {
+  id       String          @id @default(auto()) @map("_id") @db.ObjectId
+  type     VerifyEmailType
+  user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId   String          @db.ObjectId
+  uuid     String
+  expired  Boolean         @default(false)
+  verified Boolean         @default(false)
+
+  verifiedAt DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([userId])
 }
