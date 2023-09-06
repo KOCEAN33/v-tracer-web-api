@@ -9,19 +9,25 @@ import { ReviewModule } from './modules/reviews/review.module';
 
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { ExceptionModule } from './common/exception/exception.module';
+import { EmailModule } from './modules/email/email.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: [`.${process.env.NODE_ENV}.env`],
+      envFilePath: [
+        `${__dirname}/common/config/env/.${process.env.NODE_ENV}.env`,
+      ],
       load: [config],
+      cache: true,
       isGlobal: true,
     }),
+
+    ExceptionModule,
     AuthModule,
     UsersModule,
     ProductModule,
     ReviewModule,
-    ExceptionModule,
+    EmailModule,
   ],
   controllers: [],
   providers: [Logger],

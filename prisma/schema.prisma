@@ -126,6 +126,7 @@ model Question {
 enum VerifyEmailType {
   NEWACCOUNT
   DELETEACCOUNT
+  CHANGEPASSWORD
 }
 
 model VerifyEmail {
