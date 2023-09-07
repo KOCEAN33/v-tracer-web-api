@@ -134,13 +134,15 @@ model VerifyEmail {
   type     VerifyEmailType
   user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId   String          @db.ObjectId
+  email    String
   uuid     String
-  expired  Boolean         @default(false)
   verified Boolean         @default(false)
+  expired  Boolean         @default(false)
 
-  verifiedAt DateTime
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  expiresIn  DateTime
+  verifiedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 
   @@index([userId])
 }

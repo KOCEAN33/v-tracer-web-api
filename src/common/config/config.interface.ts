@@ -1,6 +1,7 @@
 export interface Config {
   swagger: SwaggerConfig;
   security: SecurityConfig;
+  email: EmailConfig;
 }
 
 export interface SecurityConfig {
@@ -15,4 +16,10 @@ export interface SwaggerConfig {
   description: string;
   version: string;
   path: string;
+}
+
+export interface EmailConfig {
+  domain: string;
+  verifySender: string;
+  expiresIn: number;
 }

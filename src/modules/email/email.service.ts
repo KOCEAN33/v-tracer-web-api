@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import * as FormData from 'form-data';
-import Mailgun, { MailgunMessageData } from 'mailgun.js';
 import { ConfigService } from '@nestjs/config';
-// import Handlebars from 'handlebars';
+import { MailgunService } from 'nestjs-mailgun';
+import { MailgunMessageData } from 'mailgun.js';
 import * as fs from 'fs';
 import * as handlebars from 'handlebars';
 import * as path from 'path';
-import { MailgunService } from 'nestjs-mailgun';
-import * as process from 'process';
+
+import { EmailConfig } from '../../common/config/config.interface';
+import { SendEmail } from './interface/send-email.interface';
 
 @Injectable()
 export class EmailService {
@@ -16,45 +16,42 @@ export class EmailService {
     private readonly mailgunService: MailgunService,
   ) {}
 
-  public async emailCreate(email: string) {
+  public async sendEmail(setup: SendEmail, html) {
+    const emailConfig = this.configService.get<EmailConfig>('email');
+    const domain = emailConfig.domain;
+    const sender = emailConfig.verifySender;
+
     const options: MailgunMessageData = {
-      from: 'tries.io <no-reply@tries.io>',
-      to: email,
-      subject: 'test',
-      text: 'tesetsetsetst',
-      // html: '',
+      from: sender,
+      to: setup.receiver,
+      subject: setup.subject,
+      html: html,
       'o:testmode': process.env.NODE_ENV === 'development',
     };
-    return await this.mailgunService.createEmail('tries.io', options);
+    return await this.mailgunService.createEmail(domain, options);
   }
 
-  public emailSender(receiver: string) {
-    const APIKEY = this.configService.get<string>('MAILGUN_API_KEY');
-    const DOMAIN = this.configService.get<string>('MAILGUN_DOMAIN');
-    const mailgun = new Mailgun(FormData);
-    const client = mailgun.client({
-      username: 'tries',
-      key: APIKEY,
-    });
-    const messageData = {
-      from: 'tries.io <no-reply@tries.io>',
-      to: receiver,
-      // html: html,
-      subject: 'Hello',
-      text: 'this is test',
-    };
-    client.messages
-      .create(DOMAIN, messageData)
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+  public async compileVerifyEmail(data) {
+    const source = await this.getEmailTemplate('email-verify.handlebars');
+    const template = handlebars.compile(source);
+    return template(data);
   }
 
-  // Return E-Mail HTML compiled with data
-  private emailTemplateCompiler(templateName: string, data) {
+  public setExpireDate(): Date {
+    const emailConfig = this.configService.get<EmailConfig>('email');
+    const expire = emailConfig.expiresIn;
+    const now = new Date();
+    return this.addMinutes(now, expire);
+  }
+
+  // date calculation
+  private addMinutes(date: Date, minutes: number): Date {
+    date.setMinutes(date.getMinutes() + minutes);
+    return date;
+  }
+
+  // get email template from ./template folder
+  private async getEmailTemplate(templateName: string) {
     const templatePath = path.join(
       __dirname,
       '..',
@@ -65,8 +62,6 @@ export class EmailService {
       'email',
       templateName,
     );
-    const source = fs.readFileSync(templatePath, 'utf8');
-    const template = handlebars.compile(source);
-    return template(data);
+    return fs.readFileSync(templatePath, 'utf8');
   }
 }

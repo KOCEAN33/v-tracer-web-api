@@ -13,6 +13,11 @@ const config: Config = {
     refreshIn: '14d',
     bcryptSaltOrRound: 12,
   },
+  email: {
+    domain: 'tries.io',
+    verifySender: 'tries.io <no-reply@tries.io>',
+    expiresIn: 60,
+  },
 };
 
 export default (): Config => config;

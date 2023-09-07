@@ -1,17 +1,17 @@
-import { Controller, Get, Post } from '@nestjs/common';
-import { EmailService } from './email.service';
+import { Controller, Post } from '@nestjs/common';
+
+import { CommandBus } from '@nestjs/cqrs';
+import { VerifyEmailCommand } from './commands/verify-email.command';
 
 @Controller('/api/email')
 export class EmailController {
-  constructor(private emailService: EmailService) {}
+  constructor(private commandBus: CommandBus) {}
 
-  @Post('test')
-  async sendmail() {
-    return await this.emailService.emailCreate('iam@xanny.us');
+  @Post('verify')
+  async verify() {
+    const userId = '6494ed4bcdebc4eb4c615c25';
+    const email = 'iaasdm@xanny.us';
+    const command = new VerifyEmailCommand(userId, email);
+    return this.commandBus.execute(command);
   }
-
-  // @Get('template')
-  // async template() {
-  //   return this.emailService.emailTemplate('email-verify.handlebars');
-  // }
 }
