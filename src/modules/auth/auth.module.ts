@@ -22,6 +22,7 @@ import { RefreshTokenHandler } from './commands/refresh-token.handler';
 import { GetUserFromTokenHandler } from './queries/get-user.handler';
 import { SaveTokenEventHandler } from './events/save-token.event.handler';
 import { UpdateTokenEventHandler } from './events/update-token.event.handler';
+import { EmailModule } from '../email/email.module';
 
 const commandHandlers = [
   UserSignUpHandler,
@@ -61,6 +62,7 @@ const eventHandlers = [SaveTokenEventHandler, UpdateTokenEventHandler];
     PasswordService,
     JwtStrategy,
     JwtAuthGuard,
+    EmailModule,
 
     ...commandHandlers,
     ...queryHandlers,
