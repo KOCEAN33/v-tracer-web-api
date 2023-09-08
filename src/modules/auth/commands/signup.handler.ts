@@ -1,13 +1,9 @@
-import {
-  CommandBus,
-  CommandHandler,
-  EventBus,
-  ICommandHandler,
-} from '@nestjs/cqrs';
+import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import {
   ConflictException,
   Injectable,
   UnauthorizedException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 
 import { AuthRepository } from '../repository/auth.repository';
@@ -50,9 +46,15 @@ export class UserSignUpHandler implements ICommandHandler<UserSignUpCommand> {
 
     // Send email to verify user
     const verifyEmailCommand = new VerifyEmailCommand(save.id, email);
-    await this.commandBus.execute(verifyEmailCommand);
+    const mail = await this.commandBus.execute(verifyEmailCommand);
 
-    // TODO: change return to useful value
-    return 'plz check your email';
+    if (mail.status === 400) {
+      throw new UnprocessableEntityException('Fail to send email');
+    }
+
+    if (mail.status === 200) {
+      // TODO: change return to useful value
+      return 'plz check your email';
+    }
   }
 }

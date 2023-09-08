@@ -1,170 +1,120 @@
-import { Test } from '@nestjs/testing';
-import { UnprocessableEntityException } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 
 import { UserSignUpCommand } from './signup.command';
 import { UserSignUpHandler } from './signup.handler';
 import { AuthRepository } from '../repository/auth.repository';
 import { PasswordService } from '../password.service';
-import { TokenService } from '../token.service';
-import { EventBus } from '@nestjs/cqrs';
-import { CreateNewTokenEvent } from '../events/create-token.event';
+
+import { CommandBus } from '@nestjs/cqrs';
+
+import { VerifyEmailCommand } from '../../email/commands/verify-email.command';
+import {
+  ConflictException,
+  UnauthorizedException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 
 describe('UserSignUpHandler', () => {
   let userSignUpHandler: UserSignUpHandler;
   let authRepository: AuthRepository;
-  let passwordService: PasswordService;
-  let tokenService: TokenService;
-  let eventBus: EventBus;
+  // let passwordService: PasswordService;
+  let commandBus: CommandBus;
 
   beforeEach(async () => {
-    const moduleRef = await Test.createTestingModule({
+    const moduleRef: TestingModule = await Test.createTestingModule({
       providers: [
         UserSignUpHandler,
         {
           provide: AuthRepository,
-          useValue: {},
+          useValue: {
+            getUserByEmail: jest.fn(),
+            createUser: { id: '1234', email: 'dev@xanny.us' },
+          },
         },
-        { provide: PasswordService, useValue: {} },
-        { provide: TokenService, useValue: {} },
-        { provide: EventBus, useValue: {} },
+        {
+          provide: PasswordService,
+          useValue: { hashPassword: jest.fn(() => ({})) },
+        },
+        { provide: CommandBus, useValue: { execute: jest.fn() } },
       ],
     }).compile();
 
     userSignUpHandler = moduleRef.get<UserSignUpHandler>(UserSignUpHandler);
     authRepository = moduleRef.get<AuthRepository>(AuthRepository);
-    passwordService = moduleRef.get<PasswordService>(PasswordService);
-    tokenService = moduleRef.get<TokenService>(TokenService);
-    eventBus = moduleRef.get<EventBus>(EventBus);
+    // passwordService = moduleRef.get<PasswordService>(PasswordService);
+    commandBus = moduleRef.get<CommandBus>(CommandBus);
   });
 
-  it('should create a new user and return tokens', async () => {
-    const command = new UserSignUpCommand(
-      'John Doe',
-      '@johndoe',
-      'john.doe@example.com',
+  it('should be an instanceof UserSignUpHandler', () => {
+    expect(userSignUpHandler).toBeInstanceOf(UserSignUpHandler);
+  });
+
+  it('should create a new user and send verification email', async () => {
+    const commandData = [
+      'xanny',
+      'dev@xanny.us',
       'password123',
+      'fingerprint',
+    ] as const;
+    const checkUser = null;
+    const save = { id: '123', email: 'dev@xanny.us' };
+    const mail = { status: 200 };
+
+    authRepository.getUserByEmail = jest.fn().mockResolvedValue(checkUser);
+    authRepository.createUser = jest.fn().mockResolvedValue(save);
+    commandBus.execute = jest.fn().mockResolvedValue(mail);
+
+    const result = await userSignUpHandler.execute(
+      new UserSignUpCommand(...commandData),
     );
-    const hashedPassword = 'hashed_password';
-    const user = {
-      id: '1',
-      name: 'John Doe',
-      handle: '@johndoe',
-      email: 'john.doe@example.com',
-      password: hashedPassword,
-    };
-    const tokens = {
-      accessToken: 'access_token',
-      refreshToken: 'refresh_token',
-    };
 
-    passwordService.hashPassword = jest.fn().mockResolvedValue(hashedPassword);
-    authRepository.getUserByEmail = jest.fn().mockResolvedValue(null);
-    authRepository.getUserByHandle = jest.fn().mockResolvedValue(null);
-    authRepository.createUser = jest.fn().mockResolvedValue(user);
-    tokenService.generateTokens = jest.fn().mockReturnValue(tokens);
-    eventBus.publish = jest.fn();
-
-    const result = await userSignUpHandler.execute(command);
-
-    expect(result).toEqual(tokens);
-    expect(passwordService.hashPassword).toHaveBeenCalledWith(command.password);
-    expect(authRepository.getUserByEmail).toHaveBeenCalledWith(command.email);
-    expect(authRepository.createUser).toHaveBeenCalledWith(
-      command.name,
-      command.handle,
-      command.email,
-      hashedPassword,
-    );
-    expect(tokenService.generateTokens).toHaveBeenCalledWith({
-      userId: user.id,
-    });
-
-    expect(eventBus.publish).toHaveBeenCalledWith(
-      new CreateNewTokenEvent(user.id, tokens.accessToken, tokens.refreshToken),
+    expect(result).toEqual('plz check your email');
+    expect(commandBus.execute).toHaveBeenCalledWith(
+      new VerifyEmailCommand(save.id, save.email),
     );
   });
 
-  it('should throw UnprocessableEntityException if email is already used', async () => {
-    const command = new UserSignUpCommand(
-      'John Doe',
-      '@johndoe',
-      'john.doe@example.com',
-      'password123',
-    );
-    const hashedPassword = 'hashed_password';
-    const user = {
-      id: '1',
-      name: 'John Doe',
-      email: 'john.doe@example.com',
-      password: hashedPassword,
-    };
+  it('should throw UnauthorizedException when no fingerprint', async () => {
+    const commandData = ['xanny', 'dev@xanny.us', 'password123', ''] as const;
 
-    passwordService.hashPassword = jest.fn().mockResolvedValue(hashedPassword);
-    authRepository.getUserByEmail = jest.fn().mockResolvedValue(user);
-    authRepository.getUserByHandle = jest.fn().mockResolvedValue(null);
-
-    await expect(userSignUpHandler.execute(command)).rejects.toThrow(
-      new UnprocessableEntityException(`Email ${command.email} already used.`),
-    );
-    expect(authRepository.getUserByEmail).toHaveBeenCalledWith(command.email);
-    expect(authRepository.getUserByHandle).toHaveBeenCalledWith(command.handle);
+    await expect(
+      userSignUpHandler.execute(new UserSignUpCommand(...commandData)),
+    ).rejects.toThrow(UnauthorizedException);
   });
 
-  it('should throw UnprocessableEntityException if handle is already used', async () => {
-    const command = new UserSignUpCommand(
-      'John Doe',
-      '@johndoe',
-      'john.doe@example.com',
+  it('should throw ConflictException when email is duplicated', async () => {
+    const commandData = [
+      'xanny',
+      'dev@xanny.us',
       'password123',
-    );
-    const hashedPassword = 'hashed_password';
-    const user = {
-      id: '1',
-      name: 'John Doe',
-      handle: '@johndoe',
-      email: 'john.doe@example.com',
-      password: hashedPassword,
-    };
+      'fingerprint',
+    ] as const;
+    const checkUser = { email: 'dev@xanny.us' };
 
-    passwordService.hashPassword = jest.fn().mockResolvedValue(hashedPassword);
-    authRepository.getUserByEmail = jest.fn().mockResolvedValue(null);
-    authRepository.getUserByHandle = jest.fn().mockResolvedValue(user);
+    authRepository.getUserByEmail = jest.fn().mockResolvedValue(checkUser);
 
-    await expect(userSignUpHandler.execute(command)).rejects.toThrow(
-      new UnprocessableEntityException(
-        `Handle ${command.handle} already used.`,
-      ),
-    );
-    expect(authRepository.getUserByEmail).toHaveBeenCalledWith(command.email);
-    expect(authRepository.getUserByHandle).toHaveBeenCalledWith(command.handle);
+    await expect(
+      userSignUpHandler.execute(new UserSignUpCommand(...commandData)),
+    ).rejects.toThrow(ConflictException);
   });
 
-  it('should throw UnprocessableEntityException if handle and email is already used', async () => {
-    const command = new UserSignUpCommand(
-      'John Doe',
-      '@johndoe',
-      'john.doe@example.com',
+  it('should throw UnprocessableEntityException when unable to send email', async () => {
+    const commandData = [
+      'xanny',
+      'dev@xanny.us',
       'password123',
-    );
-    const hashedPassword = 'hashed_password';
-    const user = {
-      id: '1',
-      name: 'John Doe',
-      handle: '@johndoe',
-      email: 'john.doe@example.com',
-      password: hashedPassword,
-    };
+      'fingerprint',
+    ] as const;
+    const checkUser = null;
+    const save = { id: '123', email: 'dev@xanny.us' };
+    const mail = { status: 400 };
 
-    passwordService.hashPassword = jest.fn().mockResolvedValue(hashedPassword);
-    authRepository.getUserByEmail = jest.fn().mockResolvedValue(user);
-    authRepository.getUserByHandle = jest.fn().mockResolvedValue(user);
+    authRepository.getUserByEmail = jest.fn().mockResolvedValue(checkUser);
+    authRepository.createUser = jest.fn().mockResolvedValue(save);
+    commandBus.execute = jest.fn().mockResolvedValue(mail);
 
-    await expect(userSignUpHandler.execute(command)).rejects.toThrow(
-      new UnprocessableEntityException(
-        `Email ${command.email} and Handle ${command.handle} already used.`,
-      ),
-    );
-    expect(authRepository.getUserByEmail).toHaveBeenCalledWith(command.email);
-    expect(authRepository.getUserByHandle).toHaveBeenCalledWith(command.handle);
+    await expect(
+      userSignUpHandler.execute(new UserSignUpCommand(...commandData)),
+    ).rejects.toThrow(UnprocessableEntityException);
   });
 });

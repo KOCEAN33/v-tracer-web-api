@@ -6,6 +6,7 @@ import { VerifyEmailCommand } from './verify-email.command';
 import { EmailService } from '../email.service';
 import { EmailRepository } from '../repository/email.repository';
 import type { MessagesSendResult } from 'mailgun.js';
+import { InternalServerErrorException } from '@nestjs/common';
 
 interface VerifyEmailCommandInterface {
   status: number;
@@ -66,10 +67,11 @@ export class VerifyEmailHandler implements ICommandHandler<VerifyEmailCommand> {
       ),
       await this.emailService.sendEmail(setup, html),
     ]);
-    if (mail.status === 200) {
+
+    if (mail.status == 200) {
       return mail;
     }
 
-    throw new Error('Failed to send email');
+    throw new InternalServerErrorException('failed to send email');
   }
 }
