@@ -4,9 +4,10 @@ import {
 } from 'nest-winston';
 import * as winstonDaily from 'winston-daily-rotate-file';
 import * as winston from 'winston';
+import * as path from 'path';
 
 const env = process.env.NODE_ENV;
-const logDir = __dirname + '../../../../../logs';
+const logDir = path.join(__dirname, '..', '..', '..', '..', 'logs');
 
 const dailyOptions = (level: string) => {
   return {

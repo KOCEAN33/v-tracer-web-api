@@ -11,18 +11,20 @@ datasource db {
 }
 
 model User {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
-  name     String
-  email    String @unique
-  password String
+  id         String  @id @default(auto()) @map("_id") @db.ObjectId
+  name       String
+  email      String  @unique
+  password   String
+  isVerified Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  authToken AuthToken[]
-  review    Review[]
-  question  Question[]
-  proCon    ProCon[]
+  authToken   AuthToken[]
+  review      Review[]
+  question    Question[]
+  proCon      ProCon[]
+  verifyEmail VerifyEmail[]
 }
 
 model AuthToken {
@@ -76,24 +78,24 @@ model Company {
 }
 
 model Review {
-  id              String   @id @default(auto()) @map("_id") @db.ObjectId
-  product         Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productId       String   @db.ObjectId
-  user            User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  authorId        String   @db.ObjectId
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  product         Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId       String    @db.ObjectId
+  user            User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId        String    @db.ObjectId
   title           String
   body            String
-  alternative     Product? @relation("alternativeReviews", fields: [alternativeId], references: [id], onDelete: Cascade)
-  alternativeId   String[] @db.ObjectId
+  alternative     Product?  @relation("alternativeReviews", fields: [alternativeId], references: [id], onDelete: Cascade)
+  alternativeId   String[]  @db.ObjectId
   alternativeBody String?
-  switched        Product? @relation("switchedReviews", fields: [switchedId], references: [id], onDelete: Cascade)
-  switchedId      String[] @db.ObjectId
+  switched        Product?  @relation("switchedReviews", fields: [switchedId], references: [id], onDelete: Cascade)
+  switchedId      String[]  @db.ObjectId
   switchedBody    String?
-
-  publishedAt DateTime?
-  deletedAt   DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  // Boolean 형 추가 
+  publishedAt     DateTime?
+  deletedAt       DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 }
 
 model ProCon {
@@ -119,4 +121,28 @@ model Question {
   deletedAt   DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+}
+
+enum VerifyEmailType {
+  NEWACCOUNT
+  DELETEACCOUNT
+  CHANGEPASSWORD
+}
+
+model VerifyEmail {
+  id       String          @id @default(auto()) @map("_id") @db.ObjectId
+  type     VerifyEmailType
+  user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId   String          @db.ObjectId
+  email    String
+  token    String
+  verified Boolean         @default(false)
+  expired  Boolean         @default(false)
+
+  expiresIn  DateTime
+  verifiedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([userId])
 }
