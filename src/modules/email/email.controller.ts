@@ -10,8 +10,10 @@ export class EmailController {
   @Post('verify')
   async verify() {
     const userId = '6494ed4bcdebc4eb4c615c25';
-    const email = 'iaasdm@xanny.us';
+    const email = 'tagasdon8054@gmail.com';
     const command = new VerifyEmailCommand(userId, email);
     return this.commandBus.execute(command);
   }
+
+  // resend the email
 }

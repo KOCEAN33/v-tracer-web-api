@@ -8,19 +8,26 @@ export class EmailRepository {
   async saveVerifyToken(
     userId: string,
     email: string,
-    uuid: string,
+    token: string,
     expiresIn: Date,
-  ) {
-    return await this.prisma.verifyEmail.create({
+  ): Promise<void> {
+    await this.prisma.verifyEmail.create({
       data: {
         type: 'NEWACCOUNT',
         userId: userId,
         email: email,
-        uuid: uuid,
+        token: token,
         verified: false,
         expired: false,
         expiresIn: expiresIn,
       },
+    });
+  }
+
+  async invalidateOldToken(userId: string): Promise<void> {
+    await this.prisma.verifyEmail.updateMany({
+      where: { userId: userId, expired: false },
+      data: { expired: true },
     });
   }
 }
