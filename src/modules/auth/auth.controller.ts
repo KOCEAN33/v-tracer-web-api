@@ -7,15 +7,11 @@ import {
   Req,
   Res,
   Ip,
+  Query,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import type { Request, Response } from 'express';
-import {
-  ApiBearerAuth,
-  ApiCreatedResponse,
-  ApiOperation,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { UserSignUpDto } from './dto/signup.dto';
 import { UserLoginDto } from './dto/login.dto';
@@ -24,10 +20,11 @@ import { UserSignUpCommand } from './commands/signup.command';
 import { UserLoginCommand } from './commands/login.command';
 
 import { RefreshTokenCommand } from './commands/refresh-token.command';
-import { GetUserFromTokenQuery } from './queries/get-user.query';
 
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { CustomRequest } from '../../common/interface/custom-request.interface';
+import { VerifyEmailQueryDTO } from './dto/verify-email.query.dto';
+import { UserVerifyEmailCommand } from './commands/verify-email.command';
 
 @ApiTags('Auth API')
 @Controller('/api/auth')
@@ -83,23 +80,23 @@ export class AuthController {
   @Post('/signup')
   @ApiOperation({ summary: 'User Signup' })
   @ApiTags('Auth')
-  @ApiCreatedResponse({ description: '유저 생성', type: UserSignUpDto })
-  async signUp(@Body() dto: UserSignUpDto) {
+  @ApiCreatedResponse({ description: '회원 가입', type: UserSignUpDto })
+  async signUp(@Req() req: Request, @Body() dto: UserSignUpDto) {
     dto.email = dto.email.toLowerCase();
-    const { name, handle, email, password } = dto;
-    const command = new UserSignUpCommand(name, handle, email, password);
+    const fingerprint = req.headers['fingerprint'] as string;
+    const { name, email, password } = dto;
+    const command = new UserSignUpCommand(name, email, password, fingerprint);
     return this.commandBus.execute(command);
   }
 
-  @ApiOperation({ summary: 'User Login' })
-  @ApiCreatedResponse({ description: 'User Login', type: UserLoginDto })
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
-  @Get('/get')
-  async getUserFromToken(@Req() req: Request) {
-    // const getUserFromToken = new GetUserFromTokenQuery(userId);
-    // return this.queryBus.execute(getUserFromToken);
+  @Post('/verify/email')
+  async verifyEmail(@Query() queryString: VerifyEmailQueryDTO) {
+    const { id, confirmationCode } = queryString;
+    const command = new UserVerifyEmailCommand(id, confirmationCode);
+    return this.commandBus.execute(command);
   }
+
+  // TODO : resend verify email
 
   @UseGuards(JwtAuthGuard)
   @Get('/test')
@@ -107,12 +104,14 @@ export class AuthController {
     return ip;
   }
 
+  @ApiOperation({ summary: 'Logout' })
   @Post('/logout')
   async logout() {
     return;
   }
 
-  @Post('/purge-token')
+  @ApiOperation({ summary: 'Logout from every device' })
+  @Post('/logout-all')
   async purgeToken() {
     return;
   }

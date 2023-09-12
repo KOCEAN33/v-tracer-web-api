@@ -1,29 +1,13 @@
-import {
-  IsEmail,
-  IsString,
-  Matches,
-  MaxLength,
-  MinLength,
-} from 'class-validator';
-import { Transform } from 'class-transformer';
+import { IsEmail, IsString, MaxLength, MinLength } from 'class-validator';
 
 import { ApiProperty } from '@nestjs/swagger';
-import { NotIn } from '../../../common/decorators/not-in';
 
 export class UserSignUpDto {
-  @Transform((params) => params.value.trim())
-  @NotIn('password', { message: 'password는 name과 달라야 합니다' })
   @IsString()
   @MinLength(2)
   @MaxLength(30)
   @ApiProperty({ example: 'asashi', description: 'name' })
   name: string;
-
-  @IsString()
-  @MinLength(2)
-  @MaxLength(30)
-  @ApiProperty({ example: '@asashi', description: 'Callable ID' })
-  handle: string;
 
   @IsEmail()
   @MaxLength(60)
@@ -31,7 +15,8 @@ export class UserSignUpDto {
   email: string;
 
   @IsString()
-  @Matches(/^[A-Za-z\d!@#$%^&*()]{8,30}$/)
+  @MinLength(6)
+  @MaxLength(30)
   @ApiProperty({ example: 'password123', description: 'password' })
   password: string;
 }
