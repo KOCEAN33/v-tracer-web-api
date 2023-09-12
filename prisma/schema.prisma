@@ -10,12 +10,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserStatus {
+  Unverified
+  Activated
+  Dormancy
+  Deleted
+}
+
 model User {
-  id         String  @id @default(auto()) @map("_id") @db.ObjectId
-  name       String
-  email      String  @unique
-  password   String
-  isVerified Boolean @default(false)
+  id       String     @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
+  email    String     @unique
+  password String
+  status   UserStatus
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -23,22 +30,30 @@ model User {
   authToken   AuthToken[]
   review      Review[]
   question    Question[]
-  proCon      ProCon[]
-  verifyEmail VerifyEmailToken[]
+  verifyToken VerifyToken[]
+}
+
+type UserAgent {
+  IP          String
+  OS          String
+  browser     String
+  fingerprint String
 }
 
 model AuthToken {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  user         User     @relation(fields: [userId], references: [id])
-  userId       String   @db.ObjectId
-  fingerprint  String
-  refreshToken String   @unique @db.String
-  ip           String
-  os           String
-  expiresIn    DateTime
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  user         User      @relation(fields: [userId], references: [id])
+  userId       String    @db.ObjectId
+  refreshToken String    @unique @db.String
+  creationUA   UserAgent
+  latestUA     UserAgent
+
+  expiresIn DateTime
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([userId])
 }
 
 model Product {
@@ -46,24 +61,14 @@ model Product {
   handle    String   @unique
   name      String
   url       String?
-  language  String[]
-  price     Price[]
   company   Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId String?  @db.ObjectId
-  ownerId   String?  @db.ObjectId
 
-  deletedAt DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  alternativeReviews Review[] @relation("alternativeReviews")
-  switchedReviews    Review[] @relation("switchedReviews")
-  review             Review[]
-  proCon             ProCon[]
-}
-
-type Price {
-  period String
+  review   Review[]
+  question Question[]
 }
 
 model Company {
@@ -74,72 +79,86 @@ model Company {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  Product Product[]
+  product Product[]
+}
+
+enum ArticleStatus {
+  Draft
+  Published
+  Deleted
 }
 
 model Review {
-  id              String    @id @default(auto()) @map("_id") @db.ObjectId
-  product         Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productId       String    @db.ObjectId
-  user            User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  authorId        String    @db.ObjectId
-  title           String
-  body            String
-  alternative     Product?  @relation("alternativeReviews", fields: [alternativeId], references: [id], onDelete: Cascade)
-  alternativeId   String[]  @db.ObjectId
-  alternativeBody String?
-  switched        Product?  @relation("switchedReviews", fields: [switchedId], references: [id], onDelete: Cascade)
-  switchedId      String[]  @db.ObjectId
-  switchedBody    String?
-  // Boolean 형 추가 
-  publishedAt     DateTime?
-  deletedAt       DateTime?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-}
-
-model ProCon {
-  id        String  @id @default(auto()) @map("_id") @db.ObjectId
-  user      User    @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  authorId  String  @db.ObjectId
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productId String  @db.ObjectId
-
-  deletedAt DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-}
-
-model Question {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
-  user     User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  authorId String @db.ObjectId
-  title    String
-  body     String
+  id        String        @id @default(auto()) @map("_id") @db.ObjectId
+  product   Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String        @db.ObjectId
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String        @db.ObjectId
+  title     String
+  body      String
+  status    ArticleStatus @default(value: Draft)
 
   publishedAt DateTime?
   deletedAt   DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-enum VerifyEmailType {
-  NEWACCOUNT
-  DELETEACCOUNT
-  CHANGEPASSWORD
+model Question {
+  id        String        @id @default(auto()) @map("_id") @db.ObjectId
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String        @db.ObjectId
+  product   Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String        @db.ObjectId
+  title     String
+  body      String
+  status    ArticleStatus @default(value: Draft)
+
+  publishedAt DateTime?
+  deletedAt   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-model VerifyEmailToken {
-  id     String          @id @default(auto()) @map("_id") @db.ObjectId
-  type   VerifyEmailType
-  user   User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String          @db.ObjectId
-  email  String
+// model ProCon {
+//   id        String  @id @default(auto()) @map("_id") @db.ObjectId
+//   user      User    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+//   authorId  String  @db.ObjectId
+//   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+//   productId String  @db.ObjectId
+//
+//   deletedAt DateTime?
+//   createdAt DateTime  @default(now())
+//   updatedAt DateTime  @updatedAt
+// }
+
+// model (not yet)
+// alternative     Product?  @relation("alternativeReviews", fields: [alternativeId], references: [id], onDelete: Cascade)
+// alternativeId   String[]  @db.ObjectId
+// alternativeBody String?
+// switched        Product?  @relation("switchedReviews", fields: [switchedId], references: [id], onDelete: Cascade)
+// switchedId      String[]  @db.ObjectId
+// switchedBody    String?
+
+enum VerifyType {
+  NewAccount
+  DeleteAccount
+  ChangePassword
+}
+
+model VerifyToken {
+  id     String     @id @default(auto()) @map("_id") @db.ObjectId
+  type   VerifyType
+  user   User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String     @db.ObjectId
+  email  String?
   token  String
 
-  isExpired  Boolean   @default(false)
-  expiresIn  DateTime
-  isVerified Boolean   @default(false)
+  isVerifiable Boolean  @default(false)
+  expiresIn    DateTime
+
   verifiedAt DateTime?
 
   createdAt DateTime @default(now())
