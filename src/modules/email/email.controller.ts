@@ -1,7 +1,7 @@
 import { Controller, Post } from '@nestjs/common';
 
 import { CommandBus } from '@nestjs/cqrs';
-import { VerifyEmailCommand } from './commands/verify-email.command';
+import { SendVerifyEmailCommand } from './commands/send-verify-email.command';
 
 @Controller('/api/email')
 export class EmailController {
@@ -11,7 +11,7 @@ export class EmailController {
   async verify() {
     const userId = '6494ed4bcdebc4eb4c615c25';
     const email = 'tagasdon8054@gmail.com';
-    const command = new VerifyEmailCommand(userId, email);
+    const command = new SendVerifyEmailCommand(userId, email);
     return this.commandBus.execute(command);
   }
 

@@ -3,10 +3,10 @@ import { EmailController } from './email.controller';
 import { EmailService } from './email.service';
 import { MailgunModule } from 'nestjs-mailgun';
 import { CqrsModule } from '@nestjs/cqrs';
-import { VerifyEmailHandler } from './commands/verify-email.handler';
+import { SendVerifyEmailHandler } from './commands/send-verify-email.handler';
 import { EmailRepository } from './repository/email.repository';
 
-const commandHandler = [VerifyEmailHandler];
+const commandHandler = [SendVerifyEmailHandler];
 
 @Module({
   imports: [

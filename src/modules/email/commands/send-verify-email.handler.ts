@@ -2,7 +2,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ConfigService } from '@nestjs/config';
 import { v4 } from 'uuid';
 
-import { VerifyEmailCommand } from './verify-email.command';
+import { SendVerifyEmailCommand } from './send-verify-email.command';
 import { EmailService } from '../email.service';
 import { EmailRepository } from '../repository/email.repository';
 import type { MessagesSendResult } from 'mailgun.js';
@@ -14,8 +14,10 @@ interface VerifyEmailCommandInterface {
   message?: string;
 }
 
-@CommandHandler(VerifyEmailCommand)
-export class VerifyEmailHandler implements ICommandHandler<VerifyEmailCommand> {
+@CommandHandler(SendVerifyEmailCommand)
+export class SendVerifyEmailHandler
+  implements ICommandHandler<SendVerifyEmailCommand>
+{
   constructor(
     private readonly emailService: EmailService,
     private readonly configService: ConfigService,
@@ -25,7 +27,7 @@ export class VerifyEmailHandler implements ICommandHandler<VerifyEmailCommand> {
   //TODO: check after send
 
   async execute(
-    command: VerifyEmailCommand,
+    command: SendVerifyEmailCommand,
   ): Promise<VerifyEmailCommandInterface> {
     const { userId, email } = command;
 

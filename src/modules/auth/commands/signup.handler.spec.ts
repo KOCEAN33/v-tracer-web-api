@@ -7,7 +7,7 @@ import { PasswordService } from '../password.service';
 
 import { CommandBus } from '@nestjs/cqrs';
 
-import { VerifyEmailCommand } from '../../email/commands/verify-email.command';
+import { SendVerifyEmailCommand } from '../../email/commands/send-verify-email.command';
 import {
   ConflictException,
   UnauthorizedException,
@@ -70,7 +70,7 @@ describe('UserSignUpHandler', () => {
 
     expect(result).toEqual('plz check your email');
     expect(commandBus.execute).toHaveBeenCalledWith(
-      new VerifyEmailCommand(save.id, save.email),
+      new SendVerifyEmailCommand(save.id, save.email),
     );
   });
 

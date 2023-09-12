@@ -24,7 +24,7 @@ model User {
   review      Review[]
   question    Question[]
   proCon      ProCon[]
-  verifyEmail VerifyEmail[]
+  verifyEmail VerifyEmailToken[]
 }
 
 model AuthToken {
@@ -129,20 +129,20 @@ enum VerifyEmailType {
   CHANGEPASSWORD
 }
 
-model VerifyEmail {
-  id       String          @id @default(auto()) @map("_id") @db.ObjectId
-  type     VerifyEmailType
-  user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId   String          @db.ObjectId
-  email    String
-  token    String
-  verified Boolean         @default(false)
-  expired  Boolean         @default(false)
-
+model VerifyEmailToken {
+  id         String          @id @default(auto()) @map("_id") @db.ObjectId
+  type       VerifyEmailType
+  user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String          @db.ObjectId
+  email      String
+  token      String
+  isExpired  Boolean         @default(false)
   expiresIn  DateTime
+  isVerified Boolean         @default(false)
   verifiedAt DateTime?
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId])
 }

@@ -5,7 +5,7 @@ export class VerifyEmailQueryDTO {
   @IsString()
   @IsMongoId()
   @ApiProperty({ example: '6494ed4bcdebc4eb4c615c25', description: 'userId' })
-  userId: string;
+  id: string;
 
   @IsString()
   @IsUUID()

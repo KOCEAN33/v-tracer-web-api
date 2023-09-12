@@ -9,7 +9,7 @@ import {
 import { AuthRepository } from '../repository/auth.repository';
 import { PasswordService } from '../password.service';
 import { UserSignUpCommand } from './signup.command';
-import { VerifyEmailCommand } from '../../email/commands/verify-email.command';
+import { SendVerifyEmailCommand } from '../../email/commands/send-verify-email.command';
 
 @Injectable()
 @CommandHandler(UserSignUpCommand)
@@ -45,7 +45,7 @@ export class UserSignUpHandler implements ICommandHandler<UserSignUpCommand> {
     );
 
     // Send email to verify user
-    const verifyEmailCommand = new VerifyEmailCommand(save.id, email);
+    const verifyEmailCommand = new SendVerifyEmailCommand(save.id, email);
     const mail = await this.commandBus.execute(verifyEmailCommand);
 
     if (mail.status === 400) {

@@ -7,7 +7,6 @@ import {
   Req,
   Res,
   Ip,
-  Param,
   Query,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
@@ -24,10 +23,7 @@ import { RefreshTokenCommand } from './commands/refresh-token.command';
 
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { CustomRequest } from '../../common/interface/custom-request.interface';
-import {
-  VerifyEmailQueryDTO,
-  VerifyEmailQueryStringDTO,
-} from './dto/verify-email.query.dto';
+import { VerifyEmailQueryDTO } from './dto/verify-email.query.dto';
 import { UserVerifyEmailCommand } from './commands/verify-email.command';
 
 @ApiTags('Auth API')
@@ -95,8 +91,8 @@ export class AuthController {
 
   @Post('/verify/email')
   async verifyEmail(@Query() queryString: VerifyEmailQueryDTO) {
-    const { userId, confirmationCode } = queryString;
-    const command = new UserVerifyEmailCommand(userId, confirmationCode);
+    const { id, confirmationCode } = queryString;
+    const command = new UserVerifyEmailCommand(id, confirmationCode);
     return this.commandBus.execute(command);
   }
 
