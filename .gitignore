@@ -405,3 +405,4 @@ logs/**/*.json
 logs/**/*.log
 
 sonarqube-scanner.js
+.scannerwork

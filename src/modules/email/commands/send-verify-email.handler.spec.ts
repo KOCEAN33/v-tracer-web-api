@@ -2,18 +2,18 @@ import { EmailService } from '../email.service';
 import { ConfigService } from '@nestjs/config';
 import { EmailRepository } from '../repository/email.repository';
 import { Test, TestingModule } from '@nestjs/testing';
-import { VerifyEmailHandler } from './verify-email.handler';
-import { VerifyEmailCommand } from './verify-email.command';
+import { SendVerifyEmailHandler } from './send-verify-email.handler';
+import { SendVerifyEmailCommand } from './send-verify-email.command';
 import { InternalServerErrorException } from '@nestjs/common';
 
 describe('VerifyEmailHandler', () => {
-  let verifyEmailHandler: VerifyEmailHandler;
+  let verifyEmailHandler: SendVerifyEmailHandler;
   let emailService: EmailService;
 
   beforeEach(async () => {
     const moduleRef: TestingModule = await Test.createTestingModule({
       providers: [
-        VerifyEmailHandler,
+        SendVerifyEmailHandler,
         { provide: ConfigService, useValue: { get: jest.fn } },
         {
           provide: EmailService,
@@ -34,12 +34,14 @@ describe('VerifyEmailHandler', () => {
       ],
     }).compile();
 
-    verifyEmailHandler = moduleRef.get<VerifyEmailHandler>(VerifyEmailHandler);
+    verifyEmailHandler = moduleRef.get<SendVerifyEmailHandler>(
+      SendVerifyEmailHandler,
+    );
     emailService = moduleRef.get<EmailService>(EmailService);
   });
 
-  it('should be an instanceof VerifyEmailHandler ', () => {
-    expect(verifyEmailHandler).toBeInstanceOf(VerifyEmailHandler);
+  it('should be an instanceof SendVerifyEmailHandler ', () => {
+    expect(verifyEmailHandler).toBeInstanceOf(SendVerifyEmailHandler);
   });
 
   it('should send email to user', async () => {
@@ -53,7 +55,7 @@ describe('VerifyEmailHandler', () => {
     emailService.sendEmail = jest.fn().mockResolvedValue(mail);
 
     const result = await verifyEmailHandler.execute(
-      new VerifyEmailCommand(...commandData),
+      new SendVerifyEmailCommand(...commandData),
     );
     expect(result).toEqual(mail);
   });
@@ -67,7 +69,9 @@ describe('VerifyEmailHandler', () => {
       .mockReturnValue(emailAddressValidate);
 
     expect(
-      await verifyEmailHandler.execute(new VerifyEmailCommand(...commandData)),
+      await verifyEmailHandler.execute(
+        new SendVerifyEmailCommand(...commandData),
+      ),
     ).toEqual({
       status: 400,
       message: `Invalid email address : ${emailAddressValidate.reason}`,
@@ -85,7 +89,7 @@ describe('VerifyEmailHandler', () => {
     emailService.sendEmail = jest.fn().mockResolvedValue(mail);
 
     await expect(
-      verifyEmailHandler.execute(new VerifyEmailCommand(...commandData)),
+      verifyEmailHandler.execute(new SendVerifyEmailCommand(...commandData)),
     ).rejects.toThrow(InternalServerErrorException);
   });
 });

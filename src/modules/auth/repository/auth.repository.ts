@@ -1,15 +1,11 @@
 import { Injectable } from '@nestjs/common';
+import { User, AuthToken, VerifyEmailToken } from '@prisma/client';
 
-import { User, AuthToken } from '@prisma/client';
 import { PrismaService } from '../../../database/prisma.service';
-import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthRepository {
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly configService: ConfigService,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async createUser(name: string, email: string, hashedPassword: string) {
     return await this.prisma.user.create({
@@ -36,6 +32,39 @@ export class AuthRepository {
       where: {
         refreshToken: refreshToken,
       },
+    });
+  }
+
+  async getVerifyEmailToken(
+    userId: string,
+    token: string,
+  ): Promise<VerifyEmailToken[]> {
+    return await this.prisma.verifyEmailToken.findMany({
+      where: {
+        userId: userId,
+        token: token,
+        type: 'NEWACCOUNT',
+        isExpired: false,
+        isVerified: false,
+      },
+    });
+  }
+
+  async updateUserVerifyByEmail(userId: string): Promise<void> {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { isVerified: true },
+    });
+  }
+
+  async updateVerifyEmailToken(
+    id: string,
+    userId: string,
+    token: string,
+  ): Promise<void> {
+    await this.prisma.verifyEmailToken.update({
+      where: { id: id, userId: userId, token: token },
+      data: { isExpired: true, isVerified: true, verifiedAt: new Date() },
     });
   }
 

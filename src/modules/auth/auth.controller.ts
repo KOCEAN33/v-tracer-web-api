@@ -7,6 +7,7 @@ import {
   Req,
   Res,
   Ip,
+  Query,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import type { Request, Response } from 'express';
@@ -22,6 +23,8 @@ import { RefreshTokenCommand } from './commands/refresh-token.command';
 
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { CustomRequest } from '../../common/interface/custom-request.interface';
+import { VerifyEmailQueryDTO } from './dto/verify-email.query.dto';
+import { UserVerifyEmailCommand } from './commands/verify-email.command';
 
 @ApiTags('Auth API')
 @Controller('/api/auth')
@@ -77,7 +80,7 @@ export class AuthController {
   @Post('/signup')
   @ApiOperation({ summary: 'User Signup' })
   @ApiTags('Auth')
-  @ApiCreatedResponse({ description: '유저 생성', type: UserSignUpDto })
+  @ApiCreatedResponse({ description: '회원 가입', type: UserSignUpDto })
   async signUp(@Req() req: Request, @Body() dto: UserSignUpDto) {
     dto.email = dto.email.toLowerCase();
     const fingerprint = req.headers['fingerprint'] as string;
@@ -85,6 +88,15 @@ export class AuthController {
     const command = new UserSignUpCommand(name, email, password, fingerprint);
     return this.commandBus.execute(command);
   }
+
+  @Post('/verify/email')
+  async verifyEmail(@Query() queryString: VerifyEmailQueryDTO) {
+    const { id, confirmationCode } = queryString;
+    const command = new UserVerifyEmailCommand(id, confirmationCode);
+    return this.commandBus.execute(command);
+  }
+
+  // TODO : resend verify email
 
   @UseGuards(JwtAuthGuard)
   @Get('/test')

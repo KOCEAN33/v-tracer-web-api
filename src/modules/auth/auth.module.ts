@@ -23,11 +23,13 @@ import { GetUserFromTokenHandler } from './queries/get-user.handler';
 import { SaveTokenEventHandler } from './events/save-token.event.handler';
 import { UpdateTokenEventHandler } from './events/update-token.event.handler';
 import { EmailModule } from '../email/email.module';
+import { UserVerifyEmailHandler } from './commands/verify-email.handler';
 
 const commandHandlers = [
   UserSignUpHandler,
   UserLoginHandler,
   RefreshTokenHandler,
+  UserVerifyEmailHandler,
 ];
 
 const queryHandlers = [GetUserFromTokenHandler];
