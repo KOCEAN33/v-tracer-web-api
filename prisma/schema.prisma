@@ -130,15 +130,16 @@ enum VerifyEmailType {
 }
 
 model VerifyEmailToken {
-  id         String          @id @default(auto()) @map("_id") @db.ObjectId
-  type       VerifyEmailType
-  user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId     String          @db.ObjectId
-  email      String
-  token      String
-  isExpired  Boolean         @default(false)
+  id     String          @id @default(auto()) @map("_id") @db.ObjectId
+  type   VerifyEmailType
+  user   User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String          @db.ObjectId
+  email  String
+  token  String
+
+  isExpired  Boolean   @default(false)
   expiresIn  DateTime
-  isVerified Boolean         @default(false)
+  isVerified Boolean   @default(false)
   verifiedAt DateTime?
 
   createdAt DateTime @default(now())

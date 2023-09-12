@@ -1,15 +1,11 @@
 import { Injectable } from '@nestjs/common';
 
-import { User, AuthToken, VerifyEmailToken } from '@prisma/client';
 import { PrismaService } from '../../../database/prisma.service';
-import { ConfigService } from '@nestjs/config';
+import { User, AuthToken, VerifyEmailToken } from '@prisma/client';
 
 @Injectable()
 export class AuthRepository {
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly configService: ConfigService,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async createUser(name: string, email: string, hashedPassword: string) {
     return await this.prisma.user.create({
@@ -42,8 +38,8 @@ export class AuthRepository {
   async getVerifyEmailToken(
     userId: string,
     token: string,
-  ): Promise<VerifyEmailToken> {
-    return await this.prisma.verifyEmailToken.findFirst({
+  ): Promise<VerifyEmailToken[]> {
+    return await this.prisma.verifyEmailToken.findMany({
       where: {
         userId: userId,
         token: token,
@@ -68,7 +64,7 @@ export class AuthRepository {
   ): Promise<void> {
     await this.prisma.verifyEmailToken.update({
       where: { id: id, userId: userId, token: token },
-      data: { isVerified: true, verifiedAt: new Date() },
+      data: { isExpired: true, isVerified: true, verifiedAt: new Date() },
     });
   }
 

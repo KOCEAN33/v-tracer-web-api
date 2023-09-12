@@ -96,6 +96,8 @@ export class AuthController {
     return this.commandBus.execute(command);
   }
 
+  // TODO : resend verify email
+
   @UseGuards(JwtAuthGuard)
   @Get('/test')
   async ping(@Req() req, @Ip() ip) {
