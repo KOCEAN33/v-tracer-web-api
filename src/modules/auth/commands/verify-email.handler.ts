@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException } from '@nestjs/common';
+import { ForbiddenException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import { AuthRepository } from '../repository/auth.repository';
@@ -24,12 +24,17 @@ export class UserVerifyEmailHandler
       throw new ForbiddenException('Invalid request');
     }
     if (tokens.length > 1) {
-      throw new BadRequestException('Something went wrong');
+      throw new ForbiddenException('Something went wrong');
     }
 
     // check is token available
     const token = tokens[0];
     if (token.expiresIn <= new Date()) {
+      throw new ForbiddenException('Invalid request');
+    }
+
+    // check verification token is valid
+    if (token.token !== confirmationCode) {
       throw new ForbiddenException('Invalid request');
     }
 
