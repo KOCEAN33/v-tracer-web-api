@@ -14,33 +14,24 @@ export class UserVerifyEmailHandler
     const { userId, confirmationCode } = command;
 
     // get the tokens from db
-    const tokens = await this.authRepository.getVerifyEmailToken(
+    const token = await this.authRepository.getNewAccountVerifyEmailToken(
       userId,
       confirmationCode,
     );
 
     // check is tokens in db is variable
-    if (!tokens) {
+    if (!token) {
       throw new ForbiddenException('Invalid request');
-    }
-    if (tokens.length > 1) {
-      throw new ForbiddenException('Something went wrong');
     }
 
     // check is token available
-    const token = tokens[0];
     if (token.expiresIn <= new Date()) {
-      throw new ForbiddenException('Invalid request');
-    }
-
-    // check verification token is valid
-    if (token.token !== confirmationCode) {
       throw new ForbiddenException('Invalid request');
     }
 
     // update user & token status
     await Promise.all([
-      await this.authRepository.updateVerifyEmailToken(
+      await this.authRepository.updateVerifyToken(
         token.id,
         userId,
         confirmationCode,

@@ -1,16 +1,17 @@
 import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UAParser } from 'ua-parser-js';
 
 import { PasswordService } from '../password.service';
 import { AuthRepository } from '../repository/auth.repository';
 import { TokenService } from '../token.service';
 import { UserLoginCommand } from './login.command';
 import { SaveTokenEvent } from '../events/save-token.event';
+import { UserAgentParser } from '../ua.service';
 
 interface LoginResponse {
-  accessToken: string;
+  message: string;
+  accessToken?: string;
   userData: { id: string; name: string };
 }
 
@@ -22,12 +23,13 @@ export class UserLoginHandler implements ICommandHandler<UserLoginCommand> {
     private readonly tokenService: TokenService,
     private readonly jwtService: JwtService,
     private readonly eventBus: EventBus,
+    private readonly userAgentParser: UserAgentParser,
   ) {}
 
   async execute(command: UserLoginCommand): Promise<LoginResponse> {
     const { email, password, response, ip, userAgent, fingerprint } = command;
 
-    const user = await this.authRepository.getUserByEmail(email);
+    const user = await this.authRepository.getUserByEmailWithPassword(email);
 
     if (!user) {
       throw new BadRequestException('Invalid Username or Password');
@@ -35,40 +37,53 @@ export class UserLoginHandler implements ICommandHandler<UserLoginCommand> {
 
     const passwordValid = await this.passwordService.validatePassword(
       password,
-      user.password,
+      user.password.password,
     );
 
     if (!passwordValid) {
       throw new BadRequestException('Invalid Username or Password');
     }
+    if (user.status === 'Unverified') {
+      return {
+        message: 'Unverified',
+        userData: { id: user.id, name: user.name },
+      };
+    }
 
-    const { accessToken, refreshToken } = this.tokenService.generateTokens({
-      userId: user.id,
-    });
+    // successful login logic
+    if (user.status === 'Activated') {
+      const { accessToken, refreshToken } = this.tokenService.generateTokens({
+        userId: user.id,
+      });
 
-    const decodeJWT = this.jwtService.decode(refreshToken);
-    const expiresIn = new Date(decodeJWT['exp'] * 1000);
+      const decodeJWT = this.jwtService.decode(refreshToken);
+      const expiresIn = new Date(decodeJWT['exp'] * 1000);
 
-    // save refreshToken
-    const parser = new UAParser(userAgent);
-    const os = parser.getOS().name;
+      // save refreshToken
+      const parsedUserAgent = this.userAgentParser.parser(
+        userAgent,
+        ip,
+        fingerprint,
+      );
 
-    this.eventBus.publish(
-      new SaveTokenEvent(user.id, refreshToken, ip, os, fingerprint, expiresIn),
-    );
+      this.eventBus.publish(
+        new SaveTokenEvent(user.id, refreshToken, parsedUserAgent, expiresIn),
+      );
 
-    response.clearCookie('token');
-    response.cookie('token', refreshToken, {
-      httpOnly: true,
-      sameSite: 'strict',
-      secure: process.env.NODE_ENV !== 'development',
-    });
+      response.clearCookie('token');
+      response.cookie('token', refreshToken, {
+        httpOnly: true,
+        sameSite: 'strict',
+        secure: process.env.NODE_ENV !== 'development',
+      });
 
-    const userData = {
-      id: user.id,
-      name: user.name,
-    };
+      const userData = {
+        id: user.id,
+        name: user.name,
+      };
 
-    return { accessToken, userData };
+      return { message: 'Login Success', accessToken, userData };
+    }
+    throw new ForbiddenException('Your account can not authorize');
   }
 }

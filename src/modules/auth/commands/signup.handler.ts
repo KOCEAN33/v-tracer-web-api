@@ -1,15 +1,19 @@
-import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import {
+  CommandBus,
+  CommandHandler,
+  EventBus,
+  ICommandHandler,
+} from '@nestjs/cqrs';
 import {
   ConflictException,
   Injectable,
   UnauthorizedException,
-  UnprocessableEntityException,
 } from '@nestjs/common';
 
 import { AuthRepository } from '../repository/auth.repository';
 import { PasswordService } from '../password.service';
 import { UserSignUpCommand } from './signup.command';
-import { SendVerifyEmailCommand } from '../../email/commands/send-verify-email.command';
+import { SendVerifyEmailEvent } from '../events/send-verify-email.event';
 
 @Injectable()
 @CommandHandler(UserSignUpCommand)
@@ -18,6 +22,7 @@ export class UserSignUpHandler implements ICommandHandler<UserSignUpCommand> {
     private readonly authRepository: AuthRepository,
     private readonly passwordService: PasswordService,
     private readonly commandBus: CommandBus,
+    private readonly eventBus: EventBus,
   ) {}
 
   async execute(command: UserSignUpCommand): Promise<string> {
@@ -38,23 +43,15 @@ export class UserSignUpHandler implements ICommandHandler<UserSignUpCommand> {
     const hashedPassword = await this.passwordService.hashPassword(password);
 
     // Add to Database
-    const save = await this.authRepository.createUser(
+    const save = await this.authRepository.createUserByEmail(
       name,
       email,
       hashedPassword,
     );
 
     // Send email to verify user
-    const verifyEmailCommand = new SendVerifyEmailCommand(save.id, email);
-    const mail = await this.commandBus.execute(verifyEmailCommand);
+    this.eventBus.publish(new SendVerifyEmailEvent(save.id, email));
 
-    if (mail.status === 400) {
-      throw new UnprocessableEntityException('Fail to send email');
-    }
-
-    if (mail.status === 200) {
-      // TODO: change return to useful value
-      return 'plz check your email';
-    }
+    return 'plz check your email';
   }
 }

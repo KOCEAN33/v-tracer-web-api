@@ -18,11 +18,10 @@ enum UserStatus {
 }
 
 model User {
-  id       String     @id @default(auto()) @map("_id") @db.ObjectId
-  name     String
-  email    String     @unique
-  password String
-  status   UserStatus
+  id     String     @id @default(auto()) @map("_id") @db.ObjectId
+  name   String
+  email  String     @unique
+  status UserStatus
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -31,6 +30,16 @@ model User {
   review      Review[]
   question    Question[]
   verifyToken VerifyToken[]
+  password    Password?
+}
+
+model Password {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId   String @unique @db.ObjectId
+  password String
+
+  updatedAt DateTime @updatedAt
 }
 
 type UserAgent {
@@ -44,16 +53,13 @@ model AuthToken {
   id           String    @id @default(auto()) @map("_id") @db.ObjectId
   user         User      @relation(fields: [userId], references: [id])
   userId       String    @db.ObjectId
-  refreshToken String    @unique @db.String
+  refreshToken String    @unique
   creationUA   UserAgent
   latestUA     UserAgent
-
-  expiresIn DateTime
+  expiresIn    DateTime
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  @@index([userId])
 }
 
 model Product {
@@ -92,8 +98,8 @@ model Review {
   id        String        @id @default(auto()) @map("_id") @db.ObjectId
   product   Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId String        @db.ObjectId
-  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String        @db.ObjectId
+  user      User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  String        @db.ObjectId
   title     String
   body      String
   status    ArticleStatus @default(value: Draft)
@@ -107,8 +113,8 @@ model Review {
 
 model Question {
   id        String        @id @default(auto()) @map("_id") @db.ObjectId
-  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String        @db.ObjectId
+  user      User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  String        @db.ObjectId
   product   Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId String        @db.ObjectId
   title     String

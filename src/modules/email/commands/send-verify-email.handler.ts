@@ -61,7 +61,7 @@ export class SendVerifyEmailHandler
 
     // Save and Send it
     const [, mail]: [void, MessagesSendResult] = await Promise.all([
-      await this.emailRepository.saveVerifyToken(
+      await this.emailRepository.createVerifyToken(
         userId,
         email,
         token,
