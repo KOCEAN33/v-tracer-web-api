@@ -21,7 +21,6 @@ export class UserSignUpHandler implements ICommandHandler<UserSignUpCommand> {
   constructor(
     private readonly authRepository: AuthRepository,
     private readonly passwordService: PasswordService,
-    private readonly commandBus: CommandBus,
     private readonly eventBus: EventBus,
   ) {}
 

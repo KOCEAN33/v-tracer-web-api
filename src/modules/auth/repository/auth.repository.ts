@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { User, AuthToken, VerifyToken, UserAgent } from '@prisma/client';
+import { User, VerifyToken, UserAgent, AuthToken } from '@prisma/client';
 
 import { PrismaService } from '../../../database/prisma.service';
 
@@ -20,13 +20,6 @@ export class AuthRepository {
 
   async getUserByEmail(email: string): Promise<User> {
     return this.prisma.user.findUnique({ where: { email: email } });
-  }
-
-  async getRefreshToken(userId: string, refreshToken: string) {
-    return await this.prisma.user.findFirst({
-      where: { id: userId, status: 'Activated' },
-      include: { authToken: { where: { refreshToken: refreshToken } } },
-    });
   }
 
   async getNewAccountVerifyEmailToken(
@@ -76,6 +69,17 @@ export class AuthRepository {
     });
   }
 
+  async getRefreshToken(
+    userId: string,
+    refreshToken: string,
+  ): Promise<AuthToken> {
+    const token = await this.prisma.user.findFirst({
+      where: { id: userId, status: 'Activated' },
+      include: { authToken: { where: { refreshToken: refreshToken } } },
+    });
+    return token.authToken[0];
+  }
+
   async saveRefreshToken(
     userId: string,
     refreshToken: string,
@@ -93,13 +97,14 @@ export class AuthRepository {
     });
   }
 
+  // TODO: fix DB schema, it should be update refreshToken even UA data doesn't exist
   async updateRefreshToken(
     id: string,
     refreshToken: string,
     userAgent: UserAgent,
     expiresIn: Date,
-  ) {
-    return await this.prisma.authToken.update({
+  ): Promise<void> {
+    await this.prisma.authToken.update({
       where: { id: id },
       data: {
         refreshToken: refreshToken,

@@ -1,10 +1,11 @@
-import { EmailService } from '../email.service';
-import { ConfigService } from '@nestjs/config';
-import { EmailRepository } from '../repository/email.repository';
+import { InternalServerErrorException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { ConfigService } from '@nestjs/config';
+
+import { EmailService } from '../email.service';
+import { EmailRepository } from '../repository/email.repository';
 import { SendVerifyEmailHandler } from './send-verify-email.handler';
 import { SendVerifyEmailCommand } from './send-verify-email.command';
-import { InternalServerErrorException } from '@nestjs/common';
 
 describe('VerifyEmailHandler', () => {
   let verifyEmailHandler: SendVerifyEmailHandler;
@@ -28,7 +29,7 @@ describe('VerifyEmailHandler', () => {
           provide: EmailRepository,
           useValue: {
             invalidateOldToken: jest.fn(),
-            saveVerifyToken: jest.fn(),
+            createVerifyToken: jest.fn(),
           },
         },
       ],
@@ -45,7 +46,7 @@ describe('VerifyEmailHandler', () => {
   });
 
   it('should send email to user', async () => {
-    const commandData = ['userid', 'dev@example.com'] as const;
+    const commandData = ['userId', 'dev@example.com'] as const;
     const emailAddressValidate = { valid: true };
     const mail = { status: 200 };
 
