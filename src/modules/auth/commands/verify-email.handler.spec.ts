@@ -1,10 +1,10 @@
-import { ForbiddenException } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { AuthRepository } from '../repository/auth.repository';
 import { UserVerifyEmailHandler } from './verify-email.handler';
 import { UserVerifyEmailCommand } from './verify-email.command';
+import { ForbiddenException } from '@nestjs/common';
 
 describe('UserVerifyEmailHandler', () => {
   let userVerifyEmailHandler: UserVerifyEmailHandler;
@@ -17,8 +17,8 @@ describe('UserVerifyEmailHandler', () => {
         {
           provide: AuthRepository,
           useValue: {
-            getVerifyEmailToken: jest.fn(),
-            updateVerifyEmailToken: jest.fn(),
+            getNewAccountVerifyEmailToken: jest.fn(),
+            updateVerifyToken: jest.fn(),
             updateUserVerifyByEmail: jest.fn(),
           },
         },
@@ -41,24 +41,23 @@ describe('UserVerifyEmailHandler', () => {
   it('should update User & VerifyEmailToken', async () => {
     const today = new Date();
     const commandData = ['verifyUserId', 'verifyToken'] as const;
-    const tokens = [
-      {
-        id: 'tokenId',
-        userId: 'verifyUserId',
-        token: 'verifyToken',
-        expiresIn: today.setHours(today.getHours() + 1),
-      },
-    ];
-    const token = tokens[0];
+    const token = {
+      id: 'tokenId',
+      userId: 'verifyUserId',
+      token: 'verifyToken',
+      expiresIn: today.setHours(today.getHours() + 1),
+    };
 
-    authRepository.getVerifyEmailToken = jest.fn().mockResolvedValue(tokens);
+    authRepository.getNewAccountVerifyEmailToken = jest
+      .fn()
+      .mockResolvedValue(token);
 
     const result = await userVerifyEmailHandler.execute(
       new UserVerifyEmailCommand(...commandData),
     );
 
     expect(result).toEqual('success to verify your email');
-    expect(authRepository.updateVerifyEmailToken).toHaveBeenCalledWith(
+    expect(authRepository.updateVerifyToken).toHaveBeenCalledWith(
       token.id,
       token.userId,
       'verifyToken',
@@ -67,10 +66,13 @@ describe('UserVerifyEmailHandler', () => {
       'verifyUserId',
     );
   });
+
   it('should throw Forbidden error if no tokens are provided', async () => {
     const commandData = ['verifyUserId', 'verifyToken'] as const;
 
-    authRepository.getVerifyEmailToken = jest.fn().mockResolvedValue(null);
+    authRepository.getNewAccountVerifyEmailToken = jest
+      .fn()
+      .mockResolvedValue(null);
 
     await expect(
       userVerifyEmailHandler.execute(
@@ -78,65 +80,20 @@ describe('UserVerifyEmailHandler', () => {
       ),
     ).rejects.toThrow(new ForbiddenException('Invalid request'));
   });
-  it('should throw Forbidden error if token founded more then one', async () => {
-    const commandData = ['verifyUserId', 'verifyToken'] as const;
-    const today = new Date();
-    const tokens = [
-      {
-        id: 'tokenId',
-        userId: 'verifyUserId',
-        token: 'verifyToken',
-        expiresIn: today.setHours(today.getHours() + 1),
-      },
-      {
-        id: 'tokenId2',
-        userId: 'verifyUserId2',
-        token: 'verifyToken2',
-        expiresIn: today.setHours(today.getHours() + 1),
-      },
-    ];
 
-    authRepository.getVerifyEmailToken = jest.fn().mockResolvedValue(tokens);
-
-    await expect(
-      userVerifyEmailHandler.execute(
-        new UserVerifyEmailCommand(...commandData),
-      ),
-    ).rejects.toThrow(new ForbiddenException('Something went wrong'));
-  });
   it('should throw Forbidden error if token expired', async () => {
     const commandData = ['verifyUserId', 'verifyToken'] as const;
     const today = new Date();
-    const tokens = [
-      {
-        id: 'tokenId',
-        userId: 'verifyUserId',
-        token: 'verifyToken',
-        expiresIn: today.setHours(today.getHours() - 1),
-      },
-    ];
+    const tokens = {
+      id: 'tokenId',
+      userId: 'verifyUserId',
+      token: 'verifyToken',
+      expiresIn: today.setHours(today.getHours() - 1),
+    };
 
-    authRepository.getVerifyEmailToken = jest.fn().mockResolvedValue(tokens);
-
-    await expect(
-      userVerifyEmailHandler.execute(
-        new UserVerifyEmailCommand(...commandData),
-      ),
-    ).rejects.toThrow(new ForbiddenException('Invalid request'));
-  });
-  it('should throw Forbidden error if token is different', async () => {
-    const commandData = ['verifyUserId', 'verifyToken'] as const;
-    const today = new Date();
-    const tokens = [
-      {
-        id: 'tokenId',
-        userId: 'verifyUserId',
-        token: 'otherVerifyToken',
-        expiresIn: today.setHours(today.getHours() - 1),
-      },
-    ];
-
-    authRepository.getVerifyEmailToken = jest.fn().mockResolvedValue(tokens);
+    authRepository.getNewAccountVerifyEmailToken = jest
+      .fn()
+      .mockResolvedValue(tokens);
 
     await expect(
       userVerifyEmailHandler.execute(

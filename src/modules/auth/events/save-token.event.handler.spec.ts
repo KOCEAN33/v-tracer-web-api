@@ -29,18 +29,20 @@ describe('SaveTokenEventHandler', () => {
   });
 
   it('should save new refresh token', async () => {
+    const userAgent = {
+      IP: '127.0.0.1',
+      OS: 'windows',
+      browser: 'Firefox',
+      fingerprint: 'fingerprint',
+    };
     const eventData = [
       '27359',
       'faceRefreshToken',
-      '127.0.0.1',
-      'Windows',
-      'fingerprint',
+      userAgent,
       new Date(),
     ] as const;
 
-    const event = new SaveTokenEvent(...eventData);
-
-    await saveTokenEventHandler.handle(event);
+    await saveTokenEventHandler.handle(new SaveTokenEvent(...eventData));
 
     expect(authRepository.saveRefreshToken).toHaveBeenCalledWith(...eventData);
   });

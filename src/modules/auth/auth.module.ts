@@ -24,6 +24,8 @@ import { SaveTokenEventHandler } from './events/save-token.event.handler';
 import { UpdateTokenEventHandler } from './events/update-token.event.handler';
 import { EmailModule } from '../email/email.module';
 import { UserVerifyEmailHandler } from './commands/verify-email.handler';
+import { UserAgentParser } from './ua.service';
+import { SendVerifyEmailEventHandler } from './events/send-verify-email.event.handler';
 
 const commandHandlers = [
   UserSignUpHandler,
@@ -34,7 +36,11 @@ const commandHandlers = [
 
 const queryHandlers = [GetUserFromTokenHandler];
 
-const eventHandlers = [SaveTokenEventHandler, UpdateTokenEventHandler];
+const eventHandlers = [
+  SaveTokenEventHandler,
+  UpdateTokenEventHandler,
+  SendVerifyEmailEventHandler,
+];
 
 @Module({
   imports: [
@@ -65,6 +71,7 @@ const eventHandlers = [SaveTokenEventHandler, UpdateTokenEventHandler];
     JwtStrategy,
     JwtAuthGuard,
     EmailModule,
+    UserAgentParser,
 
     ...commandHandlers,
     ...queryHandlers,

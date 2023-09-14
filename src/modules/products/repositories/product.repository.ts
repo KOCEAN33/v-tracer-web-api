@@ -11,13 +11,6 @@ export class ProductRepository {
     });
   }
 
-  async updateProduct(handle, name, ownerId, url) {
-    return await this.prisma.product.update({
-      where: { handle: handle },
-      data: { name, ownerId, url },
-    });
-  }
-
   // Query
   async getProductByProductHandle(handle) {
     return await this.prisma.product.findUnique({ where: { handle: handle } });

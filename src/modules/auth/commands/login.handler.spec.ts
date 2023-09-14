@@ -10,21 +10,14 @@ import { TokenService } from '../token.service';
 import { UserLoginHandler } from './login.handler';
 import { UserLoginCommand } from './login.command';
 import { SaveTokenEvent } from '../events/save-token.event';
-
-const commandData = [
-  'test@example.com',
-  'password',
-  { clearCookie: jest.fn(), cookie: jest.fn() } as any,
-  '127.0.0.1',
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/117.0',
-  'fingerprint',
-] as const;
+import { UserAgentParser } from '../ua.service';
 
 describe('UserLoginHandler', () => {
   let userLoginHandler: UserLoginHandler;
   let authRepository: AuthRepository;
   let passwordService: PasswordService;
   let eventBus: EventBus;
+  let userAgentParser: UserAgentParser;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -33,7 +26,7 @@ describe('UserLoginHandler', () => {
         {
           provide: AuthRepository,
           useValue: {
-            getUserByEmail: jest.fn(),
+            getUserByEmailWithPassword: jest.fn(),
           },
         },
         {
@@ -65,6 +58,7 @@ describe('UserLoginHandler', () => {
             publish: jest.fn(),
           },
         },
+        { provide: UserAgentParser, useValue: { parser: jest.fn() } },
       ],
     }).compile();
 
@@ -72,6 +66,7 @@ describe('UserLoginHandler', () => {
     authRepository = module.get<AuthRepository>(AuthRepository);
     passwordService = module.get<PasswordService>(PasswordService);
     eventBus = module.get<EventBus>(EventBus);
+    userAgentParser = module.get<UserAgentParser>(UserAgentParser);
   });
 
   it('should be an instanceof UserLoginHandler', () => {
@@ -79,13 +74,32 @@ describe('UserLoginHandler', () => {
   });
 
   it('should return access token and user data on successful login', async () => {
+    const commandData = [
+      'test@example.com',
+      'password',
+      { clearCookie: jest.fn(), cookie: jest.fn() } as any,
+      '127.0.0.1',
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/117.0',
+      'fingerprint',
+    ] as const;
     const mockUser = {
       id: 'userId',
       name: 'John',
-      password: 'hashedPassword',
+      status: 'Activated',
+      isVerified: true,
+      password: { password: 'hashedPassword' },
     };
-    authRepository.getUserByEmail = jest.fn().mockResolvedValue(mockUser);
+    const parsedUserAgent = {
+      IP: '127.0.0.1',
+      OS: 'windows',
+      browser: 'Firefox',
+      fingerprint: 'fingerprint',
+    };
+    authRepository.getUserByEmailWithPassword = jest
+      .fn()
+      .mockResolvedValue(mockUser);
     passwordService.validatePassword = jest.fn().mockResolvedValue(true);
+    userAgentParser.parser = jest.fn().mockReturnValue(parsedUserAgent);
 
     const result = await userLoginHandler.execute(
       new UserLoginCommand(...commandData),
@@ -93,33 +107,80 @@ describe('UserLoginHandler', () => {
 
     expect(result).toEqual({
       accessToken: 'fakeAccessToken',
-      userData: { id: 'userId', name: 'John' },
+      message: 'Login Success',
+      userData: { id: 'userId', name: 'John', isVerified: true },
     });
     expect(eventBus.publish).toHaveBeenCalledWith(
       new SaveTokenEvent(
         'userId',
         'fakeRefreshToken',
-        '127.0.0.1',
-        'Windows',
-        'fingerprint',
+        parsedUserAgent,
         new Date(1693479600 * 1000),
       ),
     );
   });
 
+  it('should return alarm when user does not verified', async () => {
+    const commandData = [
+      'test@example.com',
+      'password',
+      { clearCookie: jest.fn(), cookie: jest.fn() } as any,
+      '127.0.0.1',
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/117.0',
+      'fingerprint',
+    ] as const;
+    const mockUser = {
+      id: 'userId',
+      name: 'John',
+      status: 'Unverified',
+      isVerified: false,
+      password: { password: 'hashedPassword' },
+    };
+
+    authRepository.getUserByEmailWithPassword = jest
+      .fn()
+      .mockResolvedValue(mockUser);
+    passwordService.validatePassword = jest.fn().mockResolvedValue(true);
+
+    const result = await userLoginHandler.execute(
+      new UserLoginCommand(...commandData),
+    );
+
+    expect(result).toEqual({
+      message: 'Your account is not verified',
+      userData: { id: 'userId', name: 'John', isVerified: false },
+    });
+  });
+
   it('should throw BadRequestException if user does not exist', async () => {
-    authRepository.getUserByEmail = jest.fn(() => null);
+    const commandData = [
+      'test@example.com',
+      'password',
+      { clearCookie: jest.fn(), cookie: jest.fn() } as any,
+      '127.0.0.1',
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/117.0',
+      'fingerprint',
+    ] as const;
+    authRepository.getUserByEmailWithPassword = jest.fn(() => null);
 
     await expect(
       userLoginHandler.execute(new UserLoginCommand(...commandData)),
     ).rejects.toThrow(BadRequestException);
   });
 
-  it('should throw BadRequestException if password is invalid', async () => {
+  it('should throw BadRequestException if password is not equal', async () => {
+    const commandData = [
+      'test@example.com',
+      'password',
+      { clearCookie: jest.fn(), cookie: jest.fn() } as any,
+      '127.0.0.1',
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/117.0',
+      'fingerprint',
+    ] as const;
     const mockUser = {
       id: 'userId',
       name: 'John',
-      password: 'hashedPassword',
+      password: { password: 'hashedPassword' },
     };
     authRepository.getUserByEmail = jest.fn().mockResolvedValue(mockUser);
     passwordService.validatePassword = jest.fn().mockResolvedValue(false);
