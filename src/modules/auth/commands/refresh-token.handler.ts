@@ -58,7 +58,6 @@ export class RefreshTokenHandler
       ip,
       fingerprint,
     );
-    console.log(token.id, refreshToken, parsedUserAgent, expiresIn);
 
     // update refreshToken to keep logged in
     this.eventBus.publish(

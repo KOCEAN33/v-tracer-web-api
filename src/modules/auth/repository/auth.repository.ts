@@ -29,7 +29,6 @@ export class AuthRepository {
     const data = await this.prisma.user.findFirst({
       where: {
         id: userId,
-        status: 'Unverified',
       },
       include: {
         verifyToken: {
@@ -43,7 +42,7 @@ export class AuthRepository {
   async updateUserVerifyByEmail(userId: string): Promise<void> {
     await this.prisma.user.update({
       where: { id: userId },
-      data: { status: 'Activated' },
+      data: { status: 'Activated', isVerified: true },
     });
   }
 
@@ -74,7 +73,7 @@ export class AuthRepository {
     refreshToken: string,
   ): Promise<AuthToken> {
     const token = await this.prisma.user.findFirst({
-      where: { id: userId, status: 'Activated' },
+      where: { id: userId, isVerified: true },
       include: { authToken: { where: { refreshToken: refreshToken } } },
     });
     return token.authToken[0];

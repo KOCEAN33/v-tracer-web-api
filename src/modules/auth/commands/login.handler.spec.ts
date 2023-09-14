@@ -86,6 +86,7 @@ describe('UserLoginHandler', () => {
       id: 'userId',
       name: 'John',
       status: 'Activated',
+      isVerified: true,
       password: { password: 'hashedPassword' },
     };
     const parsedUserAgent = {
@@ -107,7 +108,7 @@ describe('UserLoginHandler', () => {
     expect(result).toEqual({
       accessToken: 'fakeAccessToken',
       message: 'Login Success',
-      userData: { id: 'userId', name: 'John' },
+      userData: { id: 'userId', name: 'John', isVerified: true },
     });
     expect(eventBus.publish).toHaveBeenCalledWith(
       new SaveTokenEvent(
@@ -119,7 +120,7 @@ describe('UserLoginHandler', () => {
     );
   });
 
-  it('should return Unverified when user does not authenticated', async () => {
+  it('should return alarm when user does not verified', async () => {
     const commandData = [
       'test@example.com',
       'password',
@@ -132,6 +133,7 @@ describe('UserLoginHandler', () => {
       id: 'userId',
       name: 'John',
       status: 'Unverified',
+      isVerified: false,
       password: { password: 'hashedPassword' },
     };
 
@@ -145,8 +147,8 @@ describe('UserLoginHandler', () => {
     );
 
     expect(result).toEqual({
-      message: 'Unverified',
-      userData: { id: 'userId', name: 'John' },
+      message: 'Your account is not verified',
+      userData: { id: 'userId', name: 'John', isVerified: false },
     });
   });
 
@@ -166,7 +168,7 @@ describe('UserLoginHandler', () => {
     ).rejects.toThrow(BadRequestException);
   });
 
-  it('should throw BadRequestException if password is invalid', async () => {
+  it('should throw BadRequestException if password is not equal', async () => {
     const commandData = [
       'test@example.com',
       'password',

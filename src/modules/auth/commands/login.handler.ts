@@ -12,7 +12,7 @@ import { UserAgentParser } from '../ua.service';
 interface LoginResponse {
   message: string;
   accessToken?: string;
-  userData: { id: string; name: string };
+  userData: { id: string; name: string; isVerified: boolean };
 }
 
 @CommandHandler(UserLoginCommand)
@@ -43,47 +43,47 @@ export class UserLoginHandler implements ICommandHandler<UserLoginCommand> {
     if (!passwordValid) {
       throw new BadRequestException('Invalid Username or Password');
     }
-    if (user.status === 'Unverified') {
+
+    // reject login
+    if (user.isVerified === false) {
       return {
-        message: 'Unverified',
-        userData: { id: user.id, name: user.name },
+        message: 'Your account is not verified',
+        userData: { id: user.id, name: user.name, isVerified: user.isVerified },
       };
     }
 
     // successful login logic
-    if (user.status === 'Activated') {
-      const { accessToken, refreshToken } = this.tokenService.generateTokens({
-        userId: user.id,
-      });
+    const { accessToken, refreshToken } = this.tokenService.generateTokens({
+      userId: user.id,
+    });
 
-      const decodeJWT = this.jwtService.decode(refreshToken);
-      const expiresIn = new Date(decodeJWT['exp'] * 1000);
+    const decodeJWT = this.jwtService.decode(refreshToken);
+    const expiresIn = new Date(decodeJWT['exp'] * 1000);
 
-      // save refreshToken
-      const parsedUserAgent = this.userAgentParser.parser(
-        userAgent,
-        ip,
-        fingerprint,
-      );
+    // save refreshToken
+    const parsedUserAgent = this.userAgentParser.parser(
+      userAgent,
+      ip,
+      fingerprint,
+    );
 
-      this.eventBus.publish(
-        new SaveTokenEvent(user.id, refreshToken, parsedUserAgent, expiresIn),
-      );
+    this.eventBus.publish(
+      new SaveTokenEvent(user.id, refreshToken, parsedUserAgent, expiresIn),
+    );
 
-      response.clearCookie('token');
-      response.cookie('token', refreshToken, {
-        httpOnly: true,
-        sameSite: 'strict',
-        secure: process.env.NODE_ENV !== 'development',
-      });
+    response.clearCookie('token');
+    response.cookie('token', refreshToken, {
+      httpOnly: true,
+      sameSite: 'strict',
+      secure: process.env.NODE_ENV !== 'development',
+    });
 
-      const userData = {
-        id: user.id,
-        name: user.name,
-      };
+    const userData = {
+      id: user.id,
+      name: user.name,
+      isVerified: user.isVerified,
+    };
 
-      return { message: 'Login Success', accessToken, userData };
-    }
-    throw new ForbiddenException('Your account can not authorize');
+    return { message: 'Login Success', accessToken, userData };
   }
 }

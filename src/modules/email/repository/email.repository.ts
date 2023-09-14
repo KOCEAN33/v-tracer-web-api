@@ -29,4 +29,11 @@ export class EmailRepository {
       data: { isVerifiable: false },
     });
   }
+
+  async updateUserStatusEmailNotExist(userId: string) {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { status: 'NoEmailExist' },
+    });
+  }
 }

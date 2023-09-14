@@ -30,6 +30,7 @@ describe('VerifyEmailHandler', () => {
           useValue: {
             invalidateOldToken: jest.fn(),
             createVerifyToken: jest.fn(),
+            updateUserStatusEmailNotExist: jest.fn(),
           },
         },
       ],
@@ -61,7 +62,7 @@ describe('VerifyEmailHandler', () => {
     expect(result).toEqual(mail);
   });
 
-  it('should failed email address validation', async () => {
+  it('should failed if email address does not exist', async () => {
     const commandData = ['userid', 'dev@notvalid.com'] as const;
     const emailAddressValidate = { valid: false, status: 400, reason: 'smtp' };
 
