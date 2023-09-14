@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { User, AuthToken, VerifyEmailToken } from '@prisma/client';
+import { User, VerifyToken, UserAgent, AuthToken } from '@prisma/client';
 
 import { PrismaService } from '../../../database/prisma.service';
 
@@ -7,102 +7,107 @@ import { PrismaService } from '../../../database/prisma.service';
 export class AuthRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createUser(name: string, email: string, hashedPassword: string) {
-    return await this.prisma.user.create({
-      data: {
-        name: name,
-        email: email,
-        password: hashedPassword,
-      },
-    });
-  }
-
   async getUserById(userId: string): Promise<User> {
     return this.prisma.user.findUnique({ where: { id: userId } });
   }
 
-  async getUserByEmail(email: string): Promise<User> {
+  async getUserByEmailWithPassword(email: string) {
     return await this.prisma.user.findUnique({
       where: { email: email },
+      include: { password: { select: { password: true } } },
     });
   }
 
-  async getUserByRefreshToken(refreshToken: string): Promise<AuthToken> {
-    return await this.prisma.authToken.findUnique({
-      where: {
-        refreshToken: refreshToken,
-      },
-    });
+  async getUserByEmail(email: string): Promise<User> {
+    return this.prisma.user.findUnique({ where: { email: email } });
   }
 
-  async getVerifyEmailToken(
+  async getNewAccountVerifyEmailToken(
     userId: string,
     token: string,
-  ): Promise<VerifyEmailToken[]> {
-    return await this.prisma.verifyEmailToken.findMany({
+  ): Promise<VerifyToken> {
+    const data = await this.prisma.user.findFirst({
       where: {
-        userId: userId,
-        token: token,
-        type: 'NEWACCOUNT',
-        isExpired: false,
-        isVerified: false,
+        id: userId,
+      },
+      include: {
+        verifyToken: {
+          where: { type: 'NewAccount', token: token, isVerifiable: true },
+        },
       },
     });
+    return data.verifyToken[0];
   }
 
   async updateUserVerifyByEmail(userId: string): Promise<void> {
     await this.prisma.user.update({
       where: { id: userId },
-      data: { isVerified: true },
+      data: { status: 'Activated', isVerified: true },
     });
   }
 
-  async updateVerifyEmailToken(
+  async updateVerifyToken(
     id: string,
     userId: string,
     token: string,
   ): Promise<void> {
-    await this.prisma.verifyEmailToken.update({
-      where: { id: id, userId: userId, token: token },
-      data: { isExpired: true, isVerified: true, verifiedAt: new Date() },
+    await this.prisma.verifyToken.update({
+      where: { id: id, type: 'NewAccount', userId: userId, token: token },
+      data: { isVerifiable: false, verifiedAt: new Date() },
     });
+  }
+
+  async createUserByEmail(name: string, email: string, hashedPassword: string) {
+    return await this.prisma.user.create({
+      data: {
+        name: name,
+        email: email,
+        status: 'Unverified',
+        password: { create: { password: hashedPassword } },
+      },
+    });
+  }
+
+  async getRefreshToken(
+    userId: string,
+    refreshToken: string,
+  ): Promise<AuthToken> {
+    const token = await this.prisma.user.findFirst({
+      where: { id: userId, isVerified: true },
+      include: { authToken: { where: { refreshToken: refreshToken } } },
+    });
+    return token.authToken[0];
   }
 
   async saveRefreshToken(
     userId: string,
     refreshToken: string,
-    ip: string,
-    os: string,
-    fingerprint: string,
+    userAgent: UserAgent,
     expiresIn: Date,
-  ) {
-    return await this.prisma.authToken.create({
+  ): Promise<void> {
+    await this.prisma.authToken.create({
       data: {
         userId: userId,
-        fingerprint: fingerprint,
-        ip: ip,
-        os: os,
         refreshToken: refreshToken,
+        creationUA: userAgent,
+        latestUA: userAgent,
         expiresIn: expiresIn,
       },
     });
   }
 
+  // TODO: fix DB schema, it should be update refreshToken even UA data doesn't exist
   async updateRefreshToken(
     id: string,
     refreshToken: string,
-    ip: string,
-    os: string,
-    fingerprint: string,
+    userAgent: UserAgent,
     expiresIn: Date,
-  ) {
-    return await this.prisma.authToken.update({
+  ): Promise<void> {
+    await this.prisma.authToken.update({
       where: { id: id },
       data: {
         refreshToken: refreshToken,
-        ip: ip,
-        os: os,
-        fingerprint: fingerprint,
+        latestUA: userAgent,
         expiresIn: expiresIn,
       },
     });

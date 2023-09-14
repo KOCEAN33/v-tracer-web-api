@@ -5,29 +5,35 @@ import { PrismaService } from '../../../database/prisma.service';
 export class EmailRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async saveVerifyToken(
+  async createVerifyToken(
     userId: string,
     email: string,
     token: string,
     expiresIn: Date,
   ): Promise<void> {
-    await this.prisma.verifyEmailToken.create({
+    await this.prisma.verifyToken.create({
       data: {
-        type: 'NEWACCOUNT',
+        type: 'NewAccount',
         userId: userId,
         email: email,
         token: token,
-        isVerified: false,
-        isExpired: false,
+        isVerifiable: true,
         expiresIn: expiresIn,
       },
     });
   }
 
   async invalidateOldToken(userId: string): Promise<void> {
-    await this.prisma.verifyEmailToken.updateMany({
-      where: { userId: userId, isExpired: false },
-      data: { isExpired: true },
+    await this.prisma.verifyToken.updateMany({
+      where: { userId: userId },
+      data: { isVerifiable: false },
+    });
+  }
+
+  async updateUserStatusEmailNotExist(userId: string) {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { status: 'NoEmailExist' },
     });
   }
 }

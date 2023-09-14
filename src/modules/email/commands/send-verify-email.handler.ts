@@ -31,10 +31,13 @@ export class SendVerifyEmailHandler
   ): Promise<VerifyEmailCommandInterface> {
     const { userId, email } = command;
 
+    // check this email address is exist
     const emailAddressValidate =
       await this.emailService.validateEmailAddress(email);
 
     if (!emailAddressValidate.valid) {
+      await this.emailRepository.updateUserStatusEmailNotExist(userId);
+      // TODO: should throw error that this email is not exist
       return {
         status: 400,
         message: `Invalid email address : ${emailAddressValidate.reason}`,
@@ -61,7 +64,7 @@ export class SendVerifyEmailHandler
 
     // Save and Send it
     const [, mail]: [void, MessagesSendResult] = await Promise.all([
-      await this.emailRepository.saveVerifyToken(
+      await this.emailRepository.createVerifyToken(
         userId,
         email,
         token,

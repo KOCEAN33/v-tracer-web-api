@@ -5,7 +5,7 @@ import { UserSignUpHandler } from './signup.handler';
 import { AuthRepository } from '../repository/auth.repository';
 import { PasswordService } from '../password.service';
 
-import { CommandBus } from '@nestjs/cqrs';
+import { CommandBus, EventBus } from '@nestjs/cqrs';
 
 import { SendVerifyEmailCommand } from '../../email/commands/send-verify-email.command';
 import {
@@ -17,8 +17,8 @@ import {
 describe('UserSignUpHandler', () => {
   let userSignUpHandler: UserSignUpHandler;
   let authRepository: AuthRepository;
-  // let passwordService: PasswordService;
   let commandBus: CommandBus;
+  let eventBus: EventBus;
 
   beforeEach(async () => {
     const moduleRef: TestingModule = await Test.createTestingModule({
@@ -28,21 +28,20 @@ describe('UserSignUpHandler', () => {
           provide: AuthRepository,
           useValue: {
             getUserByEmail: jest.fn(),
-            createUser: { id: '1234', email: 'dev@xanny.us' },
+            createUserByEmail: jest.fn(),
           },
         },
         {
           provide: PasswordService,
           useValue: { hashPassword: jest.fn(() => ({})) },
         },
-        { provide: CommandBus, useValue: { execute: jest.fn() } },
+        { provide: EventBus, useValue: { publish: jest.fn() } },
       ],
     }).compile();
 
     userSignUpHandler = moduleRef.get<UserSignUpHandler>(UserSignUpHandler);
     authRepository = moduleRef.get<AuthRepository>(AuthRepository);
-    // passwordService = moduleRef.get<PasswordService>(PasswordService);
-    commandBus = moduleRef.get<CommandBus>(CommandBus);
+    eventBus = moduleRef.get<EventBus>(EventBus);
   });
 
   it('should be an instanceof UserSignUpHandler', () => {
@@ -58,18 +57,16 @@ describe('UserSignUpHandler', () => {
     ] as const;
     const checkUser = null;
     const save = { id: '123', email: 'dev@xanny.us' };
-    const mail = { status: 200 };
 
     authRepository.getUserByEmail = jest.fn().mockResolvedValue(checkUser);
-    authRepository.createUser = jest.fn().mockResolvedValue(save);
-    commandBus.execute = jest.fn().mockResolvedValue(mail);
+    authRepository.createUserByEmail = jest.fn().mockResolvedValue(save);
 
     const result = await userSignUpHandler.execute(
       new UserSignUpCommand(...commandData),
     );
 
     expect(result).toEqual('plz check your email');
-    expect(commandBus.execute).toHaveBeenCalledWith(
+    expect(eventBus.publish).toHaveBeenCalledWith(
       new SendVerifyEmailCommand(save.id, save.email),
     );
   });
@@ -96,25 +93,5 @@ describe('UserSignUpHandler', () => {
     await expect(
       userSignUpHandler.execute(new UserSignUpCommand(...commandData)),
     ).rejects.toThrow(ConflictException);
-  });
-
-  it('should throw UnprocessableEntityException when unable to send email', async () => {
-    const commandData = [
-      'xanny',
-      'dev@xanny.us',
-      'password123',
-      'fingerprint',
-    ] as const;
-    const checkUser = null;
-    const save = { id: '123', email: 'dev@xanny.us' };
-    const mail = { status: 400 };
-
-    authRepository.getUserByEmail = jest.fn().mockResolvedValue(checkUser);
-    authRepository.createUser = jest.fn().mockResolvedValue(save);
-    commandBus.execute = jest.fn().mockResolvedValue(mail);
-
-    await expect(
-      userSignUpHandler.execute(new UserSignUpCommand(...commandData)),
-    ).rejects.toThrow(UnprocessableEntityException);
   });
 });

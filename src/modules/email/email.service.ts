@@ -29,6 +29,7 @@ export class EmailService {
       html: html,
       'o:testmode': process.env.NODE_ENV === 'development',
     };
+    console.log(options.to);
     return await this.mailgunService.createEmail(domain, options);
   }
 
