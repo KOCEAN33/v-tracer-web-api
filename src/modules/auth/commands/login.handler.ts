@@ -12,7 +12,12 @@ import { UserAgentParser } from '../ua.service';
 interface LoginResponse {
   message: string;
   accessToken?: string;
-  userData: { id: string; name: string; isVerified: boolean };
+  userData: {
+    id: string;
+    name: string;
+    imageSrc?: string;
+    isVerified?: boolean;
+  };
 }
 
 @CommandHandler(UserLoginCommand)
@@ -81,7 +86,7 @@ export class UserLoginHandler implements ICommandHandler<UserLoginCommand> {
     const userData = {
       id: user.id,
       name: user.name,
-      isVerified: user.isVerified,
+      imageSrc: user.imageSrc,
     };
 
     return { message: 'Login Success', accessToken, userData };

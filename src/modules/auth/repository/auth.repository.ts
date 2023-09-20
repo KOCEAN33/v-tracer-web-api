@@ -74,7 +74,15 @@ export class AuthRepository {
   ): Promise<AuthToken> {
     const token = await this.prisma.user.findFirst({
       where: { id: userId, isVerified: true },
-      include: { authToken: { where: { refreshToken: refreshToken } } },
+      include: {
+        authToken: {
+          where: {
+            refreshToken: refreshToken,
+            isActivated: true,
+            expiresIn: { gte: new Date() },
+          },
+        },
+      },
     });
     return token.authToken[0];
   }
@@ -92,6 +100,7 @@ export class AuthRepository {
         creationUA: userAgent,
         latestUA: userAgent,
         expiresIn: expiresIn,
+        isActivated: true,
       },
     });
   }
@@ -109,7 +118,19 @@ export class AuthRepository {
         refreshToken: refreshToken,
         latestUA: userAgent,
         expiresIn: expiresIn,
+        isActivated: true,
       },
+    });
+  }
+
+  async disableRefreshToken(
+    userId: string,
+    refreshToken: string,
+    userAgent: UserAgent,
+  ): Promise<void> {
+    await this.prisma.authToken.update({
+      where: { userId: userId, refreshToken: refreshToken },
+      data: { latestUA: userAgent, isActivated: false },
     });
   }
 }
