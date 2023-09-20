@@ -9,7 +9,7 @@ import {
   Ip,
   Query,
 } from '@nestjs/common';
-import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { CommandBus } from '@nestjs/cqrs';
 import type { Request, Response } from 'express';
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
@@ -25,14 +25,13 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { CustomRequest } from '../../common/interface/custom-request.interface';
 import { VerifyEmailQueryDTO } from './dto/verify-email.query.dto';
 import { UserVerifyEmailCommand } from './commands/verify-email.command';
+import { UserLogoutCommand } from './commands/logout.command';
+import { LogoutDto } from './dto/logout.dto';
 
 @ApiTags('Auth API')
 @Controller('/api/auth')
 export class AuthController {
-  constructor(
-    private commandBus: CommandBus,
-    private queryBus: QueryBus,
-  ) {}
+  constructor(private commandBus: CommandBus) {}
 
   @ApiOperation({ summary: 'User Login' })
   @ApiCreatedResponse({ description: 'User Login', type: UserLoginDto })
@@ -101,13 +100,30 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('/test')
   async ping(@Req() req, @Ip() ip) {
-    return ip;
+    return 'success';
   }
 
   @ApiOperation({ summary: 'Logout' })
   @Post('/logout')
-  async logout() {
-    return;
+  async logout(
+    @Res({ passthrough: true }) res: Response,
+    @Req() req: Request,
+    @Body() dto: LogoutDto,
+    @Ip() ip: string,
+  ) {
+    const fingerprint = req.headers['fingerprint'] as string;
+    const userAgent = req.headers['user-agent'];
+    const refreshToken = req.cookies['token'];
+    const { userId } = dto;
+    const command = new UserLogoutCommand(
+      res,
+      userId,
+      refreshToken,
+      ip,
+      userAgent,
+      fingerprint,
+    );
+    return this.commandBus.execute(command);
   }
 
   @ApiOperation({ summary: 'Logout from every device' })
