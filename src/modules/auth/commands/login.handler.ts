@@ -15,7 +15,7 @@ interface LoginResponse {
   userData: {
     id: string;
     name: string;
-    imageSrc?: string;
+    image?: string;
     isVerified?: boolean;
   };
 }
@@ -60,6 +60,8 @@ export class UserLoginHandler implements ICommandHandler<UserLoginCommand> {
     // successful login logic
     const { accessToken, refreshToken } = this.tokenService.generateTokens({
       userId: user.id,
+      name: user.name,
+      image: user.imageSrc,
     });
 
     const decodeJWT = this.jwtService.decode(refreshToken);
@@ -86,7 +88,7 @@ export class UserLoginHandler implements ICommandHandler<UserLoginCommand> {
     const userData = {
       id: user.id,
       name: user.name,
-      imageSrc: user.imageSrc,
+      image: user.imageSrc,
     };
 
     return { message: 'Login Success', accessToken, userData };

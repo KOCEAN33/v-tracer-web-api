@@ -16,7 +16,11 @@ export class TokenService {
     private readonly configService: ConfigService,
   ) {}
 
-  generateTokens(payload: { userId: string }): Token {
+  generateTokens(payload: {
+    userId: string;
+    name: string;
+    image: string;
+  }): Token {
     return {
       accessToken: this.generateAccessToken(payload),
       refreshToken: this.generateRefreshToken(payload),
@@ -35,7 +39,11 @@ export class TokenService {
     }
   }
 
-  private generateAccessToken(payload: { userId: string }): string {
+  private generateAccessToken(payload: {
+    userId: string;
+    name: string;
+    image: string;
+  }): string {
     return this.jwtService.sign(payload);
   }
 

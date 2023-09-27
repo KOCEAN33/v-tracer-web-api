@@ -19,7 +19,7 @@ import { SecurityConfig } from '../../common/config/config.interface';
 import { UserSignUpHandler } from './commands/signup.handler';
 import { UserLoginHandler } from './commands/login.handler';
 import { RefreshTokenHandler } from './commands/refresh-token.handler';
-import { GetUserFromTokenHandler } from './queries/get-user.handler';
+import { GetUserFromTokenHandler } from './queries/get-myinfo.handler';
 import { SaveTokenEventHandler } from './events/save-token.event.handler';
 import { UpdateTokenEventHandler } from './events/update-token.event.handler';
 import { EmailModule } from '../email/email.module';
