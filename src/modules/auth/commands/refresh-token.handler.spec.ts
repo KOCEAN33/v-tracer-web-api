@@ -34,7 +34,10 @@ describe('RefreshTokenHandler', () => {
         RefreshTokenHandler,
         {
           provide: AuthRepository,
-          useValue: { getUserByRefreshToken: jest.fn() },
+          useValue: {
+            getUserByRefreshToken: jest.fn(),
+            getUserById: jest.fn(),
+          },
         },
         {
           provide: TokenService,
@@ -74,6 +77,7 @@ describe('RefreshTokenHandler', () => {
 
   it('should refresh access and refresh tokens and publish UpdateTokenEvent', async () => {
     const payload = { userId: 'mockUserId' };
+    const mockUser = { id: 'mockUserId', name: 'mockUser', image: 'mockImage' };
     const token = { id: 'mockTokenId', userId: 'mockUserId' };
     const parsedUserAgent = {
       IP: '127.0.0.1',
@@ -84,6 +88,7 @@ describe('RefreshTokenHandler', () => {
 
     tokenService.extractUserIdFromToken = jest.fn().mockReturnValue(payload);
     authRepository.getRefreshToken = jest.fn().mockResolvedValue(token);
+    authRepository.getUserById = jest.fn().mockResolvedValue(mockUser);
     userAgentParser.parser = jest.fn().mockReturnValue(parsedUserAgent);
 
     const result = await refreshTokenHandler.execute(

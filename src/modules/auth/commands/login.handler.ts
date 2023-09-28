@@ -1,5 +1,5 @@
 import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
-import { BadRequestException, ForbiddenException } from '@nestjs/common';
+import { BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
 import { PasswordService } from '../password.service';
@@ -61,7 +61,7 @@ export class UserLoginHandler implements ICommandHandler<UserLoginCommand> {
     const { accessToken, refreshToken } = this.tokenService.generateTokens({
       userId: user.id,
       name: user.name,
-      image: user.imageSrc,
+      image: user.image,
     });
 
     const decodeJWT = this.jwtService.decode(refreshToken);
@@ -88,7 +88,7 @@ export class UserLoginHandler implements ICommandHandler<UserLoginCommand> {
     const userData = {
       id: user.id,
       name: user.name,
-      image: user.imageSrc,
+      image: user.image,
     };
 
     return { message: 'Login Success', accessToken, userData };

@@ -49,7 +49,7 @@ export class RefreshTokenHandler
     const { accessToken, refreshToken } = this.tokenService.generateTokens({
       userId: user.id,
       name: user.name,
-      image: user.imageSrc,
+      image: user.image,
     });
 
     // get expired time

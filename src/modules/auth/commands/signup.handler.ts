@@ -1,19 +1,14 @@
-import {
-  CommandBus,
-  CommandHandler,
-  EventBus,
-  ICommandHandler,
-} from '@nestjs/cqrs';
+import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import {
   ConflictException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
 
+import { SendVerifyEmailEvent } from '../events/send-verify-email.event';
 import { AuthRepository } from '../repository/auth.repository';
 import { PasswordService } from '../password.service';
 import { UserSignUpCommand } from './signup.command';
-import { SendVerifyEmailEvent } from '../events/send-verify-email.event';
 
 @Injectable()
 @CommandHandler(UserSignUpCommand)

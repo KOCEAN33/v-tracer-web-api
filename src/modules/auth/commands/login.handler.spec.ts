@@ -86,7 +86,7 @@ describe('UserLoginHandler', () => {
       id: 'userId',
       name: 'John',
       status: 'Activated',
-      imageSrc: 'imageUrl',
+      image: 'imageUrl',
       isVerified: true,
       password: { password: 'hashedPassword' },
     };
@@ -109,7 +109,7 @@ describe('UserLoginHandler', () => {
     expect(result).toEqual({
       accessToken: 'fakeAccessToken',
       message: 'Login Success',
-      userData: { id: 'userId', name: 'John', imageSrc: 'imageUrl' },
+      userData: { id: 'userId', name: 'John', image: 'imageUrl' },
     });
     expect(eventBus.publish).toHaveBeenCalledWith(
       new SaveTokenEvent(
