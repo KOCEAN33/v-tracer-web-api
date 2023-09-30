@@ -26,7 +26,7 @@ export class GetUserFromTokenHandler implements IQueryHandler<GetMyInfoQuery> {
     return {
       id: user.id,
       name: user.name,
-      image: user.imageSrc,
+      image: user.image,
     };
   }
 }
