@@ -5,8 +5,15 @@ import {
   ExceptionFilter,
   HttpException,
   InternalServerErrorException,
+  HttpStatus,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
+
+interface ErrorResponse {
+  statusCode: number;
+  message: string;
+  data: null;
+}
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -16,21 +23,46 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const res = ctx.getResponse<Response>();
     const req = ctx.getRequest<Request>();
-    const stack = exception.stack;
+
+    const statusCode =
+      exception instanceof HttpException
+        ? exception.getStatus()
+        : HttpStatus.INTERNAL_SERVER_ERROR;
+    const message =
+      exception instanceof HttpException
+        ? exception.message
+        : 'Internal server error';
+    // const stack = exception.stack;
 
     if (!(exception instanceof HttpException)) {
       exception = new InternalServerErrorException();
     }
 
-    const response = (exception as HttpException).getResponse();
+    // const response = (exception as HttpException).getResponse();
 
-    const log = {
-      timestamp: new Date(),
-      url: req.url,
-      response,
-      stack,
+    const devErrorLog: any = {
+      status: statusCode,
+      timestamp: new Date().toISOString(),
+      method: req.method,
+      errorName: exception?.name,
+      message: exception?.message,
     };
-    this.logger.error(log);
-    res.status((exception as HttpException).getStatus()).json(response);
+
+    const errorResponse: ErrorResponse = {
+      statusCode,
+      message,
+      data: null,
+    };
+
+    // const log = {
+    //   timestamp: new Date(),
+    //   url: req.url,
+    //   response,
+    //   stack,
+    // };
+    process.env.NODE_ENV === 'development'
+      ? this.logger.log(devErrorLog)
+      : undefined;
+    res.status((exception as HttpException).getStatus()).json(errorResponse);
   }
 }
