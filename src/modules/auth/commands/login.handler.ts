@@ -1,5 +1,5 @@
 import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
 import { PasswordService } from '../password.service';
@@ -50,11 +50,12 @@ export class UserLoginHandler implements ICommandHandler<UserLoginCommand> {
     }
 
     // reject login
-    if (user.isVerified === false) {
-      return {
-        message: 'Your account is not verified',
-        userData: { id: user.id, name: user.name, isVerified: user.isVerified },
-      };
+    if (!user.isVerified) {
+      throw new ForbiddenException('Your email is not verified');
+    }
+
+    if (user.image == null) {
+      user.image = undefined;
     }
 
     // successful login logic
@@ -81,7 +82,7 @@ export class UserLoginHandler implements ICommandHandler<UserLoginCommand> {
     response.clearCookie('token');
     response.cookie('token', refreshToken, {
       httpOnly: true,
-      sameSite: 'strict',
+      sameSite: true,
       secure: process.env.NODE_ENV !== 'development',
     });
 

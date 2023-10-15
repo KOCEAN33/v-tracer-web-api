@@ -10,7 +10,7 @@
     "start": "nest start",
     "start:dev": "pnpm prebuild && cross-env NODE_ENV=development nest start --watch",
     "start:debug": "pnpm prebuild && cross-env NODE_ENV=development nest start --debug --watch",
-    "start:prod": "node dist/main",
+    "start:prod": "node dist/src/main",
     "prisma:seed": "dotenv -e ./src/common/config/env/.development.env -- pnpm ts-node prisma/seed.ts",
     "push:dev": "dotenv -e ./src/common/config/env/.development.env -- pnpm prisma db push",
     "studio": "dotenv -e ./src/common/config/env/.development.env -- pnpm prisma studio",
