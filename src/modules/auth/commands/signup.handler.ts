@@ -19,7 +19,7 @@ export class UserSignUpHandler implements ICommandHandler<UserSignUpCommand> {
     private readonly eventBus: EventBus,
   ) {}
 
-  async execute(command: UserSignUpCommand): Promise<string> {
+  async execute(command: UserSignUpCommand) {
     const { name, email, password, fingerprint } = command;
 
     // Block unknown system
@@ -46,6 +46,6 @@ export class UserSignUpHandler implements ICommandHandler<UserSignUpCommand> {
     // Send email to verify user
     this.eventBus.publish(new SendVerifyEmailEvent(save.id, email));
 
-    return 'plz check your email';
+    return { message: 'account created successfully, please check your email' };
   }
 }
