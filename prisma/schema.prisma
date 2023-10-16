@@ -164,7 +164,7 @@ model VerifyToken {
   user   User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String     @db.ObjectId
   email  String?
-  token  String
+  code   String
 
   isVerifiable Boolean  @default(false)
   expiresIn    DateTime
@@ -174,5 +174,5 @@ model VerifyToken {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([userId])
+  @@index([code])
 }

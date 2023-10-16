@@ -53,8 +53,8 @@ export class PrismaService
       this.logger.verbose(event);
     });
     this.$on('query', (e) => {
-      // console.log(e);
-      console.log(`Duration: ${e.duration}ms`);
+      //console.log(JSON.stringify(e));
+      //console.log(`Duration: ${e.duration}ms`);
     });
     await this.$connect();
   }
