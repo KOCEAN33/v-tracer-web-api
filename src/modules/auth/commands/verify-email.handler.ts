@@ -13,8 +13,6 @@ export class UserVerifyEmailHandler
   async execute(command: UserVerifyEmailCommand) {
     const { verifyCode } = command;
 
-    console.log(verifyCode);
-
     // get the tokens from db
     const verifyData =
       await this.authRepository.getVerifyEmailByVerifyCode(verifyCode);

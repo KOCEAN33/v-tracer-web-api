@@ -102,7 +102,6 @@ export class AuthController {
   @Post('/verify/email')
   async verifyEmail(@Body() dto: VerifyEmailDto) {
     const { verifyCode } = dto;
-    console.log(verifyCode);
     const command = new UserVerifyEmailCommand(verifyCode);
     return this.commandBus.execute(command);
   }
@@ -112,15 +111,6 @@ export class AuthController {
   async getMyInfo(@User() userId: string) {
     const query = new GetMyInfoQuery(userId);
     return this.queryBus.execute(query);
-  }
-
-  // TODO : resend verify email
-
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
-  @Get('/test')
-  ping(@Req() req, @Ip() ip, @User() user: UserEntity) {
-    return user;
   }
 
   @ApiOperation({ summary: 'Logout' })
@@ -150,5 +140,12 @@ export class AuthController {
   @Post('/logout-all')
   async purgeToken() {
     return;
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Get('/test')
+  ping(@User() user: UserEntity) {
+    return user;
   }
 }

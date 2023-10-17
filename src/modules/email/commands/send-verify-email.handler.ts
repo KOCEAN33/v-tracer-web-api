@@ -1,11 +1,11 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ConfigService } from '@nestjs/config';
+import { NotFoundException } from '@nestjs/common';
+import type { MessagesSendResult } from 'mailgun.js';
 
 import { SendVerifyEmailCommand } from './send-verify-email.command';
 import { EmailService } from '../email.service';
 import { EmailRepository } from '../repository/email.repository';
-import type { MessagesSendResult } from 'mailgun.js';
-import { InternalServerErrorException } from '@nestjs/common';
 
 @CommandHandler(SendVerifyEmailCommand)
 export class SendVerifyEmailHandler
@@ -28,10 +28,8 @@ export class SendVerifyEmailHandler
 
     if (!emailAddressValidate.valid) {
       await this.emailRepository.updateUserStatusEmailNotExist(userId);
-      // TODO: should throw error that this email is not exist
-      return {
-        message: `Invalid email address : ${emailAddressValidate.reason}`,
-      };
+      //TODO: log error message
+      throw new NotFoundException('this email address is not exist');
     }
 
     // Invalidate old tokens

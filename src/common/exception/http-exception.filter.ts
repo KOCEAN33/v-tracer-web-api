@@ -32,7 +32,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       exception instanceof HttpException
         ? exception.message
         : 'Internal server error';
-    const stack = exception.stack;
+    //const stack = exception.stack;
 
     if (!(exception instanceof HttpException)) {
       exception = new InternalServerErrorException();
@@ -61,7 +61,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     //   response,
     //   stack,
     // };
-    console.log(devErrorLog);
+    this.logger.error(devErrorLog);
     res.status((exception as HttpException).getStatus()).json(errorResponse);
   }
 }

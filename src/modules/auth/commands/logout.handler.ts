@@ -1,4 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+
 import { UserLogoutCommand } from './logout.command';
 import { AuthRepository } from '../repository/auth.repository';
 import { UserAgentParser } from '../ua.service';

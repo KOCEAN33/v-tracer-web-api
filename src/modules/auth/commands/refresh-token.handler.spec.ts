@@ -1,13 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ForbiddenException, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { EventBus } from '@nestjs/cqrs';
 
 import { RefreshTokenCommand } from './refresh-token.command';
 import { RefreshTokenHandler } from './refresh-token.handler';
 import { AuthRepository } from '../repository/auth.repository';
-import { TokenService } from '../token.service';
 import { UpdateTokenEvent } from '../events/update-token.event';
-import { JwtService } from '@nestjs/jwt';
+import { TokenService } from '../token.service';
 import { UserAgentParser } from '../ua.service';
 
 const commandData = [
