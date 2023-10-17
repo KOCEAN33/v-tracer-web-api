@@ -34,7 +34,6 @@ import { UserLogoutCommand } from './commands/logout.command';
 import { LogoutDto } from './dto/logout.dto';
 import { GetMyInfoQuery } from './queries/get-myinfo.query';
 import { User } from '../../common/decorators/get-user.decorator';
-import { UserEntity } from './entity/user-id.entity';
 
 @ApiTags('Auth API')
 @Controller('/api/auth')
@@ -140,12 +139,5 @@ export class AuthController {
   @Post('/logout-all')
   async purgeToken() {
     return;
-  }
-
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
-  @Get('/test')
-  ping(@User() user: UserEntity) {
-    return user;
   }
 }
