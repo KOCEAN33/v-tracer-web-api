@@ -46,6 +46,6 @@ export class UserSignUpHandler implements ICommandHandler<UserSignUpCommand> {
     // Send email to verify user
     this.eventBus.publish(new SendVerifyEmailEvent(save.id, email));
 
-    return { message: 'account created successfully, please check your email' };
+    return { message: 'please verify your email' };
   }
 }

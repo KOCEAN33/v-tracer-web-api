@@ -22,21 +22,14 @@ export class AuthRepository {
     return this.prisma.user.findUnique({ where: { email: email } });
   }
 
-  async getNewAccountVerifyEmailToken(
-    userId: string,
-    token: string,
-  ): Promise<VerifyToken> {
-    const data = await this.prisma.user.findFirst({
+  async getVerifyEmailByVerifyCode(verifyCode: string) {
+    return await this.prisma.verifyToken.findFirst({
       where: {
-        id: userId,
-      },
-      include: {
-        verifyToken: {
-          where: { type: 'NewAccount', token: token, isVerifiable: true },
-        },
+        type: 'NewAccount',
+        code: verifyCode,
+        isVerifiable: true,
       },
     });
-    return data.verifyToken[0];
   }
 
   async updateUserVerifyByEmail(userId: string): Promise<void> {
@@ -46,13 +39,9 @@ export class AuthRepository {
     });
   }
 
-  async updateVerifyToken(
-    id: string,
-    userId: string,
-    token: string,
-  ): Promise<void> {
+  async updateVerifyToken(id: string): Promise<void> {
     await this.prisma.verifyToken.update({
-      where: { id: id, type: 'NewAccount', userId: userId, token: token },
+      where: { id: id },
       data: { isVerifiable: false, verifiedAt: new Date() },
     });
   }

@@ -18,30 +18,30 @@ async function main() {
 
   const seedVerifyToken = await prisma.verifyToken.createMany({
     data: [
-      {
-        type: 'NewAccount',
-        userId: '6501ef25efdbf55df72f7e24',
-        email: 'dev@example.com',
-        token: 'ecb5f58c-22eb-4aae-bbeb-0a371c2cc89d',
-        isVerifiable: true,
-        expiresIn: todayAddHour,
-      },
-      {
-        type: 'ChangePassword',
-        userId: '6501ef25efdbf55df72f7e24',
-        email: 'dev123@example.com',
-        token: 'ecb5f58c-22eb-4aae-bbeb-0a371sc21c89d',
-        isVerifiable: true,
-        expiresIn: new Date(),
-      },
-      {
-        type: 'NewAccount',
-        userId: '6501ef25efdbf55df72f7e24',
-        email: 'iam@example.com',
-        token: 'ecb5f58c-22eb-4aae-bbeb-0a3731c2cc69d',
-        isVerifiable: true,
-        expiresIn: todayAddHour,
-      },
+      // {
+      //   type: 'NewAccount',
+      //   userId: '6501ef25efdbf55df72f7e24',
+      //   email: 'dev@example.com',
+      //   token: 'ecb5f58c-22eb-4aae-bbeb-0a371c2cc89d',
+      //   isVerifiable: true,
+      //   expiresIn: todayAddHour,
+      // },
+      // {
+      //   type: 'ChangePassword',
+      //   userId: '6501ef25efdbf55df72f7e24',
+      //   email: 'dev123@example.com',
+      //   token: 'ecb5f58c-22eb-4aae-bbeb-0a371sc21c89d',
+      //   isVerifiable: true,
+      //   expiresIn: new Date(),
+      // },
+      // {
+      //   type: 'NewAccount',
+      //   userId: '6501ef25efdbf55df72f7e24',
+      //   email: 'iam@example.com',
+      //   token: 'ecb5f58c-22eb-4aae-bbeb-0a3731c2cc69d',
+      //   isVerifiable: true,
+      //   expiresIn: todayAddHour,
+      // },
     ],
   });
   console.log({ seedVerifyToken });

@@ -28,7 +28,7 @@ import { RefreshTokenCommand } from './commands/refresh-token.command';
 
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { CustomRequest } from '../../common/interface/custom-request.interface';
-import { VerifyEmailQueryDTO } from './dto/verify-email.query.dto';
+import { VerifyEmailDto } from './dto/verify-email.dto';
 import { UserVerifyEmailCommand } from './commands/verify-email.command';
 import { UserLogoutCommand } from './commands/logout.command';
 import { LogoutDto } from './dto/logout.dto';
@@ -100,9 +100,9 @@ export class AuthController {
   }
 
   @Post('/verify/email')
-  async verifyEmail(@Query() queryString: VerifyEmailQueryDTO) {
-    const { id, confirmationCode } = queryString;
-    const command = new UserVerifyEmailCommand(id, confirmationCode);
+  async verifyEmail(@Body() dto: VerifyEmailDto) {
+    const { verifyCode } = dto;
+    const command = new UserVerifyEmailCommand(verifyCode);
     return this.commandBus.execute(command);
   }
 
@@ -111,15 +111,6 @@ export class AuthController {
   async getMyInfo(@User() userId: string) {
     const query = new GetMyInfoQuery(userId);
     return this.queryBus.execute(query);
-  }
-
-  // TODO : resend verify email
-
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
-  @Get('/test')
-  ping(@Req() req, @Ip() ip, @User() user: UserEntity) {
-    return user;
   }
 
   @ApiOperation({ summary: 'Logout' })
@@ -149,5 +140,12 @@ export class AuthController {
   @Post('/logout-all')
   async purgeToken() {
     return;
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Get('/test')
+  ping(@User() user: UserEntity) {
+    return user;
   }
 }

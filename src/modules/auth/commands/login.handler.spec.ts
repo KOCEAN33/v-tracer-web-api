@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { EventBus } from '@nestjs/cqrs';
 
@@ -121,7 +121,7 @@ describe('UserLoginHandler', () => {
     );
   });
 
-  it('should return alarm when user does not verified', async () => {
+  it('should return ForbiddenException when user email does not verified', async () => {
     const commandData = [
       'test@example.com',
       'password',
@@ -143,14 +143,9 @@ describe('UserLoginHandler', () => {
       .mockResolvedValue(mockUser);
     passwordService.validatePassword = jest.fn().mockResolvedValue(true);
 
-    const result = await userLoginHandler.execute(
-      new UserLoginCommand(...commandData),
-    );
-
-    expect(result).toEqual({
-      message: 'Your account is not verified',
-      userData: { id: 'userId', name: 'John', isVerified: false },
-    });
+    expect(
+      userLoginHandler.execute(new UserLoginCommand(...commandData)),
+    ).rejects.toThrow(ForbiddenException);
   });
 
   it('should throw BadRequestException if user does not exist', async () => {

@@ -32,20 +32,21 @@ export class HttpExceptionFilter implements ExceptionFilter {
       exception instanceof HttpException
         ? exception.message
         : 'Internal server error';
-    // const stack = exception.stack;
+    //const stack = exception.stack;
 
     if (!(exception instanceof HttpException)) {
       exception = new InternalServerErrorException();
     }
 
-    // const response = (exception as HttpException).getResponse();
+    const response = (exception as HttpException).getResponse();
 
     const devErrorLog: any = {
       status: statusCode,
       timestamp: new Date().toISOString(),
       method: req.method,
-      errorName: exception?.name,
       message: exception?.message,
+      response: response,
+      // stack: stack,
     };
 
     const errorResponse: ErrorResponse = {
@@ -60,9 +61,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     //   response,
     //   stack,
     // };
-    process.env.NODE_ENV === 'development'
-      ? this.logger.log(devErrorLog)
-      : undefined;
+    this.logger.error(devErrorLog);
     res.status((exception as HttpException).getStatus()).json(errorResponse);
   }
 }
