@@ -20,7 +20,7 @@ export class UserLogoutHandler implements ICommandHandler<UserLogoutCommand> {
       command;
 
     if (!refreshToken) {
-      return { message: 'Logout success' };
+      return { message: 'success logout' };
     }
 
     const parsedUserAgent = this.userAgentParser.parser(
@@ -36,7 +36,9 @@ export class UserLogoutHandler implements ICommandHandler<UserLogoutCommand> {
     );
 
     // clear httponly cookies
-    response.clearCookie('token');
+    response.clearCookie('token', {
+      sameSite: true,
+    });
 
     return { message: 'success logout' };
   }
