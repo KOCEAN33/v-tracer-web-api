@@ -46,10 +46,10 @@ model Password {
 }
 
 type UserAgent {
-  IP          String
+  IP          String?
   OS          String?
   browser     String?
-  fingerprint String
+  fingerprint String?
 }
 
 model AuthToken {

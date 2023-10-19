@@ -12,12 +12,6 @@ import { UserAgentParser } from '../ua.service';
 interface LoginResponse {
   message: string;
   accessToken?: string;
-  userData: {
-    id: string;
-    name: string;
-    image?: string;
-    isVerified?: boolean;
-  };
 }
 
 @CommandHandler(UserLoginCommand)
@@ -51,18 +45,12 @@ export class UserLoginHandler implements ICommandHandler<UserLoginCommand> {
 
     // reject login
     if (!user.isVerified) {
-      throw new ForbiddenException('Your email is not verified');
-    }
-
-    if (user.image == null) {
-      user.image = undefined;
+      throw new ForbiddenException('Your not verified');
     }
 
     // successful login logic
     const { accessToken, refreshToken } = this.tokenService.generateTokens({
       userId: user.id,
-      name: user.name,
-      image: user.image,
     });
 
     const decodeJWT = this.jwtService.decode(refreshToken);
@@ -86,12 +74,6 @@ export class UserLoginHandler implements ICommandHandler<UserLoginCommand> {
       secure: process.env.NODE_ENV !== 'development',
     });
 
-    const userData = {
-      id: user.id,
-      name: user.name,
-      image: user.image,
-    };
-
-    return { message: 'Login Success', accessToken, userData };
+    return { message: 'Login Success', accessToken };
   }
 }

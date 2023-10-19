@@ -8,8 +8,7 @@ export class SaveTokenEventHandler implements IEventHandler<SaveTokenEvent> {
   constructor(private authRepository: AuthRepository) {}
 
   async handle(event: SaveTokenEvent) {
-    const { userId, refreshToken, userAgent, expiresIn } =
-      event as SaveTokenEvent;
+    const { userId, refreshToken, userAgent, expiresIn } = event;
 
     await this.authRepository.saveRefreshToken(
       userId,

@@ -7,32 +7,26 @@ import {
   Req,
   Res,
   Ip,
-  Query,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import type { Request, Response } from 'express';
-import {
-  ApiBearerAuth,
-  ApiCreatedResponse,
-  ApiOperation,
-  ApiTags,
-} from '@nestjs/swagger';
+import type { Response } from 'express';
+import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { UserSignUpDto } from './dto/signup.dto';
 import { UserLoginDto } from './dto/login.dto';
+import { LogoutDto } from './dto/logout.dto';
+import { VerifyEmailDto } from './dto/verify-email.dto';
 
 import { UserSignUpCommand } from './commands/signup.command';
 import { UserLoginCommand } from './commands/login.command';
-
 import { RefreshTokenCommand } from './commands/refresh-token.command';
+import { UserVerifyEmailCommand } from './commands/verify-email.command';
+
+import { GetMyInfoQuery } from './queries/get-myinfo.query';
 
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { CustomRequest } from '../../common/interface/custom-request.interface';
-import { VerifyEmailDto } from './dto/verify-email.dto';
-import { UserVerifyEmailCommand } from './commands/verify-email.command';
 import { UserLogoutCommand } from './commands/logout.command';
-import { LogoutDto } from './dto/logout.dto';
-import { GetMyInfoQuery } from './queries/get-myinfo.query';
 import { User } from '../../common/decorators/get-user.decorator';
 
 @ApiTags('Auth API')
@@ -70,7 +64,7 @@ export class AuthController {
   @Get('/refresh')
   async refreshToken(
     @Ip() ip: string,
-    @Req() req: Request,
+    @Req() req: CustomRequest,
     @Res({ passthrough: true }) response: Response,
   ) {
     const fingerprint = req.headers['fingerprint'] as string;
@@ -90,7 +84,7 @@ export class AuthController {
   @ApiOperation({ summary: 'User Signup' })
   @ApiTags('Auth')
   @ApiCreatedResponse({ description: '회원 가입', type: UserSignUpDto })
-  async signUp(@Req() req: Request, @Body() dto: UserSignUpDto) {
+  async signUp(@Req() req: CustomRequest, @Body() dto: UserSignUpDto) {
     dto.email = dto.email.toLowerCase();
     const fingerprint = req.headers['fingerprint'] as string;
     const { name, email, password } = dto;
@@ -116,7 +110,7 @@ export class AuthController {
   @Post('/logout')
   async logout(
     @Res({ passthrough: true }) res: Response,
-    @Req() req: Request,
+    @Req() req: CustomRequest,
     @Body() dto: LogoutDto,
     @Ip() ip: string,
   ) {
@@ -139,5 +133,12 @@ export class AuthController {
   @Post('/logout-all')
   async purgeToken() {
     return;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('test')
+  async test(@User() userId: string) {
+    console.log('accepted', userId);
+    return 'success';
   }
 }

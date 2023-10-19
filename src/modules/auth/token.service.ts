@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { TokenExpiredError } from 'jsonwebtoken';
 import { SecurityConfig } from '../../common/config/config.interface';
 
-export interface Token {
+interface Token {
   accessToken: string;
   refreshToken: string;
 }
@@ -16,11 +16,7 @@ export class TokenService {
     private readonly configService: ConfigService,
   ) {}
 
-  generateTokens(payload: {
-    userId: string;
-    name: string;
-    image: string;
-  }): Token {
+  generateTokens(payload: { userId: string }): Token {
     return {
       accessToken: this.generateAccessToken(payload),
       refreshToken: this.generateRefreshToken(payload),
@@ -39,11 +35,7 @@ export class TokenService {
     }
   }
 
-  private generateAccessToken(payload: {
-    userId: string;
-    name: string;
-    image: string;
-  }): string {
+  private generateAccessToken(payload: { userId: string }): string {
     return this.jwtService.sign(payload);
   }
 

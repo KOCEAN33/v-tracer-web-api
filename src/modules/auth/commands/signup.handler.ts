@@ -5,10 +5,10 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 
+import { UserSignUpCommand } from './signup.command';
 import { SendVerifyEmailEvent } from '../events/send-verify-email.event';
 import { AuthRepository } from '../repository/auth.repository';
 import { PasswordService } from '../password.service';
-import { UserSignUpCommand } from './signup.command';
 
 @Injectable()
 @CommandHandler(UserSignUpCommand)

@@ -43,13 +43,9 @@ export class RefreshTokenHandler
       throw new ForbiddenException('Access Denied');
     }
 
-    const user = await this.authRepository.getUserById(payload.userId);
-
     // new token generation
     const { accessToken, refreshToken } = this.tokenService.generateTokens({
-      userId: user.id,
-      name: user.name,
-      image: user.image,
+      userId: payload.userId,
     });
 
     // get expired time
