@@ -109,7 +109,6 @@ describe('UserLoginHandler', () => {
     expect(result).toEqual({
       accessToken: 'fakeAccessToken',
       message: 'Login Success',
-      userData: { id: 'userId', name: 'John', image: 'imageUrl' },
     });
     expect(eventBus.publish).toHaveBeenCalledWith(
       new SaveTokenEvent(

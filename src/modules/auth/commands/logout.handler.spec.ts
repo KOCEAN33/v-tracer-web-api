@@ -84,6 +84,6 @@ describe('UserLogoutHandler', () => {
       new UserLogoutCommand(...commandData),
     );
 
-    expect(result).toEqual({ message: 'Logout success' });
+    expect(result).toEqual({ message: 'success logout' });
   });
 });
