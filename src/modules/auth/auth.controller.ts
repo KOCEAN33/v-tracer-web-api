@@ -1,3 +1,4 @@
+import type { Response } from 'express';
 import {
   Body,
   Controller,
@@ -8,8 +9,7 @@ import {
   Res,
   Ip,
 } from '@nestjs/common';
-import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import type { Response } from 'express';
+import { CommandBus } from '@nestjs/cqrs';
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { UserSignUpDto } from './dto/signup.dto';
@@ -21,20 +21,17 @@ import { UserSignUpCommand } from './commands/signup.command';
 import { UserLoginCommand } from './commands/login.command';
 import { RefreshTokenCommand } from './commands/refresh-token.command';
 import { UserVerifyEmailCommand } from './commands/verify-email.command';
-
-import { GetMyInfoQuery } from './queries/get-myinfo.query';
+import { UserLogoutCommand } from './commands/logout.command';
 
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { CustomRequest } from '../../common/interface/custom-request.interface';
-import { UserLogoutCommand } from './commands/logout.command';
 import { User } from '../../common/decorators/get-user.decorator';
 
 @ApiTags('Auth API')
 @Controller('/api/auth')
 export class AuthController {
   constructor(
-    private commandBus: CommandBus,
-    private queryBus: QueryBus,
+    private commandBus: CommandBus, // private queryBus: QueryBus,
   ) {}
 
   @ApiOperation({ summary: 'User Login' })
@@ -97,13 +94,6 @@ export class AuthController {
     const { verifyCode } = dto;
     const command = new UserVerifyEmailCommand(verifyCode);
     return this.commandBus.execute(command);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('myinfo')
-  async getMyInfo(@User() userId: string) {
-    const query = new GetMyInfoQuery(userId);
-    return this.queryBus.execute(query);
   }
 
   @ApiOperation({ summary: 'Logout' })
