@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { TokenExpiredError } from 'jsonwebtoken';
 import { SecurityConfig } from '../../common/config/config.interface';
 
-export interface Token {
+interface Token {
   accessToken: string;
   refreshToken: string;
 }

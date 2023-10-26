@@ -16,7 +16,7 @@ export class EmailRepository {
         type: 'NewAccount',
         userId: userId,
         email: email,
-        token: token,
+        code: token,
         isVerifiable: true,
         expiresIn: expiresIn,
       },

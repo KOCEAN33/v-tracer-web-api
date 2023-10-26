@@ -10,6 +10,7 @@ import { winstonLogger } from './common/config/winston.config';
 import * as cookieParser from 'cookie-parser';
 
 import { useContainer } from 'class-validator';
+import { ResponseInterceptor } from './common/interceptor/response.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -17,6 +18,7 @@ async function bootstrap() {
   });
   const configService = app.get(ConfigService);
   app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalInterceptors(new ResponseInterceptor());
 
   app.use(cookieParser(`${process.env.APP_SECRET}`));
 

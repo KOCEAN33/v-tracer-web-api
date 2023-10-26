@@ -12,7 +12,6 @@ import { UserAgentParser } from '../ua.service';
 interface LoginResponse {
   message: string;
   accessToken?: string;
-  userData: { id: string; name: string; isVerified: boolean };
 }
 
 @CommandHandler(UserLoginCommand)
@@ -45,11 +44,8 @@ export class UserLoginHandler implements ICommandHandler<UserLoginCommand> {
     }
 
     // reject login
-    if (user.isVerified === false) {
-      return {
-        message: 'Your account is not verified',
-        userData: { id: user.id, name: user.name, isVerified: user.isVerified },
-      };
+    if (!user.isVerified) {
+      throw new ForbiddenException('Your not verified');
     }
 
     // successful login logic
@@ -74,16 +70,10 @@ export class UserLoginHandler implements ICommandHandler<UserLoginCommand> {
     response.clearCookie('token');
     response.cookie('token', refreshToken, {
       httpOnly: true,
-      sameSite: 'strict',
+      sameSite: true,
       secure: process.env.NODE_ENV !== 'development',
     });
 
-    const userData = {
-      id: user.id,
-      name: user.name,
-      isVerified: user.isVerified,
-    };
-
-    return { message: 'Login Success', accessToken, userData };
+    return { message: 'Login Success', accessToken };
   }
 }

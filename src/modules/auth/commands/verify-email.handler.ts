@@ -11,34 +11,28 @@ export class UserVerifyEmailHandler
   constructor(private readonly authRepository: AuthRepository) {}
 
   async execute(command: UserVerifyEmailCommand) {
-    const { userId, confirmationCode } = command;
+    const { verifyCode } = command;
 
     // get the tokens from db
-    const token = await this.authRepository.getNewAccountVerifyEmailToken(
-      userId,
-      confirmationCode,
-    );
+    const verifyData =
+      await this.authRepository.getVerifyEmailByVerifyCode(verifyCode);
 
     // check is tokens in db is variable
-    if (!token) {
+    if (!verifyData) {
       throw new ForbiddenException('Invalid request');
     }
 
     // check is token available
-    if (token.expiresIn <= new Date()) {
+    if (verifyData.expiresIn <= new Date()) {
       throw new ForbiddenException('Invalid request');
     }
 
     // update user & token status
     await Promise.all([
-      await this.authRepository.updateVerifyToken(
-        token.id,
-        userId,
-        confirmationCode,
-      ),
-      await this.authRepository.updateUserVerifyByEmail(userId),
+      await this.authRepository.updateVerifyToken(verifyData.id),
+      await this.authRepository.updateUserVerifyByEmail(verifyData.userId),
     ]);
 
-    return 'success to verify your email';
+    return { message: 'success to verify your email' };
   }
 }

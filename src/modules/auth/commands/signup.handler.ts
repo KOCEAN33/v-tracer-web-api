@@ -1,19 +1,14 @@
-import {
-  CommandBus,
-  CommandHandler,
-  EventBus,
-  ICommandHandler,
-} from '@nestjs/cqrs';
+import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import {
   ConflictException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
 
-import { AuthRepository } from '../repository/auth.repository';
-import { PasswordService } from '../password.service';
 import { UserSignUpCommand } from './signup.command';
 import { SendVerifyEmailEvent } from '../events/send-verify-email.event';
+import { AuthRepository } from '../repository/auth.repository';
+import { PasswordService } from '../password.service';
 
 @Injectable()
 @CommandHandler(UserSignUpCommand)
@@ -24,7 +19,7 @@ export class UserSignUpHandler implements ICommandHandler<UserSignUpCommand> {
     private readonly eventBus: EventBus,
   ) {}
 
-  async execute(command: UserSignUpCommand): Promise<string> {
+  async execute(command: UserSignUpCommand) {
     const { name, email, password, fingerprint } = command;
 
     // Block unknown system
@@ -51,6 +46,6 @@ export class UserSignUpHandler implements ICommandHandler<UserSignUpCommand> {
     // Send email to verify user
     this.eventBus.publish(new SendVerifyEmailEvent(save.id, email));
 
-    return 'plz check your email';
+    return { message: 'please verify your email' };
   }
 }

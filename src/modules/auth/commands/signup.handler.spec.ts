@@ -1,23 +1,16 @@
+import { EventBus } from '@nestjs/cqrs';
 import { Test, TestingModule } from '@nestjs/testing';
+import { ConflictException, UnauthorizedException } from '@nestjs/common';
 
+import { SendVerifyEmailCommand } from '../../email/commands/send-verify-email.command';
 import { UserSignUpCommand } from './signup.command';
 import { UserSignUpHandler } from './signup.handler';
 import { AuthRepository } from '../repository/auth.repository';
 import { PasswordService } from '../password.service';
 
-import { CommandBus, EventBus } from '@nestjs/cqrs';
-
-import { SendVerifyEmailCommand } from '../../email/commands/send-verify-email.command';
-import {
-  ConflictException,
-  UnauthorizedException,
-  UnprocessableEntityException,
-} from '@nestjs/common';
-
 describe('UserSignUpHandler', () => {
   let userSignUpHandler: UserSignUpHandler;
   let authRepository: AuthRepository;
-  let commandBus: CommandBus;
   let eventBus: EventBus;
 
   beforeEach(async () => {
@@ -65,7 +58,7 @@ describe('UserSignUpHandler', () => {
       new UserSignUpCommand(...commandData),
     );
 
-    expect(result).toEqual('plz check your email');
+    expect(result).toEqual({ message: 'please verify your email' });
     expect(eventBus.publish).toHaveBeenCalledWith(
       new SendVerifyEmailCommand(save.id, save.email),
     );

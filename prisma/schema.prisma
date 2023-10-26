@@ -22,6 +22,7 @@ model User {
   id         String     @id @default(auto()) @map("_id") @db.ObjectId
   name       String
   email      String     @unique
+  image      String?
   status     UserStatus
   isVerified Boolean    @default(false)
 
@@ -45,10 +46,10 @@ model Password {
 }
 
 type UserAgent {
-  IP          String
+  IP          String?
   OS          String?
   browser     String?
-  fingerprint String
+  fingerprint String?
 }
 
 model AuthToken {
@@ -56,6 +57,7 @@ model AuthToken {
   user         User      @relation(fields: [userId], references: [id])
   userId       String    @db.ObjectId
   refreshToken String    @unique
+  isActivated  Boolean   @default(false)
   creationUA   UserAgent
   latestUA     UserAgent
   expiresIn    DateTime
@@ -162,7 +164,7 @@ model VerifyToken {
   user   User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String     @db.ObjectId
   email  String?
-  token  String
+  code   String
 
   isVerifiable Boolean  @default(false)
   expiresIn    DateTime
@@ -172,5 +174,5 @@ model VerifyToken {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([userId])
+  @@index([code])
 }

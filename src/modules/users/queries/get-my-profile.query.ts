@@ -1,5 +1,5 @@
 import { IQuery } from '@nestjs/cqrs';
 
-export class GetUserFromTokenQuery implements IQuery {
+export class GetMyProfileQuery implements IQuery {
   constructor(readonly userId: string) {}
 }
