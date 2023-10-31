@@ -32,6 +32,7 @@ import { EmailModule } from './modules/email/email.module';
   controllers: [],
   providers: [Logger],
 })
+
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): any {
     consumer.apply(LoggerMiddleware).forRoutes('*');
