@@ -10,6 +10,7 @@ import { ReviewModule } from './modules/reviews/review.module';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { ExceptionModule } from './common/exception/exception.module';
 import { EmailModule } from './modules/email/email.module';
+import { KyselyModule } from './database/kysely.module';
 
 @Module({
   imports: [
@@ -21,18 +22,17 @@ import { EmailModule } from './modules/email/email.module';
       cache: true,
       isGlobal: true,
     }),
-
     ExceptionModule,
     AuthModule,
     UsersModule,
     ProductModule,
     ReviewModule,
     EmailModule,
+    KyselyModule,
   ],
   controllers: [],
   providers: [Logger],
 })
-
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): any {
     consumer.apply(LoggerMiddleware).forRoutes('*');
