@@ -1,50 +1,76 @@
 import { PrismaClient } from '@prisma/client';
+import { Kysely } from 'kysely';
+import { DB } from '../src/database/types';
+import { PlanetScaleDialect } from 'kysely-planetscale';
+import { Simplify } from 'kysely/dist/esm';
+import { AllSelection } from 'kysely/dist/esm/parser/select-parser';
+import { ExtractTableAlias } from 'kysely/dist/esm/parser/table-parser';
 
 const prisma = new PrismaClient();
 
+const genSecret = () => {
+  if (process.env.DATABASE_URL) {
+    const url = process.env.DATABASE_URL.split('/')[2];
+    const username = url.split(':')[0];
+    const password = url.split(':')[1].split('@')[0];
+    return { username, password };
+  }
+};
+
+const db = new Kysely<DB>({
+  dialect: new PlanetScaleDialect({
+    host: 'gcp.connect.psdb.cloud',
+    username: genSecret()?.username || '',
+    password: genSecret()?.password || '',
+  }),
+});
+
+async function insertUser() {
+  return await db
+    .insertInto('User')
+    .values({ email: 'tagon8054@gmail.com' })
+    .executeTakeFirst();
+}
+
+async function insertProfile(userId: number) {
+  return await db
+    .insertInto('Profile')
+    .values({ name: 'takeshi', userId: userId, updatedAt: new Date() })
+    .execute();
+}
+
+async function getUserById(
+  userId: number,
+): Promise<Simplify<AllSelection<DB, ExtractTableAlias<DB, 'Profile'>>>[]> {
+  return await db
+    .selectFrom('Profile')
+    .selectAll()
+    .where('userId', '=', userId)
+    .execute();
+}
+
+async function insertPassword(userId: number) {
+  return await db
+    .insertInto('Password')
+    .values({ password: 'passw0rd', userId: userId, updatedAt: new Date() })
+    .execute();
+}
+
+async function getUserByEmailWithPassword(email: string) {
+  return await db
+    .selectFrom('User')
+    .where('User.email', '=', email)
+    .innerJoin('Password', 'Password.userId', 'User.id')
+    .select(['Password.password'])
+    .executeTakeFirst();
+}
+
 async function main() {
   console.log('Seeding...');
-  const today = new Date();
-  const todayAddHour = new Date(today.setHours(today.getHours() + 1));
-
-  // const userData = await prisma.user.create({
-  //   data: {
-  //     name: 'John Doe',
-  //     email: 'upchh@example.com',
-  //     status: 'Activated',
-  //   },
-  // });
-  // console.log({ userData });
-
-  const seedVerifyToken = await prisma.verifyToken.createMany({
-    data: [
-      // {
-      //   type: 'NewAccount',
-      //   userId: '6501ef25efdbf55df72f7e24',
-      //   email: 'dev@example.com',
-      //   token: 'ecb5f58c-22eb-4aae-bbeb-0a371c2cc89d',
-      //   isVerifiable: true,
-      //   expiresIn: todayAddHour,
-      // },
-      // {
-      //   type: 'ChangePassword',
-      //   userId: '6501ef25efdbf55df72f7e24',
-      //   email: 'dev123@example.com',
-      //   token: 'ecb5f58c-22eb-4aae-bbeb-0a371sc21c89d',
-      //   isVerifiable: true,
-      //   expiresIn: new Date(),
-      // },
-      // {
-      //   type: 'NewAccount',
-      //   userId: '6501ef25efdbf55df72f7e24',
-      //   email: 'iam@example.com',
-      //   token: 'ecb5f58c-22eb-4aae-bbeb-0a3731c2cc69d',
-      //   isVerifiable: true,
-      //   expiresIn: todayAddHour,
-      // },
-    ],
-  });
-  console.log({ seedVerifyToken });
+  // await prisma.user.deleteMany({});
+  // const user = await insertUser();
+  const password = await getUserByEmailWithPassword('tagon8054@gmail.com');
+  console.log(password.password);
 }
 
 main()
