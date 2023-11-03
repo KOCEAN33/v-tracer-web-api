@@ -2,7 +2,6 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import { UserLogoutCommand } from './logout.command';
 import { AuthRepository } from '../repository/auth.repository';
-import { UserAgentParser } from '../ua.service';
 
 interface LogoutResponse {
   message: string;
@@ -10,35 +9,28 @@ interface LogoutResponse {
 
 @CommandHandler(UserLogoutCommand)
 export class UserLogoutHandler implements ICommandHandler<UserLogoutCommand> {
-  constructor(
-    private readonly authRepository: AuthRepository,
-    private readonly userAgentParser: UserAgentParser,
-  ) {}
+  constructor(private readonly authRepository: AuthRepository) {}
 
   async execute(command: UserLogoutCommand): Promise<LogoutResponse> {
     const { response, userId, refreshToken, ip, userAgent, fingerprint } =
       command;
 
-    if (!refreshToken) {
-      return { message: 'success logout' };
-    }
-
-    const parsedUserAgent = this.userAgentParser.parser(
-      userAgent,
-      ip,
-      fingerprint,
-    );
-
-    await this.authRepository.disableRefreshToken(
-      userId,
-      refreshToken,
-      parsedUserAgent,
-    );
-
     // clear httponly cookies
     response.clearCookie('token', {
       sameSite: true,
     });
+
+    if (!refreshToken) {
+      return { message: 'success logout' };
+    }
+
+    await this.authRepository.disableRefreshToken(
+      userId,
+      refreshToken,
+      ip,
+      userAgent,
+      fingerprint,
+    );
 
     return { message: 'success logout' };
   }

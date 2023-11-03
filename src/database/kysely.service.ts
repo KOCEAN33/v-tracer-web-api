@@ -1,27 +1,31 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PlanetScaleDialect } from 'kysely-planetscale';
+import { Kysely, ParseJSONResultsPlugin } from 'kysely';
 import { DB } from './types';
-import { Kysely } from 'kysely';
 
 @Injectable()
 export class KyselyService {
   constructor(private readonly configService: ConfigService) {}
 
   private genSecret = () => {
-    if (process.env.DATABASE_URL) {
-      const url = process.env.DATABASE_URL.split('/')[2];
+    const databaseUrl = this.configService.get<string>('DATABASE_URL');
+    if (databaseUrl) {
+      const url = databaseUrl.split('/')[2];
+      const host = url.split('@')[1];
       const username = url.split(':')[0];
       const password = url.split(':')[1].split('@')[0];
-      return { username, password };
+      return { host, username, password };
     }
   };
 
   public db = new Kysely<DB>({
     dialect: new PlanetScaleDialect({
-      host: 'gcp.connect.psdb.cloud',
+      host: this.genSecret()?.host || '',
       username: this.genSecret()?.username || '',
       password: this.genSecret()?.password || '',
     }),
+    plugins: [new ParseJSONResultsPlugin()],
+    log: ['query', 'error'],
   });
 }

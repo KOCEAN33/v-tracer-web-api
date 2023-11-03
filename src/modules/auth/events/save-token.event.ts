@@ -1,11 +1,12 @@
 import { IEvent } from '@nestjs/cqrs';
-import { UserAgent } from '@prisma/client';
 
 export class SaveTokenEvent implements IEvent {
   constructor(
-    readonly userId: string,
+    readonly userId: number,
     readonly refreshToken: string,
-    readonly userAgent: UserAgent,
+    readonly ip: string,
+    readonly userAgent: string,
+    readonly fingerprint: string,
     readonly expiresIn: Date,
   ) {}
 }

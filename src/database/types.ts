@@ -56,11 +56,12 @@ export type Profile = {
   userId: number;
   updatedAt: Timestamp;
 };
-export type Token = {
+export type RefreshToken = {
   id: Generated<number>;
   refreshToken: string;
   activate: Generated<number>;
   ip: string;
+  userAgent: string | null;
   fingerprint: string;
   expiresIn: Timestamp;
   userId: number;
@@ -70,6 +71,7 @@ export type Token = {
 export type User = {
   id: Generated<number>;
   email: string;
+  verified: Generated<number>;
   createdAt: Generated<Timestamp>;
 };
 export type VerifyCode = {
@@ -77,6 +79,7 @@ export type VerifyCode = {
   type: VerifyType;
   code: string;
   activate: Generated<number>;
+  changeData: string;
   expiresIn: Timestamp;
   userId: number;
   verifiedAt: Timestamp | null;
@@ -89,7 +92,7 @@ export type DB = {
   Password: Password;
   Product: Product;
   Profile: Profile;
-  Token: Token;
+  RefreshToken: RefreshToken;
   User: User;
   VerifyCode: VerifyCode;
 };

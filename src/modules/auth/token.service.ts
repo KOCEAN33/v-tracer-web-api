@@ -16,7 +16,7 @@ export class TokenService {
     private readonly configService: ConfigService,
   ) {}
 
-  generateTokens(payload: { userId: string }): Token {
+  generateTokens(payload: { userId: number }): Token {
     return {
       accessToken: this.generateAccessToken(payload),
       refreshToken: this.generateRefreshToken(payload),
@@ -35,11 +35,11 @@ export class TokenService {
     }
   }
 
-  private generateAccessToken(payload: { userId: string }): string {
+  private generateAccessToken(payload: { userId: number }): string {
     return this.jwtService.sign(payload);
   }
 
-  private generateRefreshToken(payload: { userId: string }): string {
+  private generateRefreshToken(payload: { userId: number }): string {
     const securityConfig = this.configService.get<SecurityConfig>('security');
     return this.jwtService.sign(payload, {
       secret: this.configService.get('JWT_REFRESH_SECRET'),

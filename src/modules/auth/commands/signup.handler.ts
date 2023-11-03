@@ -37,14 +37,14 @@ export class UserSignUpHandler implements ICommandHandler<UserSignUpCommand> {
     const hashedPassword = await this.passwordService.hashPassword(password);
 
     // Add to Database
-    const save = await this.authRepository.createUserByEmail(
+    const newUser = await this.authRepository.createUserByEmail(
       name,
       email,
       hashedPassword,
     );
 
     // Send email to verify user
-    this.eventBus.publish(new SendVerifyEmailEvent(save.id, email));
+    this.eventBus.publish(new SendVerifyEmailEvent(newUser, email));
 
     return { message: 'please verify your email' };
   }

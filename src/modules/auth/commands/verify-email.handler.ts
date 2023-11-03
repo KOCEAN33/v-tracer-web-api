@@ -30,7 +30,7 @@ export class UserVerifyEmailHandler
     // update user & token status
     await Promise.all([
       await this.authRepository.updateVerifyToken(verifyData.id),
-      await this.authRepository.updateUserVerifyByEmail(verifyData.userId),
+      await this.authRepository.updateUserVerify(verifyData.userId),
     ]);
 
     return { message: 'success to verify your email' };

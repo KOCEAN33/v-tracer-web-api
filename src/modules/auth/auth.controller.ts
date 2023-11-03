@@ -45,7 +45,7 @@ export class AuthController {
   ) {
     dto.email = dto.email.toLowerCase();
     const fingerprint = req.headers['fingerprint'] as string;
-    const userAgent = req.headers['user-agent'];
+    const userAgent = req.headers['user-agent'] as string;
     const { email, password } = dto;
     const command = new UserLoginCommand(
       email,

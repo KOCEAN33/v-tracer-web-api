@@ -1,15 +1,11 @@
-generator client {
-  provider = "prisma-client-js"
-}
+// generator client {
+//   provider = "prisma-client-js"
+// }
 
-// prisma-kysely
 generator kysely {
   provider     = "prisma-kysely"
-  // 타입이 생성될 디렉토리
   output       = "../src/database"
-  // 타입이 생성될 파일명
   fileName     = "types.ts"
-  // Optionally generate runtime enums to a separate file
   enumFileName = "enums.ts"
 }
 
@@ -20,8 +16,9 @@ datasource db {
 }
 
 model User {
-  id    Int    @id @default(autoincrement())
-  email String @unique
+  id       Int     @id @default(autoincrement())
+  email    String  @unique
+  verified Boolean @default(false)
 
   createdAt DateTime @default(now())
 
@@ -29,9 +26,9 @@ model User {
   profile Profile?
 
   // auth
-  password    Password?
-  tokens      Token[]
-  verifyCodes VerifyCode[]
+  password      Password?
+  refreshTokens RefreshToken[]
+  verifyCodes   VerifyCode[]
 
   // contents
   articles Article[]
@@ -65,11 +62,12 @@ model Password {
   @@index([userId])
 }
 
-model Token {
+model RefreshToken {
   id           Int      @id @default(autoincrement())
   refreshToken String   @unique
   activate     Boolean  @default(false)
   ip           String
+  userAgent    String?
   fingerprint  String
   expiresIn    DateTime
 
@@ -87,11 +85,12 @@ enum VerifyType {
 }
 
 model VerifyCode {
-  id        Int        @id @default(autoincrement())
-  type      VerifyType
-  code      String
-  activate  Boolean    @default(false)
-  expiresIn DateTime
+  id         Int        @id @default(autoincrement())
+  type       VerifyType
+  code       String
+  activate   Boolean    @default(false)
+  changeData String
+  expiresIn  DateTime
 
   user   User @relation(fields: [userId], references: [id])
   userId Int
