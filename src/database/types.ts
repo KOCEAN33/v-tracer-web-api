@@ -79,7 +79,7 @@ export type VerifyCode = {
   type: VerifyType;
   code: string;
   activate: Generated<number>;
-  changeData: string;
+  changeData: string | null;
   expiresIn: Timestamp;
   userId: number;
   verifiedAt: Timestamp | null;

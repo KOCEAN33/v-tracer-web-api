@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ConfigService } from '@nestjs/config';
-import { NotFoundException } from '@nestjs/common';
+import { NotFoundException, Logger } from '@nestjs/common';
 import type { MessagesSendResult } from 'mailgun.js';
 
 import { SendVerifyEmailCommand } from './send-verify-email.command';
@@ -15,6 +15,7 @@ export class SendVerifyEmailHandler
     private readonly emailService: EmailService,
     private readonly configService: ConfigService,
     private readonly emailRepository: EmailRepository,
+    private readonly logger: Logger,
   ) {}
 
   //TODO: check after send
@@ -27,8 +28,7 @@ export class SendVerifyEmailHandler
       await this.emailService.validateEmailAddress(email);
 
     if (!emailAddressValidate.valid) {
-      await this.emailRepository.updateUserStatusEmailNotExist(userId);
-      //TODO: log error message
+      this.logger.warn(`${email} is not exist`);
       throw new NotFoundException('this email address is not exist');
     }
 
@@ -52,12 +52,7 @@ export class SendVerifyEmailHandler
 
     // Save and Send it
     const [, mail]: [void, MessagesSendResult] = await Promise.all([
-      await this.emailRepository.createVerifyToken(
-        userId,
-        email,
-        token,
-        expiresIn,
-      ),
+      await this.emailRepository.createVerifyToken(userId, token, expiresIn),
       await this.emailService.sendEmail(setup, html),
     ]);
 

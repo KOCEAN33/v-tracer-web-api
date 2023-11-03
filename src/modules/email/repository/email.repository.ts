@@ -1,39 +1,33 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../../database/prisma.service';
+
+import { KyselyService } from '../../../database/kysely.service';
 
 @Injectable()
 export class EmailRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly kysely: KyselyService) {}
 
   async createVerifyToken(
-    userId: string,
-    email: string,
-    token: string,
+    userId: number,
+    code: string,
     expiresIn: Date,
   ): Promise<void> {
-    await this.prisma.verifyToken.create({
-      data: {
-        type: 'NewAccount',
-        userId: userId,
-        email: email,
-        code: token,
-        isVerifiable: true,
+    await this.kysely.db
+      .insertInto('VerifyCode')
+      .values({
+        code: code,
+        activate: 1,
+        type: 'NEWACCOUNT',
         expiresIn: expiresIn,
-      },
-    });
+        userId: userId,
+      })
+      .execute();
   }
 
-  async invalidateOldToken(userId: string): Promise<void> {
-    await this.prisma.verifyToken.updateMany({
-      where: { userId: userId },
-      data: { isVerifiable: false },
-    });
-  }
-
-  async updateUserStatusEmailNotExist(userId: string) {
-    await this.prisma.user.update({
-      where: { id: userId },
-      data: { status: 'NoEmailExist' },
-    });
+  async invalidateOldToken(userId: number): Promise<void> {
+    await this.kysely.db
+      .updateTable('VerifyCode')
+      .set({ activate: 0 })
+      .where('userId', '=', userId)
+      .execute();
   }
 }

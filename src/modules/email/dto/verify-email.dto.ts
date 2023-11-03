@@ -1,11 +1,10 @@
-import { IsEmail, IsMongoId, IsString } from 'class-validator';
+import { IsEmail, IsNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class VerifyEmailDto {
-  @IsString()
-  @IsMongoId()
+  @IsNumber()
   @ApiProperty({ description: 'userId' })
-  userId: string;
+  userId: number;
 
   @IsEmail()
   @ApiProperty({ description: 'email' })
