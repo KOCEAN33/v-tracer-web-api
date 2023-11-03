@@ -116,6 +116,7 @@ export class AuthRepository {
         userAgent: userAgent,
         expiresIn: expiresIn,
         userId: userId,
+        updatedAt: new Date(),
       })
       .execute();
   }
@@ -137,6 +138,7 @@ export class AuthRepository {
         userAgent: userAgent,
         fingerprint: fingerprint,
         expiresIn: expiresIn,
+        updatedAt: new Date(),
       })
       .where('id', '=', id)
       .where('userId', '=', userId)
@@ -157,6 +159,7 @@ export class AuthRepository {
         userAgent: userAgent,
         fingerprint: fingerprint,
         activate: 0,
+        updatedAt: new Date(),
       })
       .where('userId', '=', userId)
       .where('refreshToken', '=', refreshToken)

@@ -48,7 +48,7 @@ export class UserLoginHandler implements ICommandHandler<UserLoginCommand> {
 
     // successful login logic
     const { accessToken, refreshToken } = this.tokenService.generateTokens({
-      userId: user.id,
+      userId: user.userId,
     });
 
     const decodeJWT = this.jwtService.decode(refreshToken);
@@ -56,7 +56,7 @@ export class UserLoginHandler implements ICommandHandler<UserLoginCommand> {
 
     this.eventBus.publish(
       new SaveTokenEvent(
-        user.id,
+        user.userId,
         refreshToken,
         ip,
         userAgent,

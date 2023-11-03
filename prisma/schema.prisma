@@ -1,6 +1,6 @@
-// generator client {
-//   provider = "prisma-client-js"
-// }
+generator client {
+  provider = "prisma-client-js"
+}
 
 generator kysely {
   provider     = "prisma-kysely"
@@ -89,7 +89,7 @@ model VerifyCode {
   type       VerifyType
   code       String
   activate   Boolean    @default(false)
-  changeData String
+  changeData String?
   expiresIn  DateTime
 
   user   User @relation(fields: [userId], references: [id])
