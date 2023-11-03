@@ -13,7 +13,7 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @Get('/getme')
-  async getMyInfo(@User() userId: string) {
+  async getMyInfo(@User() userId: number) {
     const query = new GetMyProfileQuery(userId);
     return this.queryBus.execute(query);
   }

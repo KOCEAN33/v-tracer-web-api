@@ -15,12 +15,12 @@ export class GetMyProfileHandler implements IQueryHandler<GetMyProfileQuery> {
       throw new UnauthorizedException('Unauthorized');
     }
 
-    const user = await this.userRepository.getUserById(userId);
+    const user = await this.userRepository.getProfileByUserId(userId);
 
     return {
-      id: user.id,
+      id: user.userId,
       name: user.name,
-      image: user.image ? user.image : undefined,
+      image: user.imageUrl ? user.imageUrl : undefined,
     };
   }
 }

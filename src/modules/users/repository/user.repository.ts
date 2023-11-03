@@ -1,12 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../../database/prisma.service';
-import { User } from '@prisma/client';
+
+import { KyselyService } from '../../../database/kysely.service';
 
 @Injectable()
 export class UserRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly kysely: KyselyService) {}
 
-  async getUserById(userId: string): Promise<User> {
-    return this.prisma.user.findUnique({ where: { id: userId } });
+  async getProfileByUserId(userId: number) {
+    return await this.kysely.db
+      .selectFrom('Profile')
+      .selectAll()
+      .where('userId', '=', userId)
+      .executeTakeFirstOrThrow();
   }
 }
