@@ -38,7 +38,6 @@
     "class-validator": "^0.14.0",
     "cookie-parser": "^1.4.6",
     "cross-env": "^7.0.3",
-    "deep-email-validator": "^0.1.21",
     "dotenv-cli": "^7.3.0",
     "form-data": "^4.0.0",
     "handlebars": "^4.7.8",

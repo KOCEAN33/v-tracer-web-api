@@ -19,7 +19,7 @@ describe('UserVerifyEmailHandler', () => {
           useValue: {
             getVerifyEmailByVerifyCode: jest.fn(),
             updateVerifyToken: jest.fn(),
-            updateUserVerifyByEmail: jest.fn(),
+            updateUserVerify: jest.fn(),
           },
         },
         { provide: CommandBus, useValue: { execute: jest.fn() } },
@@ -39,13 +39,12 @@ describe('UserVerifyEmailHandler', () => {
   });
 
   it('should update User & VerifyEmailToken', async () => {
-    const today = new Date();
-    const commandData = ['lengthcode'] as const;
+    const commandData = ['verifyToken'] as const;
     const verifyData = {
-      id: 'databaseId',
-      userId: 'userId',
+      id: 10,
+      userId: 11,
       code: 'verifyToken',
-      expiresIn: today.setHours(today.getHours() + 1),
+      activate: 1,
     };
 
     authRepository.getVerifyEmailByVerifyCode = jest
@@ -60,38 +59,17 @@ describe('UserVerifyEmailHandler', () => {
     expect(authRepository.updateVerifyToken).toHaveBeenCalledWith(
       verifyData.id,
     );
-    expect(authRepository.updateUserVerifyByEmail).toHaveBeenCalledWith(
+    expect(authRepository.updateUserVerify).toHaveBeenCalledWith(
       verifyData.userId,
     );
   });
 
-  it('should throw Forbidden error if no tokens are provided', async () => {
-    const commandData = ['lengthcode'] as const;
+  it('should throw Forbidden error if no validatable token are provided', async () => {
+    const commandData = ['verifyToken'] as const;
 
     authRepository.getVerifyEmailByVerifyCode = jest
       .fn()
       .mockResolvedValue(null);
-
-    await expect(
-      userVerifyEmailHandler.execute(
-        new UserVerifyEmailCommand(...commandData),
-      ),
-    ).rejects.toThrow(new ForbiddenException('Invalid request'));
-  });
-
-  it('should throw Forbidden error if token expired', async () => {
-    const commandData = ['lengthcode'] as const;
-    const today = new Date();
-    const verifyData = {
-      id: 'databaseId',
-      userId: 'userId',
-      code: 'verifyToken',
-      expiresIn: today.setHours(today.getHours() - 1),
-    };
-
-    authRepository.getVerifyEmailByVerifyCode = jest
-      .fn()
-      .mockResolvedValue(verifyData);
 
     await expect(
       userVerifyEmailHandler.execute(

@@ -7,7 +7,7 @@ import * as winston from 'winston';
 import * as path from 'path';
 
 const env = process.env.NODE_ENV;
-const logDir = path.join(__dirname, '..', '..', '..', '..', 'logs');
+const logDir = path.join(__dirname, '..', '..', '..', 'logs');
 
 const dailyOptions = (level: string) => {
   return {

@@ -32,16 +32,13 @@ describe('UpdateTokenEventHandler', () => {
   });
 
   it('should save new refresh token', async () => {
-    const userAgent = {
-      IP: '127.0.0.1',
-      OS: 'windows',
-      browser: 'Firefox',
-      fingerprint: 'fingerprint',
-    };
     const eventData = [
-      '27359',
+      9,
+      10,
       'fakeRefreshToken',
-      userAgent,
+      '127.0.0.1',
+      'userAgent',
+      'fingerprint',
       new Date(),
     ] as const;
 

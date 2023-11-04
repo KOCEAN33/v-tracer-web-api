@@ -63,7 +63,6 @@ export class EmailService {
       '..',
       '..',
       '..',
-      '..',
       'templates',
       'email',
       templateName,

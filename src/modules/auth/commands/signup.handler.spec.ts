@@ -45,14 +45,14 @@ describe('UserSignUpHandler', () => {
     const commandData = [
       'xanny',
       'dev@xanny.us',
-      'password123',
+      'passw0rd',
       'fingerprint',
     ] as const;
     const checkUser = null;
-    const save = { id: '123', email: 'dev@xanny.us' };
+    const newUser = 10;
 
     authRepository.getUserByEmail = jest.fn().mockResolvedValue(checkUser);
-    authRepository.createUserByEmail = jest.fn().mockResolvedValue(save);
+    authRepository.createUserByEmail = jest.fn().mockResolvedValue(newUser);
 
     const result = await userSignUpHandler.execute(
       new UserSignUpCommand(...commandData),
@@ -60,7 +60,7 @@ describe('UserSignUpHandler', () => {
 
     expect(result).toEqual({ message: 'please verify your email' });
     expect(eventBus.publish).toHaveBeenCalledWith(
-      new SendVerifyEmailCommand(save.id, save.email),
+      new SendVerifyEmailCommand(newUser, 'dev@xanny.us'),
     );
   });
 
@@ -76,10 +76,10 @@ describe('UserSignUpHandler', () => {
     const commandData = [
       'xanny',
       'dev@xanny.us',
-      'password123',
+      'passw0rd',
       'fingerprint',
     ] as const;
-    const checkUser = { email: 'dev@xanny.us' };
+    const checkUser = 'dev@xanny.us';
 
     authRepository.getUserByEmail = jest.fn().mockResolvedValue(checkUser);
 

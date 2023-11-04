@@ -26,6 +26,6 @@ export class KyselyService {
       password: this.genSecret()?.password || '',
     }),
     plugins: [new ParseJSONResultsPlugin()],
-    log: ['query', 'error'],
+    // log: ['query', 'error'],
   });
 }

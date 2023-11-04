@@ -22,11 +22,6 @@ export class UserVerifyEmailHandler
       throw new ForbiddenException('Invalid request');
     }
 
-    // check is token available
-    if (verifyData.expiresIn <= new Date()) {
-      throw new ForbiddenException('Invalid request');
-    }
-
     // update user & token status
     await Promise.all([
       await this.authRepository.updateVerifyToken(verifyData.id),

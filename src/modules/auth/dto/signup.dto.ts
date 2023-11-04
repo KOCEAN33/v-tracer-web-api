@@ -9,6 +9,7 @@ export class UserSignUpDto {
   @ApiProperty({ example: 'asashi', description: 'name' })
   name: string;
 
+  @IsString()
   @IsEmail()
   @MaxLength(60)
   @ApiProperty({ example: 'asahi@test.com', description: 'email' })

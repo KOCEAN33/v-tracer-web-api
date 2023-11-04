@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ConfigService } from '@nestjs/config';
-import { NotFoundException, Logger } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import type { MessagesSendResult } from 'mailgun.js';
 
 import { SendVerifyEmailCommand } from './send-verify-email.command';
@@ -22,15 +22,6 @@ export class SendVerifyEmailHandler
 
   async execute(command: SendVerifyEmailCommand) {
     const { userId, email } = command;
-
-    // check this email address is exist
-    const emailAddressValidate =
-      await this.emailService.validateEmailAddress(email);
-
-    if (!emailAddressValidate.valid) {
-      this.logger.warn(`${email} is not exist`);
-      throw new NotFoundException('this email address is not exist');
-    }
 
     // Invalidate old tokens
     await this.emailRepository.invalidateOldToken(userId);
@@ -57,12 +48,10 @@ export class SendVerifyEmailHandler
     ]);
 
     if (mail.status == 200) {
-      return mail;
+      return { success: mail };
     }
 
-    // TODO: Change console.log to logger
-
-    console.error({
+    this.logger.error({
       address: email,
       message: mail?.message,
       detail: mail?.details,
