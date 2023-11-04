@@ -11,10 +11,14 @@ const commandHandler = [SendVerifyEmailHandler];
 @Module({
   imports: [
     CqrsModule,
-    MailgunModule.forRoot({
-      username: 'api',
-      key: process.env.MAILGUN_API_KEY,
-      timeout: 100000, // OPTIONAL, in milliseconds
+    MailgunModule.forAsyncRoot({
+      useFactory: async () => {
+        return {
+          username: 'api',
+          key: process.env.MAILGUN_API_KEY as string,
+          timeout: 100000, // OPTIONAL, in milliseconds
+        }
+      }
     }),
   ],
   controllers: [EmailController],

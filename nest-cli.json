@@ -6,8 +6,8 @@
     "deleteOutDir": true,
     "assets": [
       {
-        "include": "./common/config/env/*.env",
-        "outDir": "./dist/src"
+        "include": "./**/*.env",
+        "output": "./dist"
       }
     ]
   }

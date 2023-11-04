@@ -11,24 +11,25 @@ import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { ExceptionModule } from './common/exception/exception.module';
 import { EmailModule } from './modules/email/email.module';
 import { KyselyModule } from './database/kysely.module';
+import * as path from 'path';
+
+const envPath = path.join(__dirname, '..', `/env/.${process.env.NODE_ENV}.env`);
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: [
-        `${__dirname}/common/config/env/.${process.env.NODE_ENV}.env`,
-      ],
+      envFilePath: envPath,
       load: [config],
       cache: true,
       isGlobal: true,
     }),
-    ExceptionModule,
     AuthModule,
     UsersModule,
     ProductModule,
     ReviewModule,
-    EmailModule,
     KyselyModule,
+    EmailModule,
+    ExceptionModule,
   ],
   controllers: [],
   providers: [Logger],
