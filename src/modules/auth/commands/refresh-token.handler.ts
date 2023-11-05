@@ -6,7 +6,6 @@ import { RefreshTokenCommand } from './refresh-token.command';
 import { TokenService } from '../token.service';
 import { AuthRepository } from '../repository/auth.repository';
 import { UpdateTokenEvent } from '../events/update-token.event';
-import { UserAgentParser } from '../ua.service';
 
 @CommandHandler(RefreshTokenCommand)
 export class RefreshTokenHandler
@@ -17,7 +16,6 @@ export class RefreshTokenHandler
     private readonly tokenService: TokenService,
     private readonly jwtService: JwtService,
     private readonly eventBus: EventBus,
-    private readonly userAgentParser: UserAgentParser,
   ) {}
 
   async execute(command: RefreshTokenCommand) {
@@ -52,16 +50,17 @@ export class RefreshTokenHandler
     const decodeJWT = this.jwtService.decode(refreshToken);
     const expiresIn = new Date(decodeJWT['exp'] * 1000);
 
-    // User-Agent Parser
-    const parsedUserAgent = this.userAgentParser.parser(
-      userAgent,
-      ip,
-      fingerprint,
-    );
-
     // update refreshToken to keep logged in
     this.eventBus.publish(
-      new UpdateTokenEvent(token.id, refreshToken, parsedUserAgent, expiresIn),
+      new UpdateTokenEvent(
+        token.id,
+        token.userId,
+        refreshToken,
+        ip,
+        userAgent,
+        fingerprint,
+        expiresIn,
+      ),
     );
 
     // Set Cookie

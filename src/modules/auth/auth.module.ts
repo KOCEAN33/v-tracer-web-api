@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
@@ -14,7 +14,6 @@ import { AuthRepository } from './repository/auth.repository';
 import { PasswordService } from './password.service';
 import { TokenService } from './token.service';
 import { EmailModule } from '../email/email.module';
-import { UserAgentParser } from './ua.service';
 
 import { SecurityConfig } from '../../common/config/config.interface';
 
@@ -72,7 +71,6 @@ const eventHandlers = [
     JwtStrategy,
     JwtAuthGuard,
     EmailModule,
-    UserAgentParser,
 
     ...commandHandlers,
     ...queryHandlers,

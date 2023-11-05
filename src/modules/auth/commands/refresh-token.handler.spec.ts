@@ -8,7 +8,6 @@ import { RefreshTokenHandler } from './refresh-token.handler';
 import { AuthRepository } from '../repository/auth.repository';
 import { UpdateTokenEvent } from '../events/update-token.event';
 import { TokenService } from '../token.service';
-import { UserAgentParser } from '../ua.service';
 
 const commandData = [
   'refresh-token',
@@ -26,7 +25,6 @@ describe('RefreshTokenHandler', () => {
   let authRepository: AuthRepository;
   let tokenService: TokenService;
   let eventBus: EventBus;
-  let userAgentParser: UserAgentParser;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -58,7 +56,6 @@ describe('RefreshTokenHandler', () => {
           },
         },
         { provide: EventBus, useValue: { publish: jest.fn() } },
-        { provide: UserAgentParser, useValue: { parser: jest.fn() } },
       ],
     }).compile();
 
@@ -68,7 +65,6 @@ describe('RefreshTokenHandler', () => {
     );
     tokenService = module.get<TokenService>(TokenService);
     eventBus = module.get<EventBus>(EventBus);
-    userAgentParser = module.get<UserAgentParser>(UserAgentParser);
   });
 
   it('should be an instanceof RefreshTokenHandler', () => {
@@ -76,20 +72,13 @@ describe('RefreshTokenHandler', () => {
   });
 
   it('should refresh access and refresh tokens and publish UpdateTokenEvent', async () => {
-    const payload = { userId: 'mockUserId' };
-    const mockUser = { id: 'mockUserId', name: 'mockUser', image: 'mockImage' };
-    const token = { id: 'mockTokenId', userId: 'mockUserId' };
-    const parsedUserAgent = {
-      IP: '127.0.0.1',
-      OS: 'windows',
-      browser: 'Firefox',
-      fingerprint: 'fingerprint',
-    };
+    const payload = { userId: 10 };
+    const mockUser = { id: 10, email: 'dev@example.com' };
+    const token = { id: 9, userId: 10, activate: 1 };
 
     tokenService.extractUserIdFromToken = jest.fn().mockReturnValue(payload);
     authRepository.getRefreshToken = jest.fn().mockResolvedValue(token);
     authRepository.getUserById = jest.fn().mockResolvedValue(mockUser);
-    userAgentParser.parser = jest.fn().mockReturnValue(parsedUserAgent);
 
     const result = await refreshTokenHandler.execute(
       new RefreshTokenCommand(...commandData),
@@ -99,9 +88,12 @@ describe('RefreshTokenHandler', () => {
 
     expect(eventBus.publish).toHaveBeenCalledWith(
       new UpdateTokenEvent(
-        'mockTokenId',
+        token.id,
+        token.userId,
         'fakeRefreshToken',
-        parsedUserAgent,
+        '127.0.0.1',
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/117.0',
+        'fingerprint',
         new Date(1693479600 * 1000),
       ),
     );
@@ -116,7 +108,7 @@ describe('RefreshTokenHandler', () => {
   });
 
   it('should throw ForbiddenException if received refresh token does not match user refresh token in DB', async () => {
-    const payload = { userId: 'mockUserId' };
+    const payload = { userId: 10 };
     tokenService.extractUserIdFromToken = jest.fn().mockReturnValue(payload);
     authRepository.getRefreshToken = jest.fn(() => null);
 
@@ -124,15 +116,4 @@ describe('RefreshTokenHandler', () => {
       refreshTokenHandler.execute(new RefreshTokenCommand(...commandData)),
     ).rejects.toThrow(ForbiddenException);
   });
-
-  // it('should throw ForbiddenException if userId does not match', async () => {
-  //   const payload = { userId: 'mockUserId' };
-  //   const token = { id: 'mockTokenId', userId: 'anotherMockUserId' };
-  //   tokenService.extractUserIdFromToken = jest.fn().mockReturnValue(payload);
-  //   authRepository.getRefreshToken = jest.fn().mockResolvedValue(token);
-  //
-  //   await expect(
-  //     refreshTokenHandler.execute(new RefreshTokenCommand(...commandData)),
-  //   ).rejects.toThrow(ForbiddenException);
-  // });
 });

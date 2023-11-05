@@ -10,9 +10,9 @@ export class GetProductByHandleHandler
 {
   constructor(private readonly productRepository: ProductRepository) {}
 
-  async execute(query: GetProductByHandleQuery): Promise<Product> {
-    const { handle } = query;
-
-    return await this.productRepository.getProductByProductHandle(handle);
+  async execute(query: GetProductByHandleQuery) {
+    // const { handle } = query;
+    //
+    // return await this.productRepository.getProductByProductHandle(handle);
   }
 }

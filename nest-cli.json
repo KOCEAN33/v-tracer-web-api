@@ -7,7 +7,7 @@
     "assets": [
       {
         "include": "./common/config/env/*.env",
-        "outDir": "./dist/src"
+        "output": "./dist"
       }
     ]
   }

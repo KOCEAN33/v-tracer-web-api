@@ -1,178 +1,183 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
-datasource db {
-  provider = "mongodb"
-  url      = env("DATABASE_URL")
+generator kysely {
+  provider     = "prisma-kysely"
+  output       = "../src/database"
+  fileName     = "types.ts"
+  enumFileName = "enums.ts"
 }
 
-enum UserStatus {
-  Unverified
-  NoEmailExist
-  Activated
-  Dormancy
-  Deleted
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
 model User {
-  id         String     @id @default(auto()) @map("_id") @db.ObjectId
-  name       String
-  email      String     @unique
-  image      String?
-  status     UserStatus
-  isVerified Boolean    @default(false)
+  id       Int     @id @default(autoincrement())
+  email    String  @unique
+  verified Boolean @default(false)
 
   createdAt DateTime @default(now())
+
+  // user
+  profile Profile?
+
+  // auth
+  password      Password?
+  refreshTokens RefreshToken[]
+  verifyCodes   VerifyCode[]
+
+  // contents
+  posts    Post[]
+  comments Comment[]
+
+  @@index([email])
+}
+
+model Profile {
+  id       Int     @id @default(autoincrement())
+  name     String
+  imageUrl String? @db.Text
+
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int  @unique
+
   updatedAt DateTime @updatedAt
 
-  authToken   AuthToken[]
-  review      Review[]
-  question    Question[]
-  verifyToken VerifyToken[]
-  password    Password?
+  @@index([userId])
 }
 
 model Password {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
-  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId   String @unique @db.ObjectId
-  password String
+  id       Int    @id @default(autoincrement())
+  password String @db.Text
+
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int  @unique
 
   updatedAt DateTime @updatedAt
+
+  @@index([userId])
 }
 
-type UserAgent {
-  IP          String?
-  OS          String?
-  browser     String?
-  fingerprint String?
-}
-
-model AuthToken {
-  id           String    @id @default(auto()) @map("_id") @db.ObjectId
-  user         User      @relation(fields: [userId], references: [id])
-  userId       String    @db.ObjectId
-  refreshToken String    @unique
-  isActivated  Boolean   @default(false)
-  creationUA   UserAgent
-  latestUA     UserAgent
+model RefreshToken {
+  id           Int      @id @default(autoincrement())
+  refreshToken String   @unique
+  activate     Boolean  @default(false)
+  ip           String
+  userAgent    String?
+  fingerprint  String
   expiresIn    DateTime
+
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+enum VerifyType {
+  NEWACCOUNT
+}
+
+model VerifyCode {
+  id         Int        @id @default(autoincrement())
+  type       VerifyType
+  code       String
+  activate   Boolean    @default(false)
+  changeData String?
+  expiresIn  DateTime
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+
+  verifiedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([code])
+  @@index([userId])
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum PostType {
+  REVIEW
+  QUESTION
+  HIDE
+}
+
+model Post {
+  id          Int        @id @default(autoincrement())
+  title       String
+  content     String     @db.Text
+  type        PostType
+  status      PostStatus @default(value: DRAFT)
+  publishedAt DateTime?
+  deleted     Boolean    @default(false)
+
+  product   Product @relation(fields: [productId], references: [id])
+  productId Int
+  user      User    @relation(fields: [authorId], references: [id])
+  authorId  Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  comments Comment[]
+
+  @@index([authorId])
+  @@index([productId])
+}
+
+model Comment {
+  id      Int     @id @default(autoincrement())
+  body    String  @db.Text
+  deleted Boolean @default(false)
+
+  post     Post @relation(fields: [postId], references: [id])
+  postId   Int
+  user     User @relation(fields: [authorId], references: [id])
+  authorId Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([postId])
+  @@index([authorId])
 }
 
 model Product {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  handle    String   @unique
-  name      String
-  url       String?
-  company   Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  companyId String?  @db.ObjectId
+  id     Int     @id @default(autoincrement())
+  handle String  @unique
+  name   String
+  url    String?
+
+  company   Company? @relation(fields: [companyId], references: [id])
+  companyId Int
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  review   Review[]
-  question Question[]
+  posts Post[]
+
+  @@index([handle])
+  @@index([companyId])
 }
 
 model Company {
-  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  id   Int    @id @default(autoincrement())
   name String
   url  String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  product Product[]
-}
-
-enum ArticleStatus {
-  Draft
-  Published
-  Deleted
-}
-
-model Review {
-  id        String        @id @default(auto()) @map("_id") @db.ObjectId
-  product   Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productId String        @db.ObjectId
-  user      User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  authorId  String        @db.ObjectId
-  title     String
-  body      String
-  status    ArticleStatus @default(value: Draft)
-
-  publishedAt DateTime?
-  deletedAt   DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Question {
-  id        String        @id @default(auto()) @map("_id") @db.ObjectId
-  user      User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  authorId  String        @db.ObjectId
-  product   Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productId String        @db.ObjectId
-  title     String
-  body      String
-  status    ArticleStatus @default(value: Draft)
-
-  publishedAt DateTime?
-  deletedAt   DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-// model ProCon {
-//   id        String  @id @default(auto()) @map("_id") @db.ObjectId
-//   user      User    @relation(fields: [authorId], references: [id], onDelete: Cascade)
-//   authorId  String  @db.ObjectId
-//   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-//   productId String  @db.ObjectId
-//
-//   deletedAt DateTime?
-//   createdAt DateTime  @default(now())
-//   updatedAt DateTime  @updatedAt
-// }
-
-// model (not yet)
-// alternative     Product?  @relation("alternativeReviews", fields: [alternativeId], references: [id], onDelete: Cascade)
-// alternativeId   String[]  @db.ObjectId
-// alternativeBody String?
-// switched        Product?  @relation("switchedReviews", fields: [switchedId], references: [id], onDelete: Cascade)
-// switchedId      String[]  @db.ObjectId
-// switchedBody    String?
-
-enum VerifyType {
-  NewAccount
-  DeleteAccount
-  ChangePassword
-}
-
-model VerifyToken {
-  id     String     @id @default(auto()) @map("_id") @db.ObjectId
-  type   VerifyType
-  user   User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String     @db.ObjectId
-  email  String?
-  code   String
-
-  isVerifiable Boolean  @default(false)
-  expiresIn    DateTime
-
-  verifiedAt DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([code])
+  products Product[]
 }

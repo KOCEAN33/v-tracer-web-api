@@ -27,7 +27,7 @@ export class EmailService {
       to: setup.receiver,
       subject: setup.subject,
       html: html,
-      // 'o:testmode': process.env.NODE_ENV === 'development',
+      'o:testmode': process.env.NODE_ENV === 'development',
     };
     console.log(options.to);
     return await this.mailgunService.createEmail(domain, options);
@@ -60,7 +60,6 @@ export class EmailService {
   private async getEmailTemplate(templateName: string) {
     const templatePath = path.join(
       __dirname,
-      '..',
       '..',
       '..',
       '..',

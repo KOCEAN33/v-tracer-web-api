@@ -1,125 +1,168 @@
 import { Injectable } from '@nestjs/common';
-import { User, UserAgent, AuthToken } from '@prisma/client';
 
-import { PrismaService } from '../../../database/prisma.service';
+import { KyselyService } from '../../../database/kysely.service';
 
 @Injectable()
 export class AuthRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly kysely: KyselyService) {}
 
-  async getUserById(userId: string): Promise<User> {
-    return this.prisma.user.findUnique({ where: { id: userId } });
+  async getUserById(userId: number) {
+    return await this.kysely.db
+      .selectFrom('Profile')
+      .selectAll()
+      .where('userId', '=', userId)
+      .executeTakeFirst();
   }
 
-  async getUserByEmailWithPassword(email: string) {
-    return await this.prisma.user.findUnique({
-      where: { email: email },
-      include: { password: { select: { password: true } } },
-    });
+  async getPasswordByEmail(email: string) {
+    return await this.kysely.db
+      .selectFrom('User')
+      .innerJoin('Password', 'Password.userId', 'User.id')
+      .where('User.email', '=', email)
+      .selectAll()
+      .executeTakeFirst();
   }
 
-  async getUserByEmail(email: string): Promise<User> {
-    return this.prisma.user.findUnique({ where: { email: email } });
+  async getUserByEmail(email: string) {
+    return this.kysely.db
+      .selectFrom('User')
+      .selectAll()
+      .where('User.email', '=', email)
+      .executeTakeFirst();
   }
 
   async getVerifyEmailByVerifyCode(verifyCode: string) {
-    return await this.prisma.verifyToken.findFirst({
-      where: {
-        type: 'NewAccount',
-        code: verifyCode,
-        isVerifiable: true,
-      },
-    });
+    return await this.kysely.db
+      .selectFrom('VerifyCode')
+      .selectAll()
+      .where('VerifyCode.code', '=', verifyCode)
+      .where('VerifyCode.activate', '=', 1)
+      .where('VerifyCode.type', '=', 'NEWACCOUNT')
+      .executeTakeFirst();
   }
 
-  async updateUserVerifyByEmail(userId: string): Promise<void> {
-    await this.prisma.user.update({
-      where: { id: userId },
-      data: { status: 'Activated', isVerified: true },
-    });
+  // User Verify Status update
+  async updateUserVerify(userId: number) {
+    await this.kysely.db
+      .updateTable('User')
+      .where('id', '=', userId)
+      .set({ verified: 1 })
+      .executeTakeFirst();
   }
 
-  async updateVerifyToken(id: string): Promise<void> {
-    await this.prisma.verifyToken.update({
-      where: { id: id },
-      data: { isVerifiable: false, verifiedAt: new Date() },
-    });
+  // Verify Token update
+  async updateVerifyToken(id: number) {
+    await this.kysely.db
+      .updateTable('VerifyCode')
+      .set({ activate: 0, verifiedAt: new Date() })
+      .where('id', '=', id)
+      .executeTakeFirst();
   }
 
   async createUserByEmail(name: string, email: string, hashedPassword: string) {
-    return await this.prisma.user.create({
-      data: {
-        name: name,
-        email: email,
-        status: 'Unverified',
-        password: { create: { password: hashedPassword } },
-      },
+    return await this.kysely.db.transaction().execute(async (trx) => {
+      const newUser = await trx
+        .insertInto('User')
+        .values({ email: email })
+        .executeTakeFirstOrThrow();
+
+      await trx
+        .insertInto('Password')
+        .values({
+          password: hashedPassword,
+          userId: Number(newUser.insertId),
+          updatedAt: new Date(),
+        })
+        .executeTakeFirstOrThrow();
+
+      await trx
+        .insertInto('Profile')
+        .values({
+          name: name,
+          userId: Number(newUser.insertId),
+          updatedAt: new Date(),
+        })
+        .executeTakeFirst();
+
+      return Number(newUser.insertId);
     });
   }
 
-  async getRefreshToken(
-    userId: string,
-    refreshToken: string,
-  ): Promise<AuthToken> {
-    const token = await this.prisma.user.findFirst({
-      where: { id: userId, isVerified: true },
-      include: {
-        authToken: {
-          where: {
-            refreshToken: refreshToken,
-            isActivated: true,
-            expiresIn: { gte: new Date() },
-          },
-        },
-      },
-    });
-    return token.authToken[0];
+  async getRefreshToken(userId: number, refreshToken: string) {
+    return await this.kysely.db
+      .selectFrom('RefreshToken')
+      .selectAll()
+      .where('userId', '=', userId)
+      .where('refreshToken', '=', refreshToken)
+      .where('expiresIn', '>', new Date())
+      .executeTakeFirst();
   }
 
   async saveRefreshToken(
-    userId: string,
+    userId: number,
     refreshToken: string,
-    userAgent: UserAgent,
+    ip: string,
+    userAgent: string,
+    fingerprint: string,
     expiresIn: Date,
-  ): Promise<void> {
-    await this.prisma.authToken.create({
-      data: {
-        userId: userId,
+  ) {
+    await this.kysely.db
+      .insertInto('RefreshToken')
+      .values({
         refreshToken: refreshToken,
-        creationUA: userAgent,
-        latestUA: userAgent,
+        activate: 1,
+        ip: ip,
+        fingerprint: fingerprint,
+        userAgent: userAgent,
         expiresIn: expiresIn,
-        isActivated: true,
-      },
-    });
+        userId: userId,
+        updatedAt: new Date(),
+      })
+      .execute();
   }
 
-  // TODO: fix DB schema, it should be update refreshToken even UA data doesn't exist
   async updateRefreshToken(
-    id: string,
+    id: number,
+    userId: number,
     refreshToken: string,
-    userAgent: UserAgent,
+    ip: string,
+    userAgent: string,
+    fingerprint: string,
     expiresIn: Date,
-  ): Promise<void> {
-    await this.prisma.authToken.update({
-      where: { id: id },
-      data: {
+  ) {
+    await this.kysely.db
+      .updateTable('RefreshToken')
+      .set({
         refreshToken: refreshToken,
-        latestUA: userAgent,
+        ip: ip,
+        userAgent: userAgent,
+        fingerprint: fingerprint,
         expiresIn: expiresIn,
-        isActivated: true,
-      },
-    });
+        updatedAt: new Date(),
+      })
+      .where('id', '=', id)
+      .where('userId', '=', userId)
+      .execute();
   }
 
   async disableRefreshToken(
-    userId: string,
+    userId: number,
     refreshToken: string,
-    userAgent: UserAgent,
+    ip: string,
+    userAgent: string,
+    fingerprint: string,
   ): Promise<void> {
-    await this.prisma.authToken.update({
-      where: { userId: userId, refreshToken: refreshToken },
-      data: { latestUA: userAgent, isActivated: false },
-    });
+    await this.kysely.db
+      .updateTable('RefreshToken')
+      .set({
+        ip: ip,
+        userAgent: userAgent,
+        fingerprint: fingerprint,
+        activate: 0,
+        updatedAt: new Date(),
+      })
+      .where('userId', '=', userId)
+      .where('refreshToken', '=', refreshToken)
+      .execute();
   }
 }

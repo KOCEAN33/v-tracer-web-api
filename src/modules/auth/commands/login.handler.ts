@@ -7,11 +7,10 @@ import { AuthRepository } from '../repository/auth.repository';
 import { TokenService } from '../token.service';
 import { UserLoginCommand } from './login.command';
 import { SaveTokenEvent } from '../events/save-token.event';
-import { UserAgentParser } from '../ua.service';
 
 interface LoginResponse {
   message: string;
-  accessToken?: string;
+  accessToken: string;
 }
 
 @CommandHandler(UserLoginCommand)
@@ -22,13 +21,12 @@ export class UserLoginHandler implements ICommandHandler<UserLoginCommand> {
     private readonly tokenService: TokenService,
     private readonly jwtService: JwtService,
     private readonly eventBus: EventBus,
-    private readonly userAgentParser: UserAgentParser,
   ) {}
 
   async execute(command: UserLoginCommand): Promise<LoginResponse> {
     const { email, password, response, ip, userAgent, fingerprint } = command;
 
-    const user = await this.authRepository.getUserByEmailWithPassword(email);
+    const user = await this.authRepository.getPasswordByEmail(email);
 
     if (!user) {
       throw new BadRequestException('Invalid Username or Password');
@@ -36,7 +34,7 @@ export class UserLoginHandler implements ICommandHandler<UserLoginCommand> {
 
     const passwordValid = await this.passwordService.validatePassword(
       password,
-      user.password.password,
+      user.password,
     );
 
     if (!passwordValid) {
@@ -44,27 +42,27 @@ export class UserLoginHandler implements ICommandHandler<UserLoginCommand> {
     }
 
     // reject login
-    if (!user.isVerified) {
+    if (!user.verified) {
       throw new ForbiddenException('Your not verified');
     }
 
     // successful login logic
     const { accessToken, refreshToken } = this.tokenService.generateTokens({
-      userId: user.id,
+      userId: user.userId,
     });
 
     const decodeJWT = this.jwtService.decode(refreshToken);
     const expiresIn = new Date(decodeJWT['exp'] * 1000);
 
-    // save refreshToken
-    const parsedUserAgent = this.userAgentParser.parser(
-      userAgent,
-      ip,
-      fingerprint,
-    );
-
     this.eventBus.publish(
-      new SaveTokenEvent(user.id, refreshToken, parsedUserAgent, expiresIn),
+      new SaveTokenEvent(
+        user.userId,
+        refreshToken,
+        ip,
+        userAgent,
+        fingerprint,
+        expiresIn,
+      ),
     );
 
     response.clearCookie('token');

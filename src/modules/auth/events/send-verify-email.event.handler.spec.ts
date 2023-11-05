@@ -30,7 +30,7 @@ describe('SaveTokenEventHandler', () => {
   });
 
   it('should save new refresh token', async () => {
-    const eventData = ['userId123', 'dev@example.com'] as const;
+    const eventData = [10, 'dev@example.com'] as const;
 
     const event = new SendVerifyEmailEvent(...eventData);
     await sendVerifyEmailEventHandler.handle(event);
