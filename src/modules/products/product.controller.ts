@@ -10,8 +10,8 @@ export class ProductController {
 
   @Post()
   async createProduct(@Body() dto: CreateProductDto) {
-    const { name, url } = dto;
-    const command = new CreateProductCommand(name, url);
+    const { name, handle, url, companyId } = dto;
+    const command = new CreateProductCommand(name, handle, url, companyId);
     return this.commandBus.execute(command);
   }
 }

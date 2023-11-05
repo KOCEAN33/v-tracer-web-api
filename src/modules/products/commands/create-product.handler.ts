@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreateProductCommand } from './create-product.command';
 import { ProductRepository } from '../repositories/product.repository';
@@ -10,9 +10,25 @@ export class CreateProductHandler
 {
   constructor(readonly productRepository: ProductRepository) {}
 
-  async execute(command: CreateProductCommand): Promise<CreateProductCommand> {
-    const { name, url } = command;
+  async execute(command: CreateProductCommand) {
+    const { name, handle, url, companyId } = command;
 
-    return this.productRepository.createProduct(name, url);
+    const checkHandle =
+      await this.productRepository.getProductByProductHandle(handle);
+
+    if (checkHandle) {
+      throw new ConflictException('Handle already exists');
+    }
+
+    const product = await this.productRepository.createProduct(
+      name,
+      handle,
+      url,
+      companyId,
+    );
+
+    const result = Number(product.insertId);
+
+    return { message: 'Product created successfully', result };
   }
 }

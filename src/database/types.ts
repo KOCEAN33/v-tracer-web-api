@@ -4,25 +4,13 @@ export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
   : ColumnType<T, T | undefined, T>;
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
-import type { VerifyType, ArticleStatus, ArticleType } from './enums';
+import type { VerifyType, PostStatus, PostType } from './enums';
 
-export type Article = {
-  id: Generated<number>;
-  title: string;
-  content: string;
-  status: Generated<ArticleStatus>;
-  publishedAt: Timestamp | null;
-  deleted: Generated<number>;
-  productId: number;
-  authorId: number;
-  createdAt: Generated<Timestamp>;
-  updatedAt: Timestamp;
-};
 export type Comment = {
   id: Generated<number>;
   body: string;
   deleted: Generated<number>;
-  articleId: number;
+  postId: number;
   authorId: number;
   createdAt: Generated<Timestamp>;
   updatedAt: Timestamp;
@@ -38,6 +26,19 @@ export type Password = {
   id: Generated<number>;
   password: string;
   userId: number;
+  updatedAt: Timestamp;
+};
+export type Post = {
+  id: Generated<number>;
+  title: string;
+  content: string;
+  type: PostType;
+  status: Generated<PostStatus>;
+  publishedAt: Timestamp | null;
+  deleted: Generated<number>;
+  productId: number;
+  authorId: number;
+  createdAt: Generated<Timestamp>;
   updatedAt: Timestamp;
 };
 export type Product = {
@@ -86,10 +87,10 @@ export type VerifyCode = {
   createdAt: Generated<Timestamp>;
 };
 export type DB = {
-  Article: Article;
   Comment: Comment;
   Company: Company;
   Password: Password;
+  Post: Post;
   Product: Product;
   Profile: Profile;
   RefreshToken: RefreshToken;

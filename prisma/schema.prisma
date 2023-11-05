@@ -31,7 +31,7 @@ model User {
   verifyCodes   VerifyCode[]
 
   // contents
-  articles Article[]
+  posts    Post[]
   comments Comment[]
 
   @@index([email])
@@ -102,23 +102,25 @@ model VerifyCode {
   @@index([userId])
 }
 
-enum ArticleStatus {
+enum PostStatus {
   DRAFT
   PUBLISHED
 }
 
-enum ArticleType {
+enum PostType {
   REVIEW
   QUESTION
+  HIDE
 }
 
-model Article {
-  id          Int           @id @default(autoincrement())
+model Post {
+  id          Int        @id @default(autoincrement())
   title       String
-  content     String        @db.Text
-  status      ArticleStatus @default(value: DRAFT)
+  content     String     @db.Text
+  type        PostType
+  status      PostStatus @default(value: DRAFT)
   publishedAt DateTime?
-  deleted     Boolean       @default(false)
+  deleted     Boolean    @default(false)
 
   product   Product @relation(fields: [productId], references: [id])
   productId Int
@@ -139,15 +141,15 @@ model Comment {
   body    String  @db.Text
   deleted Boolean @default(false)
 
-  article   Article @relation(fields: [articleId], references: [id])
-  articleId Int
-  user      User    @relation(fields: [authorId], references: [id])
-  authorId  Int
+  post     Post @relation(fields: [postId], references: [id])
+  postId   Int
+  user     User @relation(fields: [authorId], references: [id])
+  authorId Int
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([articleId])
+  @@index([postId])
   @@index([authorId])
 }
 
@@ -163,7 +165,7 @@ model Product {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  articles Article[]
+  posts Post[]
 
   @@index([handle])
   @@index([companyId])

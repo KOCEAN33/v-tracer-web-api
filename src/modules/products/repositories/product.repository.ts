@@ -1,18 +1,28 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../../database/prisma.service';
+import { KyselyService } from '../../../database/kysely.service';
 
 @Injectable()
 export class ProductRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly kysely: KyselyService) {}
 
-  async createProduct(handle, name, url?) {
-    return await this.prisma.product.create({
-      data: { handle, name, url },
-    });
+  async createProduct(
+    handle: string,
+    name: string,
+    url: string,
+    companyId: number,
+  ) {
+    return await this.kysely.db
+      .insertInto('Product')
+      .values({ name: name, handle: handle, url: url, companyId: companyId })
+      .executeTakeFirst();
   }
 
   // Query
-  async getProductByProductHandle(handle) {
-    return await this.prisma.product.findUnique({ where: { handle: handle } });
+  async getProductByProductHandle(handle: string) {
+    return await this.kysely.db
+      .selectFrom('Product')
+      .select('handle')
+      .where('handle', '=', handle)
+      .executeTakeFirst();
   }
 }
