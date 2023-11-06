@@ -4,7 +4,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 
 import { CreateProductCommand } from './commands/create-product.command';
 
-@Controller('product')
+@Controller('/api/products')
 export class ProductController {
   constructor(private commandBus: CommandBus) {}
 

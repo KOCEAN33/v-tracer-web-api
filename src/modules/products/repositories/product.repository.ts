@@ -13,7 +13,13 @@ export class ProductRepository {
   ) {
     return await this.kysely.db
       .insertInto('Product')
-      .values({ name: name, handle: handle, url: url, companyId: companyId })
+      .values({
+        name: name,
+        handle: handle,
+        url: url,
+        companyId: companyId,
+        updatedAt: new Date(),
+      })
       .executeTakeFirst();
   }
 
