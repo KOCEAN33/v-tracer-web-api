@@ -3,9 +3,11 @@ import { CqrsModule } from '@nestjs/cqrs';
 
 import { PostController } from './post.controller';
 import { PostRepository } from './repositories/post.repository';
+import { CreatePostCommandHandler } from './commands/create-post.handler';
+import { GetReviewsHandler } from './queries/get-reviews.handler';
 
-const commandHandlers = [];
-const queryHandlers = [];
+const commandHandlers = [CreatePostCommandHandler];
+const queryHandlers = [GetReviewsHandler];
 
 @Module({
   imports: [CqrsModule],

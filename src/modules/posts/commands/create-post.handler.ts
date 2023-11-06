@@ -1,8 +1,8 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-
-import { CreatePostCommand } from './create-post.command';
-import { PostRepository } from '../repositories/post.repository';
 import { NotFoundException } from '@nestjs/common';
+
+import { PostRepository } from '../repositories/post.repository';
+import { CreatePostCommand } from './create-post.command';
 
 @CommandHandler(CreatePostCommand)
 export class CreatePostCommandHandler
@@ -16,7 +16,7 @@ export class CreatePostCommandHandler
     const product = await this.postRepository.getProductByHandle(productHandle);
 
     if (!product) {
-      throw new NotFoundException('Product not found');
+      throw new NotFoundException('invalid product handle');
     }
 
     const post = await this.postRepository.createPost(
@@ -28,8 +28,8 @@ export class CreatePostCommandHandler
       userId,
     );
 
-    const result = await this.postRepository.getPostById(Number(post.insertId));
+    const result = Number(post.insertId);
 
-    return { message: 'Login Success', data: result };
+    return { message: 'post success', data: result };
   }
 }

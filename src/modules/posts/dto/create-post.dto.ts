@@ -1,6 +1,6 @@
 import { PostStatus, PostType } from '../../../database/enums';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNumber, IsString } from 'class-validator';
+import { IsEnum, IsString } from 'class-validator';
 
 export class CreatePostDto {
   @IsString()
@@ -8,8 +8,8 @@ export class CreatePostDto {
   title: string;
 
   @IsString()
-  @ApiProperty({ description: 'content', example: 'content' })
-  content: string;
+  @ApiProperty({ description: 'body', example: 'body' })
+  body: string;
 
   @IsString()
   @IsEnum(PostType)
@@ -24,8 +24,4 @@ export class CreatePostDto {
   @IsString()
   @ApiProperty({ description: 'product name', example: 'notion' })
   productHandle: string;
-
-  @IsNumber()
-  @ApiProperty({ description: 'userId', example: 10 })
-  userId: number;
 }

@@ -22,9 +22,24 @@ export class PostRepository {
       .executeTakeFirst();
   }
 
+  async getReviewsByProduct(productHandle: string) {
+    return await this.kysely.db
+      .selectFrom('Post')
+      .select([
+        'Post.id',
+        'Post.title',
+        'Post.body',
+        'Post.publishedAt',
+        'Post.authorId',
+      ])
+      .innerJoin('Product', 'Post.productId', 'Product.id')
+      .where('Product.handle', '=', productHandle)
+      .execute();
+  }
+
   async createPost(
     title: string,
-    content: string,
+    body: string,
     type: PostType,
     status: PostStatus,
     productId: number,
@@ -40,7 +55,7 @@ export class PostRepository {
       .insertInto('Post')
       .values({
         title: title,
-        content: content,
+        body: body,
         type: type,
         status: status,
         productId: productId,
