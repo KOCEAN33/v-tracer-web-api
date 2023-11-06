@@ -105,18 +105,18 @@ model VerifyCode {
 enum PostStatus {
   DRAFT
   PUBLISHED
+  HIDE
 }
 
 enum PostType {
   REVIEW
   QUESTION
-  HIDE
 }
 
 model Post {
   id          Int        @id @default(autoincrement())
   title       String
-  content     String     @db.Text
+  body        String     @db.Text
   type        PostType
   status      PostStatus @default(value: DRAFT)
   publishedAt DateTime?
@@ -160,7 +160,7 @@ model Product {
   url    String?
 
   company   Company? @relation(fields: [companyId], references: [id])
-  companyId Int
+  companyId Int?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

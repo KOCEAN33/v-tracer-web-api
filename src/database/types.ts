@@ -31,7 +31,7 @@ export type Password = {
 export type Post = {
   id: Generated<number>;
   title: string;
-  content: string;
+  body: string;
   type: PostType;
   status: Generated<PostStatus>;
   publishedAt: Timestamp | null;
@@ -46,7 +46,7 @@ export type Product = {
   handle: string;
   name: string;
   url: string | null;
-  companyId: number;
+  companyId: number | null;
   createdAt: Generated<Timestamp>;
   updatedAt: Timestamp;
 };

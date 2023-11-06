@@ -9,7 +9,7 @@ const config: Config = {
     path: 'api-docs',
   },
   security: {
-    expiresIn: '10m',
+    expiresIn: '1h',
     refreshIn: '14d',
     bcryptSaltOrRound: 12,
   },

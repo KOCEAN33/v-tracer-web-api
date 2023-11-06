@@ -127,7 +127,7 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Get('test')
-  async test(@User() userId: string) {
+  async test(@User() userId: number) {
     console.log('accepted', userId);
     return 'success';
   }
