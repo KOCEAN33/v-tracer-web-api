@@ -5,7 +5,6 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { MailgunService } from 'nestjs-mailgun';
 import { MailgunMessageData } from 'mailgun.js';
-import { validate } from 'deep-email-validator';
 
 import { EmailConfig } from '../../common/config/config.interface';
 import { SendEmail } from './interface/send-email.interface';
@@ -44,10 +43,6 @@ export class EmailService {
     const expire = emailConfig.expiresIn;
     const now = new Date();
     return this.addMinutes(now, expire);
-  }
-
-  public async validateEmailAddress(email) {
-    return await validate(email);
   }
 
   // date calculation

@@ -13,7 +13,13 @@ export class ProductRepository {
   ) {
     return await this.kysely.db
       .insertInto('Product')
-      .values({ name: name, handle: handle, url: url, companyId: companyId })
+      .values({
+        name: name,
+        handle: handle,
+        url: url,
+        companyId: companyId,
+        updatedAt: new Date(),
+      })
       .executeTakeFirst();
   }
 
@@ -21,8 +27,15 @@ export class ProductRepository {
   async getProductByProductHandle(handle: string) {
     return await this.kysely.db
       .selectFrom('Product')
-      .select('handle')
+      .selectAll()
       .where('handle', '=', handle)
       .executeTakeFirst();
+  }
+
+  async getProducts() {
+    return await this.kysely.db
+      .selectFrom('Product')
+      .select(['id', 'handle', 'name', 'companyId'])
+      .execute();
   }
 }

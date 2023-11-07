@@ -17,7 +17,7 @@ export class CreateProductHandler
       await this.productRepository.getProductByProductHandle(handle);
 
     if (checkHandle) {
-      throw new ConflictException('Handle already exists');
+      throw new ConflictException('this handle already exists');
     }
 
     const product = await this.productRepository.createProduct(
@@ -27,8 +27,8 @@ export class CreateProductHandler
       companyId,
     );
 
-    const result = Number(product.insertId);
+    const productId = Number(product.insertId);
 
-    return { message: 'Product created successfully', result };
+    return { message: 'product created successfully', productId };
   }
 }

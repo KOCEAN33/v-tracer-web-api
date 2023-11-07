@@ -1,18 +1,25 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { Product } from '@prisma/client';
+import { NotFoundException } from '@nestjs/common';
 
 import { GetProductByHandleQuery } from './get-product.query';
 import { ProductRepository } from '../repositories/product.repository';
 
 @QueryHandler(GetProductByHandleQuery)
-export class GetProductByHandleHandler
+export class GetProductByHandleQueryHandler
   implements IQueryHandler<GetProductByHandleQuery>
 {
   constructor(private readonly productRepository: ProductRepository) {}
 
   async execute(query: GetProductByHandleQuery) {
-    // const { handle } = query;
-    //
-    // return await this.productRepository.getProductByProductHandle(handle);
+    const { productHandle } = query;
+
+    const product =
+      await this.productRepository.getProductByProductHandle(productHandle);
+
+    if (!product) {
+      throw new NotFoundException('product not found');
+    }
+
+    return { message: 'success', product };
   }
 }
