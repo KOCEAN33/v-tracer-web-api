@@ -27,8 +27,15 @@ export class ProductRepository {
   async getProductByProductHandle(handle: string) {
     return await this.kysely.db
       .selectFrom('Product')
-      .select('handle')
+      .selectAll()
       .where('handle', '=', handle)
       .executeTakeFirst();
+  }
+
+  async getProducts() {
+    return await this.kysely.db
+      .selectFrom('Product')
+      .select(['id', 'handle', 'name', 'companyId'])
+      .execute();
   }
 }

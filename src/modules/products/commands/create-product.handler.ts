@@ -27,8 +27,8 @@ export class CreateProductHandler
       companyId,
     );
 
-    const result = Number(product.insertId);
+    const productId = Number(product.insertId);
 
-    return { message: 'Product created successfully', result };
+    return { message: 'Product created successfully', productId };
   }
 }
