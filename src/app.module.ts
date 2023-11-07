@@ -1,6 +1,5 @@
 import { Logger, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import * as path from 'path';
 
 import config from './common/config/config';
 import { AuthModule } from './modules/auth/auth.module';
@@ -13,12 +12,12 @@ import { ExceptionModule } from './common/exception/exception.module';
 
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 
-const envPath = path.join(__dirname, '..', `/env/.${process.env.NODE_ENV}.env`);
-
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: envPath,
+      envFilePath: [
+        `${__dirname}/common/config/env/.${process.env.NODE_ENV}.env`,
+      ],
       load: [config],
       cache: true,
       isGlobal: true,

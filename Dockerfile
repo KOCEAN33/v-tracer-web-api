@@ -1,62 +1,29 @@
 ###################
-# BUILD FOR LOCAL DEVELOPMENT
-###################
-
-FROM node:lts-alpine As development
-RUN curl -f https://get.pnpm.io/v6.16.js | node - add --global pnpm
-
-WORKDIR /usr/src/app
-
-COPY --chown=node:node pnpm-lock.yaml ./
-
-RUN pnpm fetch --prod
-
-COPY --chown=node:node . .
-RUN pnpm install
-
-USER node
-
-###################
 # BASE IMAGE
 ###################
+FROM node:20-slim As base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 COPY . /app
 WORKDIR /app
 
-FROM node:20-slim As base
 
 ###################
 # BUILD FOR PRODUCTION
 ###################
+FROM base AS prod-deps
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
 
-FROM node:lts-alpine As build
-RUN curl -f https://get.pnpm.io/v6.16.js | node - add --global pnpm
-
-WORKDIR /usr/src/app
-
-COPY --chown=node:node pnpm-lock.yaml ./
-
-COPY --chown=node:node --from=development /usr/src/app/node_modules ./node_modules
-
-COPY --chown=node:node . .
-
-RUN pnpm build
-
-ENV NODE_ENV production
-
-RUN pnpm install --prod
-
-USER node
+FROM base AS build
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+RUN pnpm run build
 
 ###################
 # PRODUCTION
 ###################
-
-FROM node:lts-alpine As production
-
-COPY --chown=node:node --from=build /usr/src/app/node_modules ./node_modules
-COPY --chown=node:node --from=build /usr/src/app/dist ./dist
-
-CMD [ "node", "dist/main.js" ]
+FROM base
+COPY --from=prod-deps /app/node_modules /app/node_modules
+COPY --from=build /app/dist /app/dist
+EXPOSE 8000
+CMD [ "pnpm", "start:prod" ]

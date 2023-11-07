@@ -7,6 +7,10 @@
       {
         "include": "../src/assets/**/*",
         "outDir" : "dist/"
+      },
+      {
+        "include": "../src/common/config/env/*.env",
+        "outDir" : "dist/"
       }
     ],
     "watchAssets": true,
