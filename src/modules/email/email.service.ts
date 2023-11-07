@@ -57,8 +57,7 @@ export class EmailService {
       __dirname,
       '..',
       '..',
-      '..',
-      'templates',
+      'assets',
       'email',
       templateName,
     );
