@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get } from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CreateProductDto } from './dto/create-product.dto';
 
@@ -6,6 +6,7 @@ import { CreateProductCommand } from './commands/create-product.command';
 import { GetProductDto } from './dto/get-product.dto';
 import { GetProductByHandleQuery } from './queries/get-product.query';
 import { GetProductsListQuery } from './queries/get-products-list.query';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 
 @Controller('/api/products')
 export class ProductController {
@@ -14,6 +15,7 @@ export class ProductController {
     private queryBus: QueryBus,
   ) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post()
   async createProduct(@Body() dto: CreateProductDto) {
     const { name, handle, url, companyId } = dto;

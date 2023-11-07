@@ -10,7 +10,8 @@ export class GetProductsListQueryHandler
 {
   constructor(private readonly productRepository: ProductRepository) {}
 
-  async execute() {
+  async execute(query: GetProductsListQuery) {
+    const {} = query;
     const products = await this.productRepository.getProducts();
 
     if (!products) {
