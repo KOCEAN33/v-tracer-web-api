@@ -27,3 +27,9 @@ COPY --from=prod-deps /app/node_modules /app/node_modules
 COPY --from=build /app/dist /app/dist
 EXPOSE 8000
 CMD [ "pnpm", "start:prod" ]
+
+# COMMAND FOR DOCKER BUILD (LINUX & UNIX)
+# DOCKER_BUILDKIT=1 docker build -t tries .
+
+# COMMAND FOR WINDOWS
+# docker build -t tries .
