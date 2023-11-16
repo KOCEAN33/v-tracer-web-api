@@ -33,3 +33,5 @@ CMD [ "pnpm", "start:prod" ]
 
 # COMMAND FOR WINDOWS
 # docker build -t tries .
+# docker build --tag koceanm/tries:api-0.0.1 .
+# docker push koceanm/tries:api-0.0.1
