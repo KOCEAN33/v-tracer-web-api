@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tries-api-deploy
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      name: tries-api-app
+  template:
+    metadata:
+      labels:
+        name: tries-api-app
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      containers:
+        - name: tries
+          image: koceanm/tries:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - secretRef:
+                name: tries-api-secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tries-api-service
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 8000
+  selector:
+    name: tries-api-app

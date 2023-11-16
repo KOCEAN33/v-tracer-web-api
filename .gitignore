@@ -406,3 +406,6 @@ logs/**/*.log
 
 sonarqube-scanner.js
 .scannerwork
+
+### k8s
+secrets.yaml
