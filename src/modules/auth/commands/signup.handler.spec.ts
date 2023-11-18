@@ -1,6 +1,6 @@
 import { EventBus } from '@nestjs/cqrs';
 import { Test, TestingModule } from '@nestjs/testing';
-import { ConflictException, UnauthorizedException } from '@nestjs/common';
+import { ConflictException } from '@nestjs/common';
 
 import { SendVerifyEmailCommand } from '../../email/commands/send-verify-email.command';
 import { UserSignUpCommand } from './signup.command';
