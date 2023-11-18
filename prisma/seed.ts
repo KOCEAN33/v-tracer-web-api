@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { Kysely } from 'kysely';
-import { DB } from '../src/database/types';
+import { DB } from '../src/@types/types';
 import { PlanetScaleDialect } from 'kysely-planetscale';
 
 const prisma = new PrismaClient();

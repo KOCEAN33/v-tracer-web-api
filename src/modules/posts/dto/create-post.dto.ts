@@ -1,4 +1,4 @@
-import { PostStatus, PostType } from '../../../database/enums';
+import { PostStatus, PostType } from '../../../@types/enums';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsString } from 'class-validator';
 

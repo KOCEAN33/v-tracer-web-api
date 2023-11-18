@@ -1,5 +1,5 @@
 import { ICommand } from '@nestjs/cqrs';
-import { PostStatus, PostType } from '../../../database/enums';
+import { PostStatus, PostType } from '../../../@types/enums';
 
 export class CreatePostCommand implements ICommand {
   constructor(

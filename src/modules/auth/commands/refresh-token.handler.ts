@@ -19,8 +19,7 @@ export class RefreshTokenHandler
   ) {}
 
   async execute(command: RefreshTokenCommand) {
-    const { receivedRefreshToken, response, ip, userAgent, fingerprint } =
-      command;
+    const { receivedRefreshToken, response, ip, userAgent } = command;
 
     const payload =
       this.tokenService.extractUserIdFromToken(receivedRefreshToken);
@@ -54,11 +53,10 @@ export class RefreshTokenHandler
     this.eventBus.publish(
       new UpdateTokenEvent(
         token.id,
-        token.userId,
+        token.user_id,
         refreshToken,
         ip,
         userAgent,
-        fingerprint,
         expiresIn,
       ),
     );

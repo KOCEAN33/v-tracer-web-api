@@ -42,9 +42,9 @@ describe('UserVerifyEmailHandler', () => {
     const commandData = ['verifyToken'] as const;
     const verifyData = {
       id: 10,
-      userId: 11,
+      user_id: 11,
       code: 'verifyToken',
-      activate: 1,
+      is_activate: 1,
     };
 
     authRepository.getVerifyEmailByVerifyCode = jest
@@ -60,7 +60,7 @@ describe('UserVerifyEmailHandler', () => {
       verifyData.id,
     );
     expect(authRepository.updateUserVerify).toHaveBeenCalledWith(
-      verifyData.userId,
+      verifyData.user_id,
     );
   });
 

@@ -12,8 +12,7 @@ export class UserLogoutHandler implements ICommandHandler<UserLogoutCommand> {
   constructor(private readonly authRepository: AuthRepository) {}
 
   async execute(command: UserLogoutCommand): Promise<LogoutResponse> {
-    const { response, userId, refreshToken, ip, userAgent, fingerprint } =
-      command;
+    const { response, userId, refreshToken, ip, userAgent } = command;
 
     // clear httponly cookies
     response.clearCookie('token', {
@@ -29,7 +28,6 @@ export class UserLogoutHandler implements ICommandHandler<UserLogoutCommand> {
       refreshToken,
       ip,
       userAgent,
-      fingerprint,
     );
 
     return { message: 'success logout' };

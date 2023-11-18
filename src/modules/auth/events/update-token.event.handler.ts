@@ -10,8 +10,7 @@ export class UpdateTokenEventHandler
   constructor(private authRepository: AuthRepository) {}
 
   async handle(event: UpdateTokenEvent) {
-    const { id, userId, refreshToken, ip, userAgent, fingerprint, expiresIn } =
-      event;
+    const { id, userId, refreshToken, ip, userAgent, expiresIn } = event;
 
     await this.authRepository.updateRefreshToken(
       id,
@@ -19,7 +18,6 @@ export class UpdateTokenEventHandler
       refreshToken,
       ip,
       userAgent,
-      fingerprint,
       expiresIn,
     );
   }

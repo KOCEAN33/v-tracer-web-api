@@ -1,9 +1,5 @@
 import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
-import {
-  ConflictException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 
 import { UserSignUpCommand } from './signup.command';
 import { SendVerifyEmailEvent } from '../events/send-verify-email.event';
@@ -20,12 +16,7 @@ export class UserSignUpHandler implements ICommandHandler<UserSignUpCommand> {
   ) {}
 
   async execute(command: UserSignUpCommand) {
-    const { name, email, password, fingerprint } = command;
-
-    // Block unknown system
-    if (!fingerprint) {
-      throw new UnauthorizedException('can not verify browser');
-    }
+    const { name, email, password } = command;
 
     // Confirm E-Mail is Unique
     const checkUser = await this.authRepository.getUserByEmail(email);

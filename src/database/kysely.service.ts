@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PlanetScaleDialect } from 'kysely-planetscale';
 import { Kysely, ParseJSONResultsPlugin } from 'kysely';
-import { DB } from './types';
+import { DB } from '../@types/types';
 
 @Injectable()
 export class KyselyService {

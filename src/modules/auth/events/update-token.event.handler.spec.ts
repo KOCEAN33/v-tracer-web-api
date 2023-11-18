@@ -38,7 +38,6 @@ describe('UpdateTokenEventHandler', () => {
       'fakeRefreshToken',
       '127.0.0.1',
       'userAgent',
-      'fingerprint',
       new Date(),
     ] as const;
 

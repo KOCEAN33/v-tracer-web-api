@@ -42,12 +42,7 @@ describe('UserSignUpHandler', () => {
   });
 
   it('should create a new user and send verification email', async () => {
-    const commandData = [
-      'xanny',
-      'dev@xanny.us',
-      'passw0rd',
-      'fingerprint',
-    ] as const;
+    const commandData = ['xanny', 'dev@xanny.us', 'passw0rd'] as const;
     const checkUser = null;
     const newUser = 10;
 
@@ -64,21 +59,8 @@ describe('UserSignUpHandler', () => {
     );
   });
 
-  it('should throw UnauthorizedException when no fingerprint', async () => {
-    const commandData = ['xanny', 'dev@xanny.us', 'password123', ''] as const;
-
-    await expect(
-      userSignUpHandler.execute(new UserSignUpCommand(...commandData)),
-    ).rejects.toThrow(UnauthorizedException);
-  });
-
   it('should throw ConflictException when email is duplicated', async () => {
-    const commandData = [
-      'xanny',
-      'dev@xanny.us',
-      'passw0rd',
-      'fingerprint',
-    ] as const;
+    const commandData = ['xanny', 'dev@xanny.us', 'passw0rd'] as const;
     const checkUser = 'dev@xanny.us';
 
     authRepository.getUserByEmail = jest.fn().mockResolvedValue(checkUser);

@@ -17,7 +17,6 @@ const commandData = [
   } as any,
   '127.0.0.1',
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/117.0',
-  'fingerprint',
 ] as const;
 
 describe('RefreshTokenHandler', () => {
@@ -74,7 +73,7 @@ describe('RefreshTokenHandler', () => {
   it('should refresh access and refresh tokens and publish UpdateTokenEvent', async () => {
     const payload = { userId: 10 };
     const mockUser = { id: 10, email: 'dev@example.com' };
-    const token = { id: 9, userId: 10, activate: 1 };
+    const token = { id: 9, user_id: 10, is_activate: 1 };
 
     tokenService.extractUserIdFromToken = jest.fn().mockReturnValue(payload);
     authRepository.getRefreshToken = jest.fn().mockResolvedValue(token);
@@ -89,11 +88,10 @@ describe('RefreshTokenHandler', () => {
     expect(eventBus.publish).toHaveBeenCalledWith(
       new UpdateTokenEvent(
         token.id,
-        token.userId,
+        token.user_id,
         'fakeRefreshToken',
         '127.0.0.1',
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/117.0',
-        'fingerprint',
         new Date(1693479600 * 1000),
       ),
     );

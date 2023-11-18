@@ -1,86 +1,91 @@
 import { Injectable } from '@nestjs/common';
 
 import { KyselyService } from '../../../database/kysely.service';
+import { InjectKysely } from 'nestjs-kysely';
+import { DB } from '../../../@types';
 
 @Injectable()
 export class AuthRepository {
-  constructor(private readonly kysely: KyselyService) {}
+  constructor(
+    private readonly kysely: KyselyService,
+    @InjectKysely() private readonly db: DB,
+  ) {}
 
   async getUserById(userId: number) {
-    return await this.kysely.db
-      .selectFrom('Profile')
+    return await this.db
+      .selectFrom('profiles')
       .selectAll()
-      .where('userId', '=', userId)
+      .where('user_id', '=', userId)
       .executeTakeFirst();
   }
 
   async getPasswordByEmail(email: string) {
-    return await this.kysely.db
-      .selectFrom('User')
-      .innerJoin('Password', 'Password.userId', 'User.id')
-      .where('User.email', '=', email)
+    return await this.db
+      .selectFrom('users')
+      .innerJoin('passwords', 'passwords.user_id', 'users.id')
+      .where('users.email', '=', email)
       .selectAll()
       .executeTakeFirst();
   }
 
   async getUserByEmail(email: string) {
-    return this.kysely.db
-      .selectFrom('User')
+    return this.db
+      .selectFrom('users')
       .selectAll()
-      .where('User.email', '=', email)
+      .where('users.email', '=', email)
       .executeTakeFirst();
   }
 
   async getVerifyEmailByVerifyCode(verifyCode: string) {
-    return await this.kysely.db
-      .selectFrom('VerifyCode')
+    return await this.db
+      .selectFrom('verify_codes')
       .selectAll()
-      .where('VerifyCode.code', '=', verifyCode)
-      .where('VerifyCode.activate', '=', 1)
-      .where('VerifyCode.type', '=', 'NEWACCOUNT')
+      .where('verify_codes.code', '=', verifyCode)
+      .where('verify_codes.is_activate', '=', 1)
+      .where('verify_codes.type', '=', 'new_account')
       .executeTakeFirst();
   }
 
   // User Verify Status update
   async updateUserVerify(userId: number) {
-    await this.kysely.db
-      .updateTable('User')
+    await this.db
+      .updateTable('users')
       .where('id', '=', userId)
-      .set({ verified: 1 })
+      .set({ is_verified: 1 })
       .executeTakeFirst();
   }
 
   // Verify Token update
   async updateVerifyToken(id: number) {
-    await this.kysely.db
-      .updateTable('VerifyCode')
-      .set({ activate: 0, verifiedAt: new Date() })
+    await this.db
+      .updateTable('verify_codes')
+      .set({ is_activate: 0, verified_at: new Date() })
       .where('id', '=', id)
       .executeTakeFirst();
   }
 
   async createUserByEmail(name: string, email: string, hashedPassword: string) {
-    return await this.kysely.db.transaction().execute(async (trx) => {
+    return await this.db.transaction().execute(async (trx) => {
       const newUser = await trx
-        .insertInto('User')
+        .insertInto('users')
         .values({ email: email })
         .executeTakeFirstOrThrow();
 
       await trx
-        .insertInto('Password')
+        .insertInto('passwords')
         .values({
           password: hashedPassword,
-          userId: Number(newUser.insertId),
-          updatedAt: new Date(),
+          user_id: Number(newUser.insertId),
+          updated_at: new Date(),
         })
         .executeTakeFirstOrThrow();
 
       await trx
-        .insertInto('Profile')
+        .insertInto('profiles')
         .values({
           name: name,
-          userId: Number(newUser.insertId),
-          updatedAt: new Date(),
+          user_id: Number(newUser.insertId),
+          updated_at: new Date(),
         })
         .executeTakeFirst();
 
@@ -89,12 +94,12 @@ export class AuthRepository {
   }
 
   async getRefreshToken(userId: number, refreshToken: string) {
-    return await this.kysely.db
-      .selectFrom('RefreshToken')
+    return await this.db
+      .selectFrom('refresh_tokens')
       .selectAll()
-      .where('userId', '=', userId)
-      .where('refreshToken', '=', refreshToken)
-      .where('expiresIn', '>', new Date())
+      .where('user_id', '=', userId)
+      .where('refresh_token', '=', refreshToken)
+      .where('expires_in', '>', new Date())
       .executeTakeFirst();
   }
 
@@ -103,20 +108,18 @@ export class AuthRepository {
     refreshToken: string,
     ip: string,
     userAgent: string,
-    fingerprint: string,
     expiresIn: Date,
   ) {
-    await this.kysely.db
-      .insertInto('RefreshToken')
+    await this.db
+      .insertInto('refresh_tokens')
       .values({
-        refreshToken: refreshToken,
-        activate: 1,
+        refresh_token: refreshToken,
+        is_activate: 1,
         ip: ip,
-        fingerprint: fingerprint,
-        userAgent: userAgent,
-        expiresIn: expiresIn,
-        userId: userId,
-        updatedAt: new Date(),
+        user_agent: userAgent,
+        expires_in: expiresIn,
+        user_id: userId,
+        updated_at: new Date(),
       })
       .execute();
   }
@@ -127,21 +130,19 @@ export class AuthRepository {
     refreshToken: string,
     ip: string,
     userAgent: string,
-    fingerprint: string,
     expiresIn: Date,
   ) {
-    await this.kysely.db
-      .updateTable('RefreshToken')
+    await this.db
+      .updateTable('refresh_tokens')
       .set({
-        refreshToken: refreshToken,
+        refresh_token: refreshToken,
         ip: ip,
-        userAgent: userAgent,
-        fingerprint: fingerprint,
-        expiresIn: expiresIn,
-        updatedAt: new Date(),
+        user_agent: userAgent,
+        expires_in: expiresIn,
+        updated_at: new Date(),
       })
       .where('id', '=', id)
-      .where('userId', '=', userId)
+      .where('user_id', '=', userId)
       .execute();
   }
 
@@ -150,19 +151,17 @@ export class AuthRepository {
     refreshToken: string,
     ip: string,
     userAgent: string,
-    fingerprint: string,
   ): Promise<void> {
-    await this.kysely.db
-      .updateTable('RefreshToken')
+    await this.db
+      .updateTable('refresh_tokens')
       .set({
         ip: ip,
-        userAgent: userAgent,
-        fingerprint: fingerprint,
-        activate: 0,
-        updatedAt: new Date(),
+        user_agent: userAgent,
+        is_activate: 0,
+        updated_at: new Date(),
       })
-      .where('userId', '=', userId)
-      .where('refreshToken', '=', refreshToken)
+      .where('user_id', '=', userId)
+      .where('refresh_token', '=', refreshToken)
       .execute();
   }
 }

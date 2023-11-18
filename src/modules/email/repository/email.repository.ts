@@ -1,33 +1,38 @@
 import { Injectable } from '@nestjs/common';
 
 import { KyselyService } from '../../../database/kysely.service';
+import { InjectKysely } from 'nestjs-kysely';
+import { DB } from '../../../@types';
 
 @Injectable()
 export class EmailRepository {
-  constructor(private readonly kysely: KyselyService) {}
+  constructor(
+    private readonly kysely: KyselyService,
+    @InjectKysely() private readonly db: DB,
+  ) {}
 
   async createVerifyToken(
     userId: number,
     code: string,
     expiresIn: Date,
   ): Promise<void> {
-    await this.kysely.db
-      .insertInto('VerifyCode')
+    await this.db
+      .insertInto('verify_codes')
       .values({
         code: code,
-        activate: 1,
-        type: 'NEWACCOUNT',
-        expiresIn: expiresIn,
-        userId: userId,
+        is_activate: 1,
+        type: 'new_account',
+        expires_in: expiresIn,
+        user_id: userId,
       })
       .execute();
   }
 
   async invalidateOldToken(userId: number): Promise<void> {
     await this.kysely.db
-      .updateTable('VerifyCode')
-      .set({ activate: 0 })
-      .where('userId', '=', userId)
+      .updateTable('verify_codes')
+      .set({ is_activate: 0 })
+      .where('user_id', '=', userId)
       .execute();
   }
 }

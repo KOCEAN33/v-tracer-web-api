@@ -24,7 +24,7 @@ export class UserLoginHandler implements ICommandHandler<UserLoginCommand> {
   ) {}
 
   async execute(command: UserLoginCommand): Promise<LoginResponse> {
-    const { email, password, response, ip, userAgent, fingerprint } = command;
+    const { email, password, response, ip, userAgent } = command;
 
     const user = await this.authRepository.getPasswordByEmail(email);
 
@@ -42,27 +42,20 @@ export class UserLoginHandler implements ICommandHandler<UserLoginCommand> {
     }
 
     // reject login
-    if (!user.verified) {
+    if (!user.is_verified) {
       throw new ForbiddenException('Your not verified');
     }
 
     // successful login logic
     const { accessToken, refreshToken } = this.tokenService.generateTokens({
-      userId: user.userId,
+      userId: user.user_id,
     });
 
     const decodeJWT = this.jwtService.decode(refreshToken);
     const expiresIn = new Date(decodeJWT['exp'] * 1000);
 
     this.eventBus.publish(
-      new SaveTokenEvent(
-        user.userId,
-        refreshToken,
-        ip,
-        userAgent,
-        fingerprint,
-        expiresIn,
-      ),
+      new SaveTokenEvent(user.user_id, refreshToken, ip, userAgent, expiresIn),
     );
 
     response.clearCookie('token');

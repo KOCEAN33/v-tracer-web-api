@@ -5,6 +5,5 @@ export class UserSignUpCommand implements ICommand {
     readonly name: string,
     readonly email: string,
     readonly password: string,
-    readonly fingerprint: string,
   ) {}
 }

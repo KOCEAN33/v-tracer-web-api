@@ -38,8 +38,8 @@ describe('CreatePostHandler', () => {
     const commandData = [
       'title',
       'body',
-      'REVIEW',
-      'PUBLISHED',
+      'review',
+      'published',
       'productHandle',
       0,
     ] as const;
@@ -73,8 +73,8 @@ describe('CreatePostHandler', () => {
     const commandData = [
       'title',
       'body',
-      'REVIEW',
-      'PUBLISHED',
+      'review',
+      'published',
       'productHandle',
       0,
     ] as const;

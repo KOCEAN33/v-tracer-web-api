@@ -8,6 +8,5 @@ export class UserLogoutCommand implements ICommand {
     readonly refreshToken: string,
     readonly ip: string,
     readonly userAgent: string,
-    readonly fingerprint: string,
   ) {}
 }

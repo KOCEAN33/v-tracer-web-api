@@ -7,7 +7,6 @@ export class UpdateTokenEvent implements IEvent {
     readonly refreshToken: string,
     readonly ip: string,
     readonly userAgent: string,
-    readonly fingerprint: string,
     readonly expiresIn: Date,
   ) {}
 }

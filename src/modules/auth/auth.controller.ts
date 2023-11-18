@@ -1,4 +1,4 @@
-import type { Response } from 'express';
+import type { Response, Request } from 'express';
 import {
   Body,
   Controller,
@@ -24,7 +24,6 @@ import { UserVerifyEmailCommand } from './commands/verify-email.command';
 import { UserLogoutCommand } from './commands/logout.command';
 
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
-import { CustomRequest } from '../../common/interface/custom-request.interface';
 import { User } from '../../common/decorators/get-user.decorator';
 
 @ApiTags('Auth API')
@@ -39,12 +38,11 @@ export class AuthController {
   @Post('/login')
   async login(
     @Ip() ip: string,
-    @Req() req: CustomRequest,
+    @Req() req: Request,
     @Res({ passthrough: true }) response: Response,
     @Body() dto: UserLoginDto,
   ) {
     dto.email = dto.email.toLowerCase();
-    const fingerprint = req.headers['fingerprint'] as string;
     const userAgent = req.headers['user-agent'] as string;
     const { email, password } = dto;
     const command = new UserLoginCommand(
@@ -53,7 +51,6 @@ export class AuthController {
       response,
       ip,
       userAgent,
-      fingerprint,
     );
     return this.commandBus.execute(command);
   }
@@ -61,10 +58,9 @@ export class AuthController {
   @Get('/refresh')
   async refreshToken(
     @Ip() ip: string,
-    @Req() req: CustomRequest,
+    @Req() req: Request,
     @Res({ passthrough: true }) response: Response,
   ) {
-    const fingerprint = req.headers['fingerprint'] as string;
     const userAgent = req.headers['user-agent'];
     const refreshToken = req.cookies['token'];
     const command = new RefreshTokenCommand(
@@ -72,7 +68,6 @@ export class AuthController {
       response,
       ip,
       userAgent,
-      fingerprint,
     );
     return this.commandBus.execute(command);
   }
@@ -81,11 +76,10 @@ export class AuthController {
   @ApiOperation({ summary: 'User Signup' })
   @ApiTags('Auth')
   @ApiCreatedResponse({ description: '회원 가입', type: UserSignUpDto })
-  async signUp(@Req() req: CustomRequest, @Body() dto: UserSignUpDto) {
+  async signUp(@Body() dto: UserSignUpDto) {
     dto.email = dto.email.toLowerCase();
-    const fingerprint = req.headers['fingerprint'] as string;
     const { name, email, password } = dto;
-    const command = new UserSignUpCommand(name, email, password, fingerprint);
+    const command = new UserSignUpCommand(name, email, password);
     return this.commandBus.execute(command);
   }
 
@@ -100,11 +94,10 @@ export class AuthController {
   @Post('/logout')
   async logout(
     @Res({ passthrough: true }) res: Response,
-    @Req() req: CustomRequest,
+    @Req() req: Request,
     @Body() dto: LogoutDto,
     @Ip() ip: string,
   ) {
-    const fingerprint = req.headers['fingerprint'] as string;
     const userAgent = req.headers['user-agent'];
     const refreshToken = req.cookies['token'];
     const { userId } = dto;
@@ -114,7 +107,6 @@ export class AuthController {
       refreshToken,
       ip,
       userAgent,
-      fingerprint,
     );
     return this.commandBus.execute(command);
   }

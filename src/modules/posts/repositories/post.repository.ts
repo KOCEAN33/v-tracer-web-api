@@ -1,22 +1,27 @@
 import { Injectable } from '@nestjs/common';
 import { KyselyService } from '../../../database/kysely.service';
-import { PostStatus, PostType } from '../../../database/enums';
+import { PostStatus, PostType } from '../../../@types/enums';
+import { InjectKysely } from 'nestjs-kysely';
+import { DB } from '../../../@types';
 
 @Injectable()
 export class PostRepository {
-  constructor(private readonly kysely: KyselyService) {}
+  constructor(
+    private readonly kysely: KyselyService,
+    @InjectKysely() private readonly db: DB,
+  ) {}
 
   async getProductByHandle(handle: string) {
-    return await this.kysely.db
-      .selectFrom('Product')
+    return await this.db
+      .selectFrom('products')
       .selectAll()
       .where('handle', '=', handle)
       .executeTakeFirst();
   }
 
   async getPostById(id: number) {
-    return await this.kysely.db
-      .selectFrom('Post')
+    return await this.db
+      .selectFrom('posts')
       .selectAll()
       .where('id', '=', id)
       .executeTakeFirst();
@@ -24,16 +29,16 @@ export class PostRepository {
 
   async getReviewsByProduct(productHandle: string) {
     return await this.kysely.db
-      .selectFrom('Post')
+      .selectFrom('posts')
       .select([
-        'Post.id',
-        'Post.title',
-        'Post.body',
-        'Post.publishedAt',
-        'Post.authorId',
+        'posts.id',
+        'posts.title',
+        'posts.body',
+        'posts.published_at',
+        'posts.author_id',
       ])
-      .innerJoin('Product', 'Post.productId', 'Product.id')
-      .where('Product.handle', '=', productHandle)
+      .innerJoin('products', 'posts.product_id', 'products.id')
+      .where('products.handle', '=', productHandle)
       .execute();
   }
 
@@ -52,16 +57,16 @@ export class PostRepository {
       return null;
     };
     return await this.kysely.db
-      .insertInto('Post')
+      .insertInto('posts')
       .values({
         title: title,
         body: body,
         type: type,
         status: status,
-        productId: productId,
-        authorId: userId,
-        publishedAt: pubAt(status),
-        updatedAt: new Date(),
+        product_id: productId,
+        author_id: userId,
+        published_at: pubAt(status),
+        updated_at: new Date(),
       })
       .executeTakeFirstOrThrow();
   }

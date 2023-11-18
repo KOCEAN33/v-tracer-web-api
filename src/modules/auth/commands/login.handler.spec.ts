@@ -76,13 +76,12 @@ describe('UserLoginHandler', () => {
       { clearCookie: jest.fn(), cookie: jest.fn() } as any,
       '127.0.0.1',
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/117.0',
-      'fingerprint',
     ] as const;
     const mockUser = {
       id: 10,
       name: 'dev@example.com',
-      verified: 1,
-      userId: 11,
+      is_verified: 1,
+      user_id: 11,
       password: 'hashedPassword',
     };
 
@@ -103,7 +102,6 @@ describe('UserLoginHandler', () => {
         'fakeRefreshToken',
         '127.0.0.1',
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/117.0',
-        'fingerprint',
         new Date(1693479600 * 1000),
       ),
     );
@@ -116,13 +114,12 @@ describe('UserLoginHandler', () => {
       { clearCookie: jest.fn(), cookie: jest.fn() } as any,
       '127.0.0.1',
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/117.0',
-      'fingerprint',
     ] as const;
     const mockUser = {
       id: 10,
       name: 'dev@example.com',
-      verified: 0,
-      userId: 11,
+      is_verified: 0,
+      user_id: 11,
       password: 'hashedPassword',
     };
 
@@ -141,7 +138,6 @@ describe('UserLoginHandler', () => {
       { clearCookie: jest.fn(), cookie: jest.fn() } as any,
       '127.0.0.1',
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/117.0',
-      'fingerprint',
     ] as const;
     authRepository.getPasswordByEmail = jest.fn(() => null);
 
@@ -157,15 +153,15 @@ describe('UserLoginHandler', () => {
       { clearCookie: jest.fn(), cookie: jest.fn() } as any,
       '127.0.0.1',
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/117.0',
-      'fingerprint',
     ] as const;
     const mockUser = {
       id: 10,
       name: 'dev@example.com',
-      verified: 0,
-      userId: 11,
+      is_verified: 1,
+      user_id: 11,
       password: 'hashedPassword',
     };
+
     authRepository.getUserByEmail = jest.fn().mockResolvedValue(mockUser);
     passwordService.validatePassword = jest.fn().mockResolvedValue(false);
 

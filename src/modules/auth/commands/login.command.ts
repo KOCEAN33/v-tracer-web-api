@@ -8,6 +8,5 @@ export class UserLoginCommand implements ICommand {
     readonly response: Response,
     readonly ip: string,
     readonly userAgent: string,
-    readonly fingerprint: string,
   ) {}
 }

@@ -18,9 +18,9 @@ export class GetMyProfileHandler implements IQueryHandler<GetMyProfileQuery> {
     const user = await this.userRepository.getProfileByUserId(userId);
 
     return {
-      id: user.userId,
+      id: user.user_id,
       name: user.name,
-      image: user.imageUrl ? user.imageUrl : undefined,
+      image: user.image_url ? user.image_url : undefined,
     };
   }
 }
