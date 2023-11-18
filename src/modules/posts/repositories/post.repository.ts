@@ -1,15 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { KyselyService } from '../../../database/kysely.service';
-import { PostStatus, PostType } from '../../../@types/enums';
 import { InjectKysely } from 'nestjs-kysely';
 import { DB } from '../../../@types';
 
+import { PostStatus, PostType } from '../../../@types/enums';
+
 @Injectable()
 export class PostRepository {
-  constructor(
-    private readonly kysely: KyselyService,
-    @InjectKysely() private readonly db: DB,
-  ) {}
+  constructor(@InjectKysely() private readonly db: DB) {}
 
   async getProductByHandle(handle: string) {
     return await this.db
@@ -28,7 +25,7 @@ export class PostRepository {
   }
 
   async getReviewsByProduct(productHandle: string) {
-    return await this.kysely.db
+    return await this.db
       .selectFrom('posts')
       .select([
         'posts.id',
@@ -56,7 +53,7 @@ export class PostRepository {
       }
       return null;
     };
-    return await this.kysely.db
+    return await this.db
       .insertInto('posts')
       .values({
         title: title,

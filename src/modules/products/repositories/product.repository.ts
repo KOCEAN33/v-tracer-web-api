@@ -1,14 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { KyselyService } from '../../../database/kysely.service';
 import { InjectKysely } from 'nestjs-kysely';
 import { DB } from '../../../@types';
 
 @Injectable()
 export class ProductRepository {
-  constructor(
-    private readonly kysely: KyselyService,
-    @InjectKysely() private readonly db: DB,
-  ) {}
+  constructor(@InjectKysely() private readonly db: DB) {}
 
   async createProduct(
     handle: string,

@@ -5,14 +5,13 @@ import { UsersController } from './users.controller';
 import { UserRepository } from './repository/user.repository';
 
 import { GetMyProfileHandler } from './queries/get-my-profile.handler';
-import { KyselyModule } from '../../database/kysely.module';
 
 const commandHandlers = [];
 
 const queryHandlers = [GetMyProfileHandler];
 
 @Module({
-  imports: [CqrsModule, KyselyModule],
+  imports: [CqrsModule],
   controllers: [UsersController],
   providers: [UserRepository, ...commandHandlers, ...queryHandlers],
 })
