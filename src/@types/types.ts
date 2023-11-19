@@ -9,7 +9,7 @@ import type { VerifyType, PostStatus, PostType } from './enums';
 export type Comment = {
   id: Generated<number>;
   body: string;
-  deleted: Generated<number>;
+  is_deleted: Generated<number>;
   post_id: number;
   author_id: number;
   created_at: Generated<Timestamp>;
