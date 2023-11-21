@@ -68,6 +68,20 @@ export type RefreshToken = {
   created_at: Generated<Timestamp>;
   updated_at: Timestamp;
 };
+export type SocialLogin = {
+  id: Generated<number>;
+  provider: string;
+  external_id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  picture: string;
+  access_token: string;
+  refresh_token: string;
+  created_at: Generated<Timestamp>;
+  updated_at: Timestamp;
+  user_id: number;
+};
 export type User = {
   id: Generated<number>;
   email: string;
@@ -92,6 +106,7 @@ export type DB = {
   products: Product;
   profiles: Profile;
   refresh_tokens: RefreshToken;
+  social_logins: SocialLogin;
   users: User;
   verify_codes: VerifyCode;
 };

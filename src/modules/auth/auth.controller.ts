@@ -8,6 +8,7 @@ import {
   Req,
   Res,
   Ip,
+  HttpStatus,
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -25,12 +26,22 @@ import { UserLogoutCommand } from './commands/logout.command';
 
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { User } from '../../common/decorators/get-user.decorator';
+import { GoogleGuard } from '../../common/guards/google.guard';
+import { GoogleService } from './google.service';
+import { SocialAuthService } from './social-auth.service';
+import { AuthGuard } from '@nestjs/passport';
+import { GenTokenDto } from './dto/gen-token.dto';
+import { GenerateTokenCommand } from './commands/generate-token.command';
+import { GoogleLoginCommand } from './commands/google-login.command';
 
 @ApiTags('Auth API')
 @Controller('/api/auth')
 export class AuthController {
   constructor(
-    private commandBus: CommandBus, // private queryBus: QueryBus,
+    private commandBus: CommandBus,
+    private readonly googleOauthService: GoogleService,
+    private readonly socialAuthService: SocialAuthService,
+    // private queryBus: QueryBus,
   ) {}
 
   @ApiOperation({ summary: 'User Login' })
@@ -107,6 +118,47 @@ export class AuthController {
       refreshToken,
       ip,
       userAgent,
+    );
+    return this.commandBus.execute(command);
+  }
+
+  @Get('/google')
+  @UseGuards(GoogleGuard)
+  async googleAuth() {
+    return HttpStatus.OK;
+  }
+
+  @Get('/google/redirect')
+  @UseGuards(GoogleGuard)
+  async googleAuthRedirect(@Req() req: any, @Res() res: Response) {
+    const userData = await this.socialAuthService.googleLogin(req);
+    if (userData) {
+      res.send(
+        `<script>window.opener.postMessage('${JSON.stringify(
+          userData,
+        )}', '*');window.close()</script>`,
+      );
+    }
+    return { message: 'google-redirect' };
+  }
+
+  @Post('/gen_token')
+  async genToken(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+    @Ip() ip: string,
+    @Body() dto: GenTokenDto,
+  ) {
+    const userAgent = req.headers['user-agent'] as string;
+    const { userId, provider, externalId, accessToken } = dto;
+    const command = new GenerateTokenCommand(
+      userId,
+      provider,
+      externalId,
+      accessToken,
+      ip,
+      userAgent,
+      res,
     );
     return this.commandBus.execute(command);
   }
