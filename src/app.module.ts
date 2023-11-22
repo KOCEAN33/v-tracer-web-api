@@ -1,5 +1,8 @@
 import { Logger, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { KyselyModule } from 'nestjs-kysely';
+import { PlanetScaleDialect } from 'kysely-planetscale';
+import { ParseJSONResultsPlugin } from 'kysely';
 
 import config from './common/config/config';
 import { AuthModule } from './modules/auth/auth.module';
@@ -11,10 +14,6 @@ import { EmailModule } from './modules/email/email.module';
 import { ExceptionModule } from './common/exception/exception.module';
 
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
-import { KyselyModule } from 'nestjs-kysely';
-import { PlanetScaleDialect } from 'kysely-planetscale';
-import { ParseJSONResultsPlugin } from 'kysely';
-import * as process from 'process';
 
 const genSecret = () => {
   const databaseUrl = process.env.DATABASE_URL as string;
@@ -44,6 +43,7 @@ const genSecret = () => {
         password: genSecret()?.password || '',
       }),
       plugins: [new ParseJSONResultsPlugin()],
+      // log: ['query'],
     }),
     AuthModule,
     UsersModule,

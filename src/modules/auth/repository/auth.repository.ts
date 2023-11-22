@@ -89,6 +89,91 @@ export class AuthRepository {
     });
   }
 
+  async createSocialAccount(
+    email: string,
+    firstName: string,
+    lastName: string,
+    picture: string,
+    provider: string,
+    externalId: string,
+    accessToken: string,
+    refreshToken: string,
+  ) {
+    return await this.db.transaction().execute(async (trx) => {
+      const newUser = await trx
+        .insertInto('users')
+        .values({ email: email, is_verified: 1 })
+        .executeTakeFirstOrThrow();
+
+      await trx
+        .insertInto('social_logins')
+        .values({
+          provider: provider,
+          external_id: externalId,
+          email: email,
+          first_name: firstName,
+          last_name: lastName,
+          picture: picture,
+          access_token: accessToken,
+          refresh_token: refreshToken,
+          user_id: Number(newUser.insertId),
+          updated_at: new Date(),
+        })
+        .executeTakeFirstOrThrow();
+
+      await trx
+        .insertInto('profiles')
+        .values({
+          name: lastName + firstName,
+          image_url: picture,
+          user_id: Number(newUser.insertId),
+          updated_at: new Date(),
+        })
+        .executeTakeFirst();
+
+      return Number(newUser.insertId);
+    });
+  }
+
+  async updateSocialAuth(
+    userId: number,
+    externalId: string,
+    accessToken: string,
+    socId: string,
+  ) {
+    return await this.db
+      .updateTable('social_logins')
+      .set({ access_token: accessToken })
+      .where('user_id', '=', userId)
+      .where('external_id', '=', externalId)
+      .where('provider', '=', socId)
+      .executeTakeFirst();
+  }
+
+  async getUserBySocialId(socialId: string) {
+    return await this.db
+      .selectFrom('social_logins')
+      .select(['user_id', 'external_id', 'provider'])
+      .where('external_id', '=', socialId)
+      .executeTakeFirst();
+  }
+
+  async getUserByAccessToken(
+    userId: number,
+    socId: string,
+    externalId: string,
+    accessToken: string,
+  ) {
+    return await this.db
+      .selectFrom('social_logins')
+      .select(['user_id', 'provider', 'external_id', 'access_token'])
+      .where('user_id', '=', userId)
+      .where('provider', '=', socId)
+      .where('external_id', '=', externalId)
+      .where('access_token', '=', accessToken)
+      .executeTakeFirst();
+  }
+
   async getRefreshToken(userId: number, refreshToken: string) {
     return await this.db
       .selectFrom('refresh_tokens')

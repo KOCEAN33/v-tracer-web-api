@@ -6,6 +6,7 @@ import type { MessagesSendResult } from 'mailgun.js';
 import { SendVerifyEmailCommand } from './send-verify-email.command';
 import { EmailService } from '../email.service';
 import { EmailRepository } from '../repository/email.repository';
+import { nanoid } from 'nanoid';
 
 @CommandHandler(SendVerifyEmailCommand)
 export class SendVerifyEmailHandler
@@ -27,7 +28,7 @@ export class SendVerifyEmailHandler
     await this.emailRepository.invalidateOldToken(userId);
 
     const clientUrl = this.configService.get<string>('CLIENT_URL');
-    const token = Math.random().toString(36).substring(2, 12);
+    const token = nanoid(12);
     // User receive this URL to verify email
     const verifyURL = `${clientUrl}/verify/email/?verifyCode=${token}`;
 

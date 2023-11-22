@@ -6,7 +6,7 @@ import { CreateProductCommand } from './commands/create-product.command';
 import { GetProductDto } from './dto/get-product.dto';
 import { GetProductByHandleQuery } from './queries/get-product.query';
 import { GetProductsListQuery } from './queries/get-products-list.query';
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('/api/products')
 export class ProductController {

@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { useContainer } from 'class-validator';
 
 import { AppModule } from './app.module';
 import { SwaggerConfig } from './common/config/config.interface';
@@ -9,7 +10,6 @@ import { SwaggerConfig } from './common/config/config.interface';
 import { winstonLogger } from './common/config/winston.config';
 import * as cookieParser from 'cookie-parser';
 
-import { useContainer } from 'class-validator';
 import { ResponseInterceptor } from './common/interceptor/response.interceptor';
 
 async function bootstrap() {
@@ -45,7 +45,7 @@ async function bootstrap() {
     SwaggerModule.setup(swaggerConfig.path, app, document);
   }
 
-  await app.listen(parseInt(process.env.PORT) || 8000);
+  await app.listen(8000);
   console.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap();
