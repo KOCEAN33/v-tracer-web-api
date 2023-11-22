@@ -7,7 +7,7 @@ import { ConfigService } from '@nestjs/config';
 import { AuthController } from './auth.controller';
 
 import { JwtStrategy } from './strategies/jwt.strategy';
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 import { AuthRepository } from './repository/auth.repository';
 
@@ -27,7 +27,7 @@ import { UpdateTokenEventHandler } from './events/update-token.event.handler';
 import { SendVerifyEmailEventHandler } from './events/send-verify-email.event.handler';
 import { GoogleService } from './google.service';
 import { GoogleStrategy } from './strategies/google.strategy';
-import { GoogleGuard } from '../../common/guards/google.guard';
+import { GoogleGuard } from './guards/google.guard';
 import { SocialAuthService } from './social-auth.service';
 import { GenerateTokenHandler } from './commands/generate-token.handler';
 import { GoogleLoginHandler } from './commands/google-login.handler';
@@ -39,7 +39,7 @@ const commandHandlers = [
   UserVerifyEmailHandler,
   UserLogoutHandler,
   GenerateTokenHandler,
-  // GoogleLoginHandler,
+  GoogleLoginHandler,
 ];
 
 const queryHandlers = [];

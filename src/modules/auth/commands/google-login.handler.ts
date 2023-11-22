@@ -1,5 +1,5 @@
 import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
-import { ForbiddenException } from '@nestjs/common';
+import { ForbiddenException, HttpStatus } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
 import { AuthRepository } from '../repository/auth.repository';
@@ -23,12 +23,6 @@ export class GoogleLoginHandler implements ICommandHandler<GoogleLoginCommand> {
   async execute(command: GoogleLoginCommand) {
     const { req, res, ip, userAgent } = command;
 
-    // const user = await this.authRepository.getUserByAccessToken(
-    //   userId,
-    //   provider,
-    //   externalId,
-    //   receivedAccessToken,
-    // );
     const userData = await this.socialAuthService.googleLogin(req);
 
     // reject login
@@ -54,7 +48,11 @@ export class GoogleLoginHandler implements ICommandHandler<GoogleLoginCommand> {
       ),
     );
 
-    const token = { message: 'login success', accessToken };
+    const token = {
+      statusCode: HttpStatus.OK,
+      message: 'login success',
+      accessToken,
+    };
 
     res.clearCookie('token');
     res.cookie('token', refreshToken, {
@@ -68,7 +66,6 @@ export class GoogleLoginHandler implements ICommandHandler<GoogleLoginCommand> {
       )}', '*');window.close()</script>`,
     );
 
-    // return { message: 'token generated', accessToken };
-    return { message: 'Google' };
+    return res.end();
   }
 }

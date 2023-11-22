@@ -24,9 +24,9 @@ import { RefreshTokenCommand } from './commands/refresh-token.command';
 import { UserVerifyEmailCommand } from './commands/verify-email.command';
 import { UserLogoutCommand } from './commands/logout.command';
 
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { User } from '../../common/decorators/get-user.decorator';
-import { GoogleGuard } from '../../common/guards/google.guard';
+import { GoogleGuard } from './guards/google.guard';
 import { GoogleService } from './google.service';
 import { SocialAuthService } from './social-auth.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -130,21 +130,21 @@ export class AuthController {
 
   @Get('/google/redirect')
   @UseGuards(GoogleGuard)
-  async googleAuthRedirect(@Req() req: any, @Res() res: Response) {
-    const userData = await this.socialAuthService.socialAuthorization(req);
-    res.cookie('test', 'testdata', {
-      httpOnly: true,
-      sameSite: true,
-    });
-
-    res.write(
-      `<script>window.opener.postMessage('${JSON.stringify(
-        userData,
-      )}', '*');window.close()</script>`,
-    );
-    // return { message: 'google-redirect' };
-    return res.end();
-    // return { message: 'google-redirect' };
+  async googleAuthRedirect(
+    @Ip() ip: string,
+    @Req() req: any,
+    @Res() res: Response,
+  ) {
+    // const userData = await this.socialAuthService.socialAuthorization(req);
+    // res.write(
+    //   `<script>window.opener.postMessage('${JSON.stringify(
+    //     userData,
+    //   )}', '*');window.close()</script>`,
+    // );
+    // return res.end();
+    const userAgent = req.headers['user-agent'] as string;
+    const command = new GoogleLoginCommand(req, res, ip, userAgent);
+    return this.commandBus.execute(command);
   }
 
   @Post('/gen_token')
