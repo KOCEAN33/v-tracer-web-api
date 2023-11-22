@@ -131,15 +131,20 @@ export class AuthController {
   @Get('/google/redirect')
   @UseGuards(GoogleGuard)
   async googleAuthRedirect(@Req() req: any, @Res() res: Response) {
-    const userData = await this.socialAuthService.googleLogin(req);
-    if (userData) {
-      res.send(
-        `<script>window.opener.postMessage('${JSON.stringify(
-          userData,
-        )}', '*');window.close()</script>`,
-      );
-    }
-    return { message: 'google-redirect' };
+    const userData = await this.socialAuthService.socialAuthorization(req);
+    res.cookie('test', 'testdata', {
+      httpOnly: true,
+      sameSite: true,
+    });
+
+    res.write(
+      `<script>window.opener.postMessage('${JSON.stringify(
+        userData,
+      )}', '*');window.close()</script>`,
+    );
+    // return { message: 'google-redirect' };
+    return res.end();
+    // return { message: 'google-redirect' };
   }
 
   @Post('/gen_token')

@@ -56,19 +56,19 @@ export class GoogleLoginHandler implements ICommandHandler<GoogleLoginCommand> {
 
     const token = { message: 'login success', accessToken };
 
-    //res.clearCookie('token');
+    res.clearCookie('token');
     res.cookie('token', refreshToken, {
       httpOnly: true,
       sameSite: true,
       secure: process.env.NODE_ENV !== 'development',
     });
-    return res.send(
+    res.write(
       `<script>window.opener.postMessage('${JSON.stringify(
         token,
       )}', '*');window.close()</script>`,
     );
 
     // return { message: 'token generated', accessToken };
-    // return { message: 'Google' };
+    return { message: 'Google' };
   }
 }
