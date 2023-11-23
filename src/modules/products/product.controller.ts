@@ -6,7 +6,7 @@ import { CreateProductCommand } from './commands/create-product.command';
 import { GetProductDto } from './dto/get-product.dto';
 import { GetProductByHandleQuery } from './queries/get-product.query';
 import { GetProductsListQuery } from './queries/get-products-list.query';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { JwtGuard } from '../auth/guards/jwt.guard';
 
 @Controller('/api/products')
 export class ProductController {
@@ -15,7 +15,7 @@ export class ProductController {
     private queryBus: QueryBus,
   ) {}
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtGuard)
   @Post()
   async createProduct(@Body() dto: CreateProductDto) {
     const { name, handle, url, companyId } = dto;

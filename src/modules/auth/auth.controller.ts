@@ -11,7 +11,10 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
+import { AuthGuard } from '@nestjs/passport';
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+
+import { User } from '../../common/decorators/get-user.decorator';
 
 import { UserSignUpDto } from './dto/signup.dto';
 import { UserLoginDto } from './dto/login.dto';
@@ -23,26 +26,12 @@ import { UserLoginCommand } from './commands/login.command';
 import { RefreshTokenCommand } from './commands/refresh-token.command';
 import { UserVerifyEmailCommand } from './commands/verify-email.command';
 import { UserLogoutCommand } from './commands/logout.command';
-
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { User } from '../../common/decorators/get-user.decorator';
-import { GoogleGuard } from './guards/google.guard';
-import { GoogleService } from './google.service';
-import { SocialAuthService } from './social-auth.service';
-import { AuthGuard } from '@nestjs/passport';
-import { GenTokenDto } from './dto/gen-token.dto';
-import { GenerateTokenCommand } from './commands/generate-token.command';
-import { GoogleLoginCommand } from './commands/google-login.command';
+import { SocialLoginCommand } from './commands/social-login.command';
 
 @ApiTags('Auth API')
 @Controller('/api/auth')
 export class AuthController {
-  constructor(
-    private commandBus: CommandBus,
-    private readonly googleOauthService: GoogleService,
-    private readonly socialAuthService: SocialAuthService,
-    // private queryBus: QueryBus,
-  ) {}
+  constructor(private commandBus: CommandBus) {}
 
   @ApiOperation({ summary: 'User Login' })
   @ApiCreatedResponse({ description: 'User Login', type: UserLoginDto })
@@ -123,48 +112,38 @@ export class AuthController {
   }
 
   @Get('/google')
-  @UseGuards(GoogleGuard)
+  @UseGuards(AuthGuard('google'))
   async googleAuth() {
     return HttpStatus.OK;
   }
 
   @Get('/google/redirect')
-  @UseGuards(GoogleGuard)
+  @UseGuards(AuthGuard('google'))
   async googleAuthRedirect(
     @Ip() ip: string,
     @Req() req: any,
     @Res() res: Response,
   ) {
-    // const userData = await this.socialAuthService.socialAuthorization(req);
-    // res.write(
-    //   `<script>window.opener.postMessage('${JSON.stringify(
-    //     userData,
-    //   )}', '*');window.close()</script>`,
-    // );
-    // return res.end();
     const userAgent = req.headers['user-agent'] as string;
-    const command = new GoogleLoginCommand(req, res, ip, userAgent);
+    const command = new SocialLoginCommand(req, res, ip, userAgent);
     return this.commandBus.execute(command);
   }
 
-  @Post('/gen_token')
-  async genToken(
-    @Req() req: Request,
-    @Res({ passthrough: true }) res: Response,
+  @Get('/github')
+  @UseGuards(AuthGuard('github'))
+  async githubAuth() {
+    return HttpStatus.OK;
+  }
+
+  @Get('/github/callback')
+  @UseGuards(AuthGuard('github'))
+  async githubCallback(
+    @Res() res: Response,
+    @Req() req: any,
     @Ip() ip: string,
-    @Body() dto: GenTokenDto,
   ) {
     const userAgent = req.headers['user-agent'] as string;
-    const { userId, provider, externalId, accessToken } = dto;
-    const command = new GenerateTokenCommand(
-      userId,
-      provider,
-      externalId,
-      accessToken,
-      ip,
-      userAgent,
-      res,
-    );
+    const command = new SocialLoginCommand(req, res, ip, userAgent);
     return this.commandBus.execute(command);
   }
 
@@ -174,7 +153,7 @@ export class AuthController {
     return;
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AuthGuard('jwt'))
   @Get('test')
   async test(@User() userId: number) {
     console.log('accepted', userId);

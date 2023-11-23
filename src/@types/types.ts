@@ -73,11 +73,9 @@ export type SocialLogin = {
   provider: string;
   external_id: string;
   email: string;
-  first_name: string;
-  last_name: string;
+  name: string;
   picture: string;
   access_token: string;
-  refresh_token: string;
   created_at: Generated<Timestamp>;
   updated_at: Timestamp;
   user_id: number;

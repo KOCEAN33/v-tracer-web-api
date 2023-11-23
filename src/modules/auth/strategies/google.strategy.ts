@@ -13,29 +13,28 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     });
   }
 
-  authorizationParams(): { [key: string]: string } {
-    return {
-      access_type: 'offline',
-      prompt: 'select_account',
-    };
-  }
+  // this sets need to get refresh token
+  // authorizationParams(): { [key: string]: string } {
+  //   return {
+  //     access_type: 'offline',
+  //     prompt: 'select_account',
+  //   };
+  // }
 
   async validate(
     accessToken: string,
-    refreshToken: string,
+    _refreshToken: string,
     profile: any,
     // done: VerifyCallback,
   ): Promise<any> {
-    const { name, emails, provider, photos } = profile;
+    const { displayName, emails, provider, photos } = profile;
     return {
       email: emails[0].value,
-      firstName: name.givenName,
-      lastName: name.familyName,
+      name: displayName,
       picture: photos[0].value,
       provider: provider,
       externalId: profile.id,
       accessToken,
-      refreshToken,
     };
   }
 }

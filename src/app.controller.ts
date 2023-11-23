@@ -6,6 +6,6 @@ export class AppController {
 
   @Get('/favicon.ico')
   favicon(@Res() res: any) {
-    res.status(204).end();
+    return res.status(204).end();
   }
 }

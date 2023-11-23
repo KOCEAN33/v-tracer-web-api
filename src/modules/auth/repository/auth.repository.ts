@@ -91,13 +91,11 @@ export class AuthRepository {
 
   async createSocialAccount(
     email: string,
-    firstName: string,
-    lastName: string,
+    name: string,
     picture: string,
     provider: string,
     externalId: string,
     accessToken: string,
-    refreshToken: string,
   ) {
     return await this.db.transaction().execute(async (trx) => {
       const newUser = await trx
@@ -111,11 +109,9 @@ export class AuthRepository {
           provider: provider,
           external_id: externalId,
           email: email,
-          first_name: firstName,
-          last_name: lastName,
+          name: name,
           picture: picture,
           access_token: accessToken,
-          refresh_token: refreshToken,
           user_id: Number(newUser.insertId),
           updated_at: new Date(),
         })
@@ -124,7 +120,7 @@ export class AuthRepository {
       await trx
         .insertInto('profiles')
         .values({
-          name: lastName + firstName,
+          name: name,
           image_url: picture,
           user_id: Number(newUser.insertId),
           updated_at: new Date(),
@@ -135,26 +131,12 @@ export class AuthRepository {
     });
   }
 
-  async updateSocialAuth(
-    userId: number,
-    externalId: string,
-    accessToken: string,
-    socId: string,
-  ) {
-    return await this.db
-      .updateTable('social_logins')
-      .set({ access_token: accessToken })
-      .where('user_id', '=', userId)
-      .where('external_id', '=', externalId)
-      .where('provider', '=', socId)
-      .executeTakeFirst();
-  }
-
-  async getUserBySocialId(socialId: string) {
+  async getUserBySocialId(externalId: string, provider: string) {
     return await this.db
       .selectFrom('social_logins')
       .select(['user_id', 'external_id', 'provider'])
-      .where('external_id', '=', socialId)
+      .where('external_id', '=', externalId)
+      .where('provider', '=', provider)
       .executeTakeFirst();
   }
 

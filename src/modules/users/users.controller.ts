@@ -1,7 +1,7 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { JwtGuard } from '../auth/guards/jwt.guard';
 import { User } from '../../common/decorators/get-user.decorator';
 import { GetMyProfileQuery } from './queries/get-my-profile.query';
 
@@ -12,7 +12,7 @@ export class UsersController {
     private queryBus: QueryBus,
   ) {}
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtGuard)
   @Get('/getme')
   async getMyInfo(@User() userId: number) {
     const query = new GetMyProfileQuery(userId);

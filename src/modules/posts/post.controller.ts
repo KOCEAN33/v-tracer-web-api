@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { JwtGuard } from '../auth/guards/jwt.guard';
 import { CreatePostDto } from './dto/create-post.dto';
 import { CreatePostCommand } from './commands/create-post.command';
 import { User } from '../../common/decorators/get-user.decorator';
@@ -15,7 +15,7 @@ export class PostController {
     private queryBus: QueryBus,
   ) {}
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtGuard)
   @Post()
   async createPost(@User() userId: number, @Body() dto: CreatePostDto) {
     const { title, body, type, status, productHandle } = dto;

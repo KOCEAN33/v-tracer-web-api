@@ -14,6 +14,7 @@ import { EmailModule } from './modules/email/email.module';
 import { ExceptionModule } from './common/exception/exception.module';
 
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
+import { AppController } from './app.controller';
 
 const genSecret = () => {
   const databaseUrl = process.env.DATABASE_URL as string;
@@ -52,7 +53,7 @@ const genSecret = () => {
     EmailModule,
     ExceptionModule,
   ],
-  controllers: [],
+  controllers: [AppController],
   providers: [Logger],
 })
 export class AppModule implements NestModule {

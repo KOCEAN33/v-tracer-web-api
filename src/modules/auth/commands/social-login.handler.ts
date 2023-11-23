@@ -2,50 +2,55 @@ import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import { ForbiddenException, HttpStatus } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
-import { AuthRepository } from '../repository/auth.repository';
 import { TokenService } from '../token.service';
 
 import { SaveTokenEvent } from '../events/save-token.event';
-import { GenerateTokenCommand } from './generate-token.command';
-import { GoogleLoginCommand } from './google-login.command';
+
+import { SocialLoginCommand } from './social-login.command';
 import { SocialAuthService } from '../social-auth.service';
 
-@CommandHandler(GoogleLoginCommand)
-export class GoogleLoginHandler implements ICommandHandler<GoogleLoginCommand> {
+@CommandHandler(SocialLoginCommand)
+export class SocialLoginHandler implements ICommandHandler<SocialLoginCommand> {
   constructor(
     private readonly socialAuthService: SocialAuthService,
-    private readonly authRepository: AuthRepository,
     private readonly tokenService: TokenService,
     private readonly jwtService: JwtService,
     private readonly eventBus: EventBus,
   ) {}
 
-  async execute(command: GoogleLoginCommand) {
+  async execute(command: SocialLoginCommand) {
     const { req, res, ip, userAgent } = command;
 
-    const userData = await this.socialAuthService.googleLogin(req);
+    const userData = await this.socialAuthService.socialAuthorization(req);
 
     // reject login
     if (!userData) {
       throw new ForbiddenException('can not verified');
     }
 
+    if (userData == 'conflict') {
+      const fail = {
+        statusCode: HttpStatus.CONFLICT,
+        message: 'this email is already in use',
+      };
+      res.write(
+        `<script>window.opener.postMessage('${JSON.stringify(
+          fail,
+        )}', '*');window.close()</script>`,
+      );
+      return res.end();
+    }
+
     // successful login logic
     const { accessToken, refreshToken } = this.tokenService.generateTokens({
-      userId: userData.userId,
+      userId: userData,
     });
 
     const decodeJWT = this.jwtService.decode(refreshToken);
     const expiresIn = new Date(decodeJWT['exp'] * 1000);
 
     this.eventBus.publish(
-      new SaveTokenEvent(
-        userData.userId,
-        refreshToken,
-        ip,
-        userAgent,
-        expiresIn,
-      ),
+      new SaveTokenEvent(userData, refreshToken, ip, userAgent, expiresIn),
     );
 
     const token = {
