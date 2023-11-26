@@ -1,8 +1,8 @@
 {
-  "name": "saas-community-api",
+  "name": "lastation-web-api",
   "private": true,
   "version": "1.0.0",
-  "description": "Backend API for saas-community",
+  "description": "WEB API Server for lastation",
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",
@@ -114,6 +114,6 @@
     "testEnvironment": "node"
   },
   "volta": {
-    "node": "20.9.0"
+    "node": "20.10.0"
   }
 }
