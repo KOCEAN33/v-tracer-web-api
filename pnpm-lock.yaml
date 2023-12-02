@@ -72,7 +72,7 @@ dependencies:
     specifier: ^9.3.0
     version: 9.3.0
   nanoid:
-    specifier: ^3.3.7
+    specifier: 3.3.7
     version: 3.3.7
   nest-winston:
     specifier: ^1.9.4
