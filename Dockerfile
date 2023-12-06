@@ -12,10 +12,13 @@ FROM base AS prod-deps
 RUN pnpm install --prod --frozen-lockfile
 
 FROM base AS build
+COPY --from=prod-deps /app/node_modules /app/node_modules
+COPY . .
+
 RUN pnpm install --frozen-lockfile
 RUN pnpm run build
 
-FROM base
+FROM base AS runner
 COPY --from=prod-deps /app/node_modules /app/node_modules
 COPY --from=build /app/dist /app/dist
 EXPOSE 8000
