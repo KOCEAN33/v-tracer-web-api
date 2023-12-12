@@ -1,7 +1,7 @@
 {
   "name": "lastation-web-api",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "WEB API Server for lastation",
   "scripts": {
     "prebuild": "rimraf dist",

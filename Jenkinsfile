@@ -38,10 +38,48 @@ pipeline {
                 }
             }
 
-            // stage('Cleaning Up') {
-            //     steps{
-            //       sh "docker rmi --force $registry:$BUILD_NUMBER"
-            //     }
-            // }
+         stage('Cleaning ') {
+                 steps{
+                     deleteDir()
+                 }
+             }
+
+         stage('Git clone') {
+             steps{
+               git credentialsId: '	lastation-gitops-jenkins', url:'git@github.com:KOCEAN33/lastation-GitOps.git', branch: 'main'
+             }
+         }
+
+         stage('Update GitOps File') {
+             steps {
+                 script {
+
+                     def filename = "environments/production/web-api/kustomization.yaml"
+                     def data = readYaml file: filename
+
+                     // Change Data
+                     data.images[0].newTag = "v${env.IMAGE_VERSION}"
+
+                     sh "rm $filename"
+                     writeYaml file: filename, data: data
+
+                 }
+             }
+         }
+
+         stage('Push git') {
+             steps {
+
+                 sshagent(credentials: ['lastation-gitops-jenkins']) {
+                 sh"""
+
+                 git add .
+                 git commit -m "UPDATE: web-api image v${env.IMAGE_VERSION} (jenkins automatically)"
+                 git push origin main
+
+                 """
+                 }
+             }
+         }
     }
 }
