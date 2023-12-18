@@ -14,8 +14,8 @@ const config: Config = {
     bcryptSaltOrRound: 12,
   },
   email: {
-    domain: 'tries.io',
-    verifySender: 'tries.io <no-reply@tries.io>',
+    domain: 'lastation.io',
+    verifySender: 'lastation.io <no-reply@lastation.io>',
     expiresIn: 60,
   },
 };
