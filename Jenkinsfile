@@ -69,15 +69,16 @@ pipeline {
 
          stage('Push git') {
              steps {
+                script {
+                     sshagent (credentials: ['v-tracer-gitops-jenkins-ssh']) {
+                     sh"""
 
-                 sshagent(credentials: ['v-tracer-gitops-jenkins-ssh']) {
-                 sh"""
+                     git add .
+                     git commit -m "UPDATE: web-api image v${env.IMAGE_VERSION} (jenkins automatically)"
+                     git push origin main
 
-                 git add .
-                 git commit -m "UPDATE: web-api image v${env.IMAGE_VERSION} (jenkins automatically)"
-                 git push origin main
-
-                 """
+                     """
+                    }
                  }
              }
          }
