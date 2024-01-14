@@ -13,3 +13,19 @@ export const PostType = {
   question: 'question',
 } as const;
 export type PostType = (typeof PostType)[keyof typeof PostType];
+export const VtuberStatus = {
+  new: 'new',
+  active: 'active',
+} as const;
+export type VtuberStatus = (typeof VtuberStatus)[keyof typeof VtuberStatus];
+export const PlatformType = {
+  youtube: 'youtube',
+  twitch: 'twitch',
+} as const;
+export type PlatformType = (typeof PlatformType)[keyof typeof PlatformType];
+export const StreamType = {
+  game: 'game',
+  uta: 'uta',
+  etc: 'etc',
+} as const;
+export type StreamType = (typeof StreamType)[keyof typeof StreamType];

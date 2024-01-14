@@ -4,17 +4,15 @@ export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
   : ColumnType<T, T | undefined, T>;
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
-import type { VerifyType, PostStatus, PostType } from './enums';
+import type {
+  VerifyType,
+  PostStatus,
+  PostType,
+  VtuberStatus,
+  PlatformType,
+  StreamType,
+} from './enums';
 
-export type Comment = {
-  id: Generated<number>;
-  body: string;
-  is_deleted: Generated<number>;
-  post_id: number;
-  author_id: number;
-  created_at: Generated<Timestamp>;
-  updated_at: Timestamp;
-};
 export type Company = {
   id: Generated<number>;
   name: string;
@@ -22,31 +20,32 @@ export type Company = {
   created_at: Generated<Timestamp>;
   updated_at: Timestamp;
 };
+export type Game = {
+  id: Generated<number>;
+  name: string;
+  url: string | null;
+  image: string | null;
+  created_at: Generated<Timestamp>;
+  updated_at: Timestamp;
+};
+export type GameKeyword = {
+  id: Generated<number>;
+  word: string;
+  game_id: number;
+};
 export type Password = {
   id: Generated<number>;
   password: string;
   user_id: number;
   updated_at: Timestamp;
 };
-export type Post = {
+export type Platform = {
   id: Generated<number>;
-  title: string;
-  body: string;
-  type: PostType;
-  status: Generated<PostStatus>;
-  published_at: Timestamp | null;
-  is_deleted: Generated<number>;
-  author_id: number;
-  product_id: number;
-  created_at: Generated<Timestamp>;
-  updated_at: Timestamp;
-};
-export type Product = {
-  id: Generated<number>;
-  handle: string;
-  name: string;
-  url: string | null;
-  company_id: number | null;
+  type: PlatformType;
+  url: string;
+  youtube_id: string;
+  youtube_handle: string;
+  twitch_id: string;
   created_at: Generated<Timestamp>;
   updated_at: Timestamp;
 };
@@ -80,6 +79,16 @@ export type SocialLogin = {
   updated_at: Timestamp;
   user_id: number;
 };
+export type Stream = {
+  id: Generated<number>;
+  type: StreamType;
+  name: string;
+  url: string;
+  game_id: number;
+  streamId: string;
+  created_at: Generated<Timestamp>;
+  updated_at: Timestamp;
+};
 export type User = {
   id: Generated<number>;
   email: string;
@@ -96,15 +105,25 @@ export type VerifyCode = {
   verified_at: Timestamp | null;
   created_at: Generated<Timestamp>;
 };
+export type Vtuber = {
+  id: Generated<number>;
+  name: string;
+  company_id: number;
+  platform_id: number;
+  created_at: Generated<Timestamp>;
+  updated_at: Timestamp;
+};
 export type DB = {
-  comments: Comment;
   companies: Company;
+  game_keywords: GameKeyword;
+  games: Game;
   passwords: Password;
-  posts: Post;
-  products: Product;
+  platforms: Platform;
   profiles: Profile;
   refresh_tokens: RefreshToken;
   social_logins: SocialLogin;
+  streams: Stream;
   users: User;
   verify_codes: VerifyCode;
+  vtubers: Vtuber;
 };
