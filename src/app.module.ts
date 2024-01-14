@@ -7,14 +7,14 @@ import { ParseJSONResultsPlugin } from 'kysely';
 import config from './common/config/config';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
-import { ProductModule } from './modules/products/product.module';
-import { PostModule } from './modules/posts/post.module';
+
 import { EmailModule } from './modules/email/email.module';
 
 import { ExceptionModule } from './common/exception/exception.module';
 
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { AppController } from './app.controller';
+import { VtuberModule } from './modules/vtuber/vtuber.module';
 
 const genSecret = () => {
   const databaseUrl = process.env.DATABASE_URL as string;
@@ -48,10 +48,9 @@ const genSecret = () => {
     }),
     AuthModule,
     UsersModule,
-    ProductModule,
-    PostModule,
     EmailModule,
     ExceptionModule,
+    VtuberModule,
   ],
   controllers: [AppController],
   providers: [Logger],
