@@ -1,15 +1,15 @@
 pipeline {
     environment {
-    REGISTRY = "sjc.vultrcr.com/lastation"
-    registryCredential = 'lastation-cr'
+    REGISTRY = "sjc.vultrcr.com/xanny"
+    registryCredential = 'xanny-cr-credentials'
     IMAGE_NAME = 'web-api'
     }
 
     agent any
     stages {
-            stage('Cloning our Git') {
+            stage('Cloning web-api Git') {
                 steps {
-                git credentialsId: 'lastation-jenkins-ssh', url:'git@github.com:KOCEAN33/lastation-web-api.git', branch: 'main'
+                git credentialsId: 'v-tracer-web-api-jenkins-ssh', url:'git@github.com:KOCEAN33/v-tracer-web-api.git', branch: 'main'
                 }
             }
 
@@ -30,8 +30,8 @@ pipeline {
             stage('Deploying Docker Image to Container Registry') {
                 steps {
                     script {
-                        withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'lastation-cr', usernameVariable: 'CR_USERNAME', passwordVariable: 'CR_PASSWORD']]) {
-                        sh "docker login https://sjc.vultrcr.com/lastation -u ${CR_USERNAME} -p ${CR_PASSWORD}"
+                        withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'xanny-cr-credentials', usernameVariable: 'CR_USERNAME', passwordVariable: 'CR_PASSWORD']]) {
+                        sh "docker login https://sjc.vultrcr.com/xanny -u ${CR_USERNAME} -p ${CR_PASSWORD}"
                         sh "docker push ${env.REGISTRY}/${env.IMAGE_NAME}:v${env.IMAGE_VERSION}"
                         }
                     }
@@ -46,7 +46,7 @@ pipeline {
 
          stage('Git clone') {
              steps{
-               git credentialsId: '	lastation-gitops-jenkins', url:'git@github.com:KOCEAN33/lastation-GitOps.git', branch: 'main'
+               git credentialsId: 'v-tracer-gitops-jenkins-ssh', url:'git@github.com:KOCEAN33/v-tracer-gitops.git', branch: 'main'
              }
          }
 
@@ -69,15 +69,16 @@ pipeline {
 
          stage('Push git') {
              steps {
+                script {
+                     sshagent (credentials: ['v-tracer-gitops-jenkins-ssh']) {
+                     sh"""
 
-                 sshagent(credentials: ['lastation-gitops-jenkins']) {
-                 sh"""
+                     git add .
+                     git commit -m "UPDATE: web-api image v${env.IMAGE_VERSION} (jenkins automatically)"
+                     git push origin main
 
-                 git add .
-                 git commit -m "UPDATE: web-api image v${env.IMAGE_VERSION} (jenkins automatically)"
-                 git push origin main
-
-                 """
+                     """
+                    }
                  }
              }
          }
