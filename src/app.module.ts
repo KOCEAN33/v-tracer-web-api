@@ -15,6 +15,7 @@ import { ExceptionModule } from './common/exception/exception.module';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { AppController } from './app.controller';
 import { VtuberModule } from './modules/vtuber/vtuber.module';
+import { StreamsModule } from './modules/streams/streams.module';
 
 const genSecret = () => {
   const databaseUrl = process.env.DATABASE_URL as string;
@@ -51,6 +52,7 @@ const genSecret = () => {
     EmailModule,
     ExceptionModule,
     VtuberModule,
+    StreamsModule,
   ],
   controllers: [AppController],
   providers: [Logger],

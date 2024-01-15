@@ -43,9 +43,9 @@ export type Platform = {
   id: Generated<number>;
   type: PlatformType;
   url: string;
-  youtube_id: string;
-  youtube_handle: string;
-  twitch_id: string;
+  youtube_id: string | null;
+  youtube_handle: string | null;
+  twitch_id: string | null;
   created_at: Generated<Timestamp>;
   updated_at: Timestamp;
 };
@@ -81,11 +81,14 @@ export type SocialLogin = {
 };
 export type Stream = {
   id: Generated<number>;
-  type: StreamType;
+  type: StreamType | null;
   name: string;
   url: string;
-  game_id: number;
+  duration: string | null;
   streamId: string;
+  game_id: number | null;
+  platform_id: number;
+  vtuber_id: number;
   created_at: Generated<Timestamp>;
   updated_at: Timestamp;
 };
@@ -108,8 +111,8 @@ export type VerifyCode = {
 export type Vtuber = {
   id: Generated<number>;
   name: string;
-  company_id: number;
-  platform_id: number;
+  company_id: number | null;
+  platform_id: number | null;
   created_at: Generated<Timestamp>;
   updated_at: Timestamp;
 };
