@@ -23,6 +23,12 @@ export const PlatformType = {
   twitch: 'twitch',
 } as const;
 export type PlatformType = (typeof PlatformType)[keyof typeof PlatformType];
+export const YoutubeStatus = {
+  newChannel: 'newChannel',
+  activated: 'activated',
+  disabled: 'disabled',
+} as const;
+export type YoutubeStatus = (typeof YoutubeStatus)[keyof typeof YoutubeStatus];
 export const StreamType = {
   game: 'game',
   uta: 'uta',

@@ -10,6 +10,7 @@ import type {
   PostType,
   VtuberStatus,
   PlatformType,
+  YoutubeStatus,
   StreamType,
 } from './enums';
 
@@ -37,16 +38,6 @@ export type Password = {
   id: Generated<number>;
   password: string;
   user_id: number;
-  updated_at: Timestamp;
-};
-export type Platform = {
-  id: Generated<number>;
-  type: PlatformType;
-  url: string;
-  youtube_id: string | null;
-  youtube_handle: string | null;
-  twitch_id: string | null;
-  created_at: Generated<Timestamp>;
   updated_at: Timestamp;
 };
 export type Profile = {
@@ -86,9 +77,8 @@ export type Stream = {
   url: string;
   duration: string | null;
   streamId: string;
-  game_id: number | null;
-  platform_id: number;
   vtuber_id: number;
+  game_id: number | null;
   created_at: Generated<Timestamp>;
   updated_at: Timestamp;
 };
@@ -112,7 +102,19 @@ export type Vtuber = {
   id: Generated<number>;
   name: string;
   company_id: number | null;
-  platform_id: number | null;
+  youtube_id: number | null;
+  created_at: Generated<Timestamp>;
+  updated_at: Timestamp;
+};
+export type Youtube = {
+  id: Generated<number>;
+  status: YoutubeStatus;
+  url: string;
+  name: string | null;
+  handle: string | null;
+  channel_id: string | null;
+  image: string | null;
+  description: string | null;
   created_at: Generated<Timestamp>;
   updated_at: Timestamp;
 };
@@ -121,7 +123,7 @@ export type DB = {
   game_keywords: GameKeyword;
   games: Game;
   passwords: Password;
-  platforms: Platform;
+  platforms: Youtube;
   profiles: Profile;
   refresh_tokens: RefreshToken;
   social_logins: SocialLogin;
