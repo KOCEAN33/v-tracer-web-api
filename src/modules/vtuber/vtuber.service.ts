@@ -1,37 +1,35 @@
-import { Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { TokenExpiredError } from 'jsonwebtoken';
-import { SecurityConfig } from '../../common/config/config.interface';
+import { VtuberRepository } from './repository/vtuber.repository';
 
 @Injectable()
 export class VtuberService {
   constructor(
-    private readonly jwtService: JwtService,
+    private readonly vtuberRepository: VtuberRepository,
     private readonly configService: ConfigService,
   ) {}
 
-  extractUserIdFromToken(token: string) {
-    try {
-      return this.jwtService.verify(token, {
-        secret: this.configService.get('JWT_REFRESH_SECRET'),
-      });
-    } catch (e) {
-      if (e instanceof TokenExpiredError) {
-        return false;
-      }
+  async addNewVtuber(name: string, companyId: number, youtubeUrl: string) {
+    // check this vtuber is already exists
+    const check = await this.vtuberRepository.getYoutubeUrl(youtubeUrl);
+    if (!!check) {
+      throw new ConflictException('this youtube channel is already exists');
     }
+    const vtuber = await this.vtuberRepository.addNewVtuber(
+      name,
+      companyId,
+      youtubeUrl,
+    );
+
+    return { message: 'success', vtuber: Number(vtuber.insertId) };
   }
 
-  private generateAccessToken(payload: { userId: number }): string {
-    return this.jwtService.sign(payload);
-  }
-
-  private generateRefreshToken(payload: { userId: number }): string {
-    const securityConfig = this.configService.get<SecurityConfig>('security');
-    return this.jwtService.sign(payload, {
-      secret: this.configService.get('JWT_REFRESH_SECRET'),
-      expiresIn: securityConfig.refreshIn,
-    });
+  async addNewCompany(name: string, url: string) {
+    const check = await this.vtuberRepository.getCompanyByUrl(url);
+    if (check) {
+      throw new ConflictException('this company is already exists');
+    }
+    const company = await this.vtuberRepository.addNewCompany(name, url);
+    return { message: 'success', company: Number(company.insertId) };
   }
 }

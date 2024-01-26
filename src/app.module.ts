@@ -45,7 +45,7 @@ const genSecret = () => {
         password: genSecret()?.password || '',
       }),
       plugins: [new ParseJSONResultsPlugin()],
-      // log: ['query'],
+      log: ['query'],
     }),
     AuthModule,
     UsersModule,

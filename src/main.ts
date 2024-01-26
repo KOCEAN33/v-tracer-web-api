@@ -14,7 +14,7 @@ import { ResponseInterceptor } from './common/interceptor/response.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    logger: winstonLogger,
+    // logger: winstonLogger,
   });
   const configService = app.get(ConfigService);
   app.useGlobalPipes(new ValidationPipe());

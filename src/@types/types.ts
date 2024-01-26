@@ -123,7 +123,6 @@ export type DB = {
   game_keywords: GameKeyword;
   games: Game;
   passwords: Password;
-  platforms: Youtube;
   profiles: Profile;
   refresh_tokens: RefreshToken;
   social_logins: SocialLogin;
@@ -131,4 +130,5 @@ export type DB = {
   users: User;
   verify_codes: VerifyCode;
   vtubers: Vtuber;
+  youtubes: Youtube;
 };
