@@ -49,6 +49,3 @@ async function bootstrap() {
   console.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap();
-
-// TODO: 전역 문자열 트림 파이프 추가
-// https://stackoverflow.com/questions/63766390/using-nest-js-i-would-like-to-trim-all-body-input-values
