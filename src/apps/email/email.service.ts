@@ -6,7 +6,7 @@ import { ConfigService } from '@nestjs/config';
 import { MailgunService } from 'nestjs-mailgun';
 import { MailgunMessageData } from 'mailgun.js';
 
-import { EmailConfig } from '../../common/config/config.interface';
+import { EmailConfig } from '../../config/config.interface';
 import { SendEmail } from './interface/send-email.interface';
 
 @Injectable()

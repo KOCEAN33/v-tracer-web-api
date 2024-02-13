@@ -19,7 +19,7 @@ import { PasswordService } from './password.service';
 import { TokenService } from './token.service';
 import { EmailModule } from '../email/email.module';
 
-import { SecurityConfig } from '../../common/config/config.interface';
+import { SecurityConfig } from '../../config/config.interface';
 
 import { UserSignUpHandler } from './commands/signup.handler';
 import { UserLoginHandler } from './commands/login.handler';

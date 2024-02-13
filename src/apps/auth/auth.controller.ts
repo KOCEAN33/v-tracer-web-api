@@ -14,7 +14,7 @@ import { CommandBus } from '@nestjs/cqrs';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
-import { User } from '../../common/decorators/get-user.decorator';
+import { User } from '../../libs/nestjs/decorators/get-user.decorator';
 
 import { UserSignUpDto } from './dto/signup.dto';
 import { UserLoginDto } from './dto/login.dto';

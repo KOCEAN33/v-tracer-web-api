@@ -6,7 +6,6 @@ import type { MessagesSendResult } from 'mailgun.js';
 import { SendVerifyEmailCommand } from './send-verify-email.command';
 import { EmailService } from '../email.service';
 import { EmailRepository } from '../repository/email.repository';
-import { nanoid } from 'nanoid';
 
 @CommandHandler(SendVerifyEmailCommand)
 export class SendVerifyEmailHandler
@@ -28,7 +27,7 @@ export class SendVerifyEmailHandler
     await this.emailRepository.invalidateOldToken(userId);
 
     const clientUrl = this.configService.get<string>('CLIENT_URL');
-    const token = nanoid(12);
+    const token = this.generateRandomString(12);
     // User receive this URL to verify email
     const verifyURL = `${clientUrl}/verify/email/?verifyCode=${token}`;
 
@@ -57,5 +56,16 @@ export class SendVerifyEmailHandler
       message: mail?.message,
       detail: mail?.details,
     });
+  }
+
+  private generateRandomString(length) {
+    const charset =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let randomString = '';
+    for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * charset.length);
+      randomString += charset[randomIndex];
+    }
+    return randomString;
   }
 }

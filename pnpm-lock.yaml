@@ -77,6 +77,9 @@ dependencies:
   nest-winston:
     specifier: ^1.9.4
     version: 1.9.4(@nestjs/common@10.3.1)(winston@3.11.0)
+  nestjs-cls:
+    specifier: ^4.1.0
+    version: 4.1.0(@nestjs/common@10.3.1)(@nestjs/core@10.3.1)(reflect-metadata@0.1.13)(rxjs@7.8.1)
   nestjs-kysely:
     specifier: ^0.1.6
     version: 0.1.6(@nestjs/common@10.3.1)(@nestjs/core@10.3.1)(kysely@0.27.2)(reflect-metadata@0.1.13)
@@ -107,6 +110,9 @@ dependencies:
   rxjs:
     specifier: ^7.8.1
     version: 7.8.1
+  uuid:
+    specifier: ^9.0.1
+    version: 9.0.1
   winston:
     specifier: ^3.11.0
     version: 3.11.0
@@ -5699,6 +5705,21 @@ packages:
       winston: 3.11.0
     dev: false
 
+  /nestjs-cls@4.1.0(@nestjs/common@10.3.1)(@nestjs/core@10.3.1)(reflect-metadata@0.1.13)(rxjs@7.8.1):
+    resolution: {integrity: sha512-BS7smXfCo9p20/vq2iGel+sg6WQB+kF9zrnwnS1KimcNLw4pp/4u6abpAqd5dm4fchHom9qYBn8KRki7hxREYg==}
+    engines: {node: '>=16'}
+    peerDependencies:
+      '@nestjs/common': '> 7.0.0 < 11'
+      '@nestjs/core': '> 7.0.0 < 11'
+      reflect-metadata: '*'
+      rxjs: '>= 7'
+    dependencies:
+      '@nestjs/common': 10.3.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.1.13)(rxjs@7.8.1)
+      '@nestjs/core': 10.3.1(@nestjs/common@10.3.1)(@nestjs/platform-express@10.3.1)(reflect-metadata@0.1.13)(rxjs@7.8.1)
+      reflect-metadata: 0.1.13
+      rxjs: 7.8.1
+    dev: false
+
   /nestjs-kysely@0.1.6(@nestjs/common@10.3.1)(@nestjs/core@10.3.1)(kysely@0.27.2)(reflect-metadata@0.1.13):
     resolution: {integrity: sha512-et03YICF33ZUZQguSunq6+hg/wTJU7LevgzKiGWQMzyhesJZUQTxoPDCZ1eMaBQ9CWdD+3qb4iZ+f5ODdxfTgQ==}
     peerDependencies:
@@ -7410,6 +7431,11 @@ packages:
   /uuid@9.0.0:
     resolution: {integrity: sha512-MXcSTerfPa4uqyzStbRoTgt5XIe3x5+42+q1sDuy3R5MDk66URdLMOZe5aPX/SQd+kuYAh0FdP/pO28IkQyTeg==}
     hasBin: true
+
+  /uuid@9.0.1:
+    resolution: {integrity: sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==}
+    hasBin: true
+    dev: false
 
   /v8-compile-cache-lib@3.0.1:
     resolution: {integrity: sha512-wa7YjyUGfNZngI/vtK0UHAN+lgDCxBPCylVXGp0zu59Fz5aiGtNXaq3DhIov063MorB+VfufLh3JlF2KdTK3xg==}

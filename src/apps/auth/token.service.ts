@@ -2,14 +2,26 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { TokenExpiredError } from 'jsonwebtoken';
-import { SecurityConfig } from '../../common/config/config.interface';
+import { SecurityConfig } from '../../config/config.interface';
+
+interface Token {
+  accessToken: string;
+  refreshToken: string;
+}
 
 @Injectable()
-export class StreamsService {
+export class TokenService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {}
+
+  generateTokens(payload: { userId: number }): Token {
+    return {
+      accessToken: this.generateAccessToken(payload),
+      refreshToken: this.generateRefreshToken(payload),
+    };
+  }
 
   extractUserIdFromToken(token: string) {
     try {

@@ -2,7 +2,7 @@ import { Controller, Get, UseGuards } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
 import { JwtGuard } from '../auth/guards/jwt.guard';
-import { User } from '../../common/decorators/get-user.decorator';
+import { User } from '../../libs/nestjs/decorators/get-user.decorator';
 import { GetMyProfileQuery } from './queries/get-my-profile.query';
 
 @Controller('/api/users')

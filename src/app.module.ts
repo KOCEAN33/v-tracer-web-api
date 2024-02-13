@@ -1,21 +1,23 @@
-import { Logger, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { KyselyModule } from 'nestjs-kysely';
 import { PlanetScaleDialect } from 'kysely-planetscale';
 import { ParseJSONResultsPlugin } from 'kysely';
+import { v4 } from 'uuid';
 
-import config from './common/config/config';
-import { AuthModule } from './modules/auth/auth.module';
-import { UsersModule } from './modules/users/users.module';
+import config from './config/config';
+import { AuthModule } from './apps/auth/auth.module';
+import { UsersModule } from './apps/users/users.module';
 
-import { EmailModule } from './modules/email/email.module';
+import { EmailModule } from './apps/email/email.module';
 
-import { ExceptionModule } from './common/exception/exception.module';
+import { ExceptionModule } from './libs/nestjs/exception/exception.module';
 
-import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { AppController } from './app.controller';
-import { VtuberModule } from './modules/vtuber/vtuber.module';
-import { StreamsModule } from './modules/streams/streams.module';
+import { VtuberModule } from './apps/vtuber/vtuber.module';
+import { StreamsModule } from './apps/streams/streams.module';
+import { LoggerModule } from './libs/modules/logger/logger.module';
+import { ClsModule } from 'nestjs-cls';
 
 const genSecret = () => {
   const databaseUrl = process.env.DATABASE_URL as string;
@@ -30,10 +32,9 @@ const genSecret = () => {
 
 @Module({
   imports: [
+    LoggerModule,
     ConfigModule.forRoot({
-      envFilePath: [
-        `${__dirname}/common/config/env/.${process.env.NODE_ENV}.env`,
-      ],
+      envFilePath: [`.env.${process.env.NODE_ENV}`],
       load: [config],
       cache: true,
       isGlobal: true,
@@ -47,6 +48,14 @@ const genSecret = () => {
       plugins: [new ParseJSONResultsPlugin()],
       // log: ['query'],
     }),
+    ClsModule.forRoot({
+      global: true,
+      middleware: {
+        mount: true,
+        generateId: true,
+        idGenerator: (req: Request) => req.headers['x-correlation-id'] ?? v4(),
+      },
+    }),
     AuthModule,
     UsersModule,
     EmailModule,
@@ -55,10 +64,6 @@ const genSecret = () => {
     StreamsModule,
   ],
   controllers: [AppController],
-  providers: [Logger],
+  providers: [],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer): any {
-    consumer.apply(LoggerMiddleware).forRoutes('*');
-  }
-}
+export class AppModule {}

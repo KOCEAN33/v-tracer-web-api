@@ -5,12 +5,12 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { useContainer } from 'class-validator';
 
 import { AppModule } from './app.module';
-import { SwaggerConfig } from './common/config/config.interface';
+import { SwaggerConfig } from './config/config.interface';
 
-import { winstonLogger } from './common/config/winston.config';
+import { winstonLogger } from './config/winston.config';
 import * as cookieParser from 'cookie-parser';
 
-import { ResponseInterceptor } from './common/interceptor/response.interceptor';
+import { ResponseInterceptor } from './libs/nestjs/interceptor/response.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
