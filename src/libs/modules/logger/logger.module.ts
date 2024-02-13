@@ -6,7 +6,9 @@ import WinstonLogger, {
 } from './winston/winston-logger';
 import LoggerService from './domain/logger.service';
 import LoggerServiceAdapter from './logger.service.adapter';
-import ConsoleTransport from './winston/transports/console';
+import ConsoleTransport from './winston/transports/console.development';
+import ConsoleTransportDevelopment from './winston/transports/console.development';
+import ConsoleTransportProduction from './winston/transports/console.production';
 
 @Global()
 @Module({
@@ -31,7 +33,9 @@ import ConsoleTransport from './winston/transports/console';
       useFactory: () => {
         const transports = [];
 
-        transports.push(ConsoleTransport.createColorize());
+        process.env.NODE_ENV == 'production'
+          ? transports.push(ConsoleTransportProduction.create())
+          : transports.push(ConsoleTransportDevelopment.createColorize());
 
         return transports;
       },

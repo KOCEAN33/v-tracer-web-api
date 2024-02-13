@@ -1,4 +1,5 @@
 import * as winston from 'winston';
+
 import { LogLevel } from '../../domain/log';
 
 enum LogColors {
@@ -11,7 +12,7 @@ enum LogColors {
   pink = '\x1b[38;5;206m',
 }
 
-export default class ConsoleTransport {
+export default class ConsoleTransportDevelopment {
   public static createColorize() {
     return new winston.transports.Console({
       format: winston.format.combine(

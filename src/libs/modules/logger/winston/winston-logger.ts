@@ -31,7 +31,7 @@ export default class WinstonLogger implements Logger {
       format: winston.format.combine(
         // Add timestamp and format the date
         winston.format.timestamp({
-          format: 'DD/MM/YYYY, HH:mm:ss',
+          format: 'YYYY/MM/DD, HH:mm:ss',
         }),
         // Errors will be logged with stack trace
         winston.format.errors({ stack: true }),

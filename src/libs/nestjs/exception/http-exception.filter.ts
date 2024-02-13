@@ -9,6 +9,7 @@ import {
   Inject,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
+
 import { LoggerKey } from '../../modules/logger/domain/logger';
 
 interface ErrorResponse {
@@ -42,14 +43,14 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     const response = (exception as HttpException).getResponse();
 
-    const devErrorLog: any = {
-      status: statusCode,
-      timestamp: new Date().toISOString(),
-      method: req.method,
-      message: exception?.message,
-      response: response,
-      stack: stack,
-    };
+    // const devErrorLog: any = {
+    //   status: statusCode,
+    //   timestamp: new Date().toISOString(),
+    //   method: req.method,
+    //   message: exception?.message,
+    //   response: response,
+    //   stack: stack,
+    // };
 
     const errorResponse: ErrorResponse = {
       statusCode,
@@ -63,7 +64,14 @@ export class HttpExceptionFilter implements ExceptionFilter {
     //   response,
     //   stack,
     // };
-    this.logger.error(JSON.stringify(devErrorLog));
+    if (process.env.NODE_ENV === 'development') {
+      this.logger.error(`${exception?.message}`, {
+        props: {
+          response: response,
+          stack: stack,
+        },
+      });
+    }
     res.status((exception as HttpException).getStatus()).json(errorResponse);
   }
 }
