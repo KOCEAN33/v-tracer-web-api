@@ -44,7 +44,6 @@
     "kysely": "^0.27.2",
     "kysely-planetscale": "^1.4.0",
     "mailgun.js": "^10.1.0",
-    "nanoid": "5.0.5",
     "nest-winston": "^1.9.4",
     "nestjs-cls": "^4.1.0",
     "nestjs-kysely": "^0.1.6",
@@ -58,8 +57,7 @@
     "rimraf": "^5.0.5",
     "rxjs": "^7.8.1",
     "uuid": "^9.0.1",
-    "winston": "^3.11.0",
-    "winston-daily-rotate-file": "^4.7.1"
+    "winston": "^3.11.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.3.1",
