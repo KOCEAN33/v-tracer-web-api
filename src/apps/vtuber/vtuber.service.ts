@@ -1,10 +1,12 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { VtuberRepository } from './repository/vtuber.repository';
+import Logger, { LoggerKey } from '../../libs/modules/logger/domain/logger';
 
 @Injectable()
 export class VtuberService {
   constructor(
+    @Inject(LoggerKey) private logger: Logger,
     private readonly vtuberRepository: VtuberRepository,
     private readonly configService: ConfigService,
   ) {}
@@ -31,5 +33,73 @@ export class VtuberService {
     }
     const company = await this.vtuberRepository.addNewCompany(name, url);
     return { message: 'success', company: Number(company.insertId) };
+  }
+
+  async getHello(): Promise<string> {
+    // Profile
+    this.logger.startProfile('getHello');
+
+    // Await random time
+    await new Promise((resolve) =>
+      setTimeout(resolve, Math.floor(Math.random() * 1000)),
+    );
+
+    // Debug
+    this.logger.debug(
+      'I am a debug message!',
+      {
+        props: {
+          foo: 'bar',
+          baz: 'qux',
+        },
+      },
+      'getHello',
+    );
+
+    // Info
+    this.logger.info('I am an info message!', {
+      props: {
+        foo: 'bar',
+        baz: 'qux',
+      },
+    });
+
+    // Warn
+    this.logger.warn('I am a warn message!', {
+      props: {
+        foo: 'bar',
+        baz: 'qux',
+      },
+      error: new Error('Hello World!'),
+    });
+
+    // Error
+    this.logger.error('I am an error message!', {
+      props: {
+        foo: 'bar',
+        baz: 'qux',
+      },
+      error: new Error('Hello World!'),
+    });
+
+    // Fatal
+    this.logger.fatal('I am a fatal message!', {
+      props: {
+        foo: 'bar',
+        baz: 'qux',
+      },
+      error: new Error('Hello World!'),
+    });
+
+    // Emergency
+    this.logger.emergency('I am an emergency message!', {
+      props: {
+        foo: 'bar',
+        baz: 'qux',
+      },
+      error: new Error('Hello World!'),
+    });
+
+    return 'Hello World!';
   }
 }

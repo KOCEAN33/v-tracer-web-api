@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
 import { AddVtuberDto } from './dto/add-vtuber.dto';
@@ -19,5 +19,10 @@ export class VtuberController {
   async addVtuber(@Body() dto: AddVtuberDto) {
     const { name, companyId, youtubeUrl } = dto;
     return await this.vtuberService.addNewVtuber(name, companyId, youtubeUrl);
+  }
+
+  @Get('/log')
+  getHello() {
+    return this.vtuberService.getHello();
   }
 }
