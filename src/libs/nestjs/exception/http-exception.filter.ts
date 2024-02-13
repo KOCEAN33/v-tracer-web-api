@@ -6,8 +6,10 @@ import {
   HttpException,
   InternalServerErrorException,
   HttpStatus,
+  Inject,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
+import { LoggerKey } from '../../modules/logger/domain/logger';
 
 interface ErrorResponse {
   statusCode: number;
@@ -17,7 +19,7 @@ interface ErrorResponse {
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
-  constructor(private readonly logger: Logger) {}
+  constructor(@Inject(LoggerKey) private logger: Logger) {}
 
   catch(exception: Error, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
@@ -61,7 +63,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     //   response,
     //   stack,
     // };
-    this.logger.error(devErrorLog);
+    this.logger.error(JSON.stringify(devErrorLog));
     res.status((exception as HttpException).getStatus()).json(errorResponse);
   }
 }

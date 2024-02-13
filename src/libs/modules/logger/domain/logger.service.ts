@@ -3,6 +3,7 @@ import { INQUIRER } from '@nestjs/core';
 import Logger, { LoggerBaseKey } from './logger';
 import { LogData, LogLevel } from './log';
 import { ConfigService } from '@nestjs/config';
+import { ClsService } from 'nestjs-cls';
 
 @Injectable({ scope: Scope.TRANSIENT })
 export default class LoggerService implements Logger {
@@ -12,6 +13,7 @@ export default class LoggerService implements Logger {
   private app: string;
 
   public constructor(
+    private readonly cls: ClsService,
     @Inject(LoggerBaseKey) private logger: Logger,
     configService: ConfigService,
     @Inject(INQUIRER) parentClass: object,
@@ -67,8 +69,7 @@ export default class LoggerService implements Logger {
       context: data?.context || this.context,
       app: data?.app || this.app,
       sourceClass: data?.sourceClass || this.sourceClass,
-      // correlationId:
-      //   data?.correlationId || this.contextStorageService.getContextId(),
+      correlationId: data?.correlationId || this.cls.getId(),
     };
   }
 

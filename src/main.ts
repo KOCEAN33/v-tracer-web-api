@@ -7,15 +7,17 @@ import { useContainer } from 'class-validator';
 import { AppModule } from './app.module';
 import { SwaggerConfig } from './config/config.interface';
 
-import { winstonLogger } from './config/winston.config';
 import * as cookieParser from 'cookie-parser';
 
 import { ResponseInterceptor } from './libs/nestjs/interceptor/response.interceptor';
+import LoggerServiceAdapter from './libs/modules/logger/logger.service.adapter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    // logger: winstonLogger,
+    bufferLogs: true,
   });
+  app.useLogger(app.get(LoggerServiceAdapter));
+
   const configService = app.get(ConfigService);
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new ResponseInterceptor());
