@@ -20,9 +20,4 @@ export class VtuberController {
     const { name, companyId, youtubeUrl } = dto;
     return await this.vtuberService.addNewVtuber(name, companyId, youtubeUrl);
   }
-
-  @Get('/log')
-  getHello() {
-    return this.vtuberService.getHello();
-  }
 }
