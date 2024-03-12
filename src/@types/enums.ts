@@ -32,6 +32,7 @@ export type YoutubeStatus = (typeof YoutubeStatus)[keyof typeof YoutubeStatus];
 export const StreamType = {
     game: "game",
     uta: "uta",
+    talk: "talk",
     etc: "etc"
 } as const;
 export type StreamType = (typeof StreamType)[keyof typeof StreamType];
