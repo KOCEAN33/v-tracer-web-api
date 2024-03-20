@@ -397,6 +397,7 @@ Temporary Items
 
 .env.development
 .production.env
+.development.env
 .stage.env
 dist
 .webpack
