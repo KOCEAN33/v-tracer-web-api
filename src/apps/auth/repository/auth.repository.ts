@@ -65,14 +65,13 @@ export class AuthRepository {
       const newUser = await trx
         .insertInto('users')
         .values({ email: email })
-        .returning('id')
         .executeTakeFirstOrThrow();
 
       await trx
         .insertInto('passwords')
         .values({
           password: hashedPassword,
-          user_id: Number(newUser.id),
+          user_id: Number(newUser.insertId),
           updated_at: new Date(),
         })
         .executeTakeFirstOrThrow();
@@ -81,12 +80,12 @@ export class AuthRepository {
         .insertInto('profiles')
         .values({
           name: name,
-          user_id: Number(newUser.id),
+          user_id: Number(newUser.insertId),
           updated_at: new Date(),
         })
         .executeTakeFirst();
 
-      return Number(newUser.id);
+      return Number(newUser.insertId);
     });
   }
 
@@ -102,7 +101,6 @@ export class AuthRepository {
       const newUser = await trx
         .insertInto('users')
         .values({ email: email, is_verified: 1 })
-        .returning('id')
         .executeTakeFirstOrThrow();
 
       await trx
@@ -114,7 +112,7 @@ export class AuthRepository {
           name: name,
           picture: picture,
           access_token: accessToken,
-          user_id: Number(newUser),
+          user_id: Number(newUser.insertId),
           updated_at: new Date(),
         })
         .executeTakeFirstOrThrow();
@@ -124,12 +122,12 @@ export class AuthRepository {
         .values({
           name: name,
           image_url: picture,
-          user_id: Number(newUser),
+          user_id: Number(newUser.insertId),
           updated_at: new Date(),
         })
         .executeTakeFirst();
 
-      return Number(newUser);
+      return Number(newUser.insertId);
     });
   }
 
