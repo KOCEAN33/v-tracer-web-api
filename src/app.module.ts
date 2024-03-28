@@ -1,9 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { ParseJSONResultsPlugin, PostgresDialect } from 'kysely';
+import { MysqlDialect, ParseJSONResultsPlugin } from 'kysely';
 import { KyselyModule } from 'nestjs-kysely';
 import { ClsModule } from 'nestjs-cls';
-import { Pool } from 'pg';
 import { v4 } from 'uuid';
 
 import config from './config/config';
@@ -16,6 +15,8 @@ import { StreamsModule } from './apps/streams/streams.module';
 
 import { ExceptionModule } from './libs/nestjs/exception/exception.module';
 import { LoggerModule } from './libs/modules/logger/logger.module';
+import { createPool } from 'mysql2';
+import * as process from 'process';
 
 const genSecret = () => {
   const databaseUrl = process.env.DATABASE_URL as string;
@@ -40,14 +41,20 @@ const genSecret = () => {
       isGlobal: true,
     }),
     KyselyModule.forRoot({
-      dialect: new PostgresDialect({
-        pool: new Pool({
+      dialect: new MysqlDialect({
+        pool: createPool({
           host: genSecret()?.host || '',
-          port: genSecret()?.port || 5432,
+          port: genSecret()?.port || 3306,
           user: genSecret()?.username || '',
           password: genSecret()?.password || '',
           database: genSecret()?.database || '',
-          // ssl: true,
+          ssl: {
+            ca: process.env.DATABASE_CA_CERT,
+            cert: process.env.DATABASE_CLIENT_CERT,
+            key: process.env.DATABASE_CLIENT_KEY,
+            rejectUnauthorized: true,
+            minVersion: 'TLSv1.2',
+          },
         }),
       }),
       plugins: [new ParseJSONResultsPlugin()],
