@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 import { InjectKysely } from 'nestjs-kysely';
-import { DB } from '../../../@types';
+import { DB } from '../../../@types/';
 
 @Injectable()
 export class AuthRepository {

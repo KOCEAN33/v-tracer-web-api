@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { createPool } from 'mysql2';
 import { MysqlDialect, ParseJSONResultsPlugin } from 'kysely';
 import { KyselyModule } from 'nestjs-kysely';
 import { ClsModule } from 'nestjs-cls';
@@ -12,11 +13,8 @@ import { EmailModule } from './apps/email/email.module';
 import { AppController } from './app.controller';
 import { VtuberModule } from './apps/vtuber/vtuber.module';
 import { StreamsModule } from './apps/streams/streams.module';
-
 import { ExceptionModule } from './libs/nestjs/exception/exception.module';
 import { LoggerModule } from './libs/modules/logger/logger.module';
-import { createPool } from 'mysql2';
-import * as process from 'process';
 
 const genSecret = () => {
   const databaseUrl = process.env.DATABASE_URL as string;

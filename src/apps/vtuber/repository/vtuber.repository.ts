@@ -11,7 +11,7 @@ export class VtuberRepository {
       const youtube = await trx
         .insertInto('youtubes')
         .values({
-          status: 'newChannel',
+          status: 'new',
           url: youtubeUrl,
           updated_at: new Date(),
         })
@@ -22,7 +22,6 @@ export class VtuberRepository {
         .values({
           name: name,
           company_id: companyId,
-          youtube_id: Number(youtube.insertId),
           updated_at: new Date(),
         })
         .executeTakeFirstOrThrow();
