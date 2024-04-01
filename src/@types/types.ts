@@ -4,7 +4,7 @@ export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
   : ColumnType<T, T | undefined, T>;
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
-import type { VerifyType, PostStatus, PostType, VtuberStatus, PlatformType, YoutubeStatus, StreamType } from "./enums";
+import type { VerifyType, VtuberStatus, YoutubeStatus, StreamType } from "./enums";
 
 export type Company = {
     id: Generated<number>;
@@ -71,6 +71,7 @@ export type Stream = {
     streamId: string;
     vtuber_id: number;
     game_id: number | null;
+    youtube_id: number | null;
     created_at: Generated<Timestamp>;
     updated_at: Timestamp;
 };
@@ -94,7 +95,6 @@ export type Vtuber = {
     id: Generated<number>;
     name: string;
     company_id: number | null;
-    youtube_id: number | null;
     created_at: Generated<Timestamp>;
     updated_at: Timestamp;
 };
@@ -109,6 +109,8 @@ export type Youtube = {
     description: string | null;
     created_at: Generated<Timestamp>;
     updated_at: Timestamp;
+    crawled_at: Timestamp;
+    vtuber_id: number;
 };
 export type DB = {
     companies: Company;
