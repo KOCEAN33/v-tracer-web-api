@@ -109,7 +109,7 @@ export type Youtube = {
     description: string | null;
     created_at: Generated<Timestamp>;
     updated_at: Timestamp;
-    crawled_at: Timestamp;
+    crawled_at: Timestamp | null;
     vtuber_id: number;
 };
 export type DB = {
