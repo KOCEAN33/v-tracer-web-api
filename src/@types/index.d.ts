@@ -1,4 +1,4 @@
+import { DB as Database } from '../@types/types';
 import { Kysely } from 'kysely';
-import { DB as Database } from './types';
 
 export type DB = Kysely<Database>;

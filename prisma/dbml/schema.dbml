@@ -1,0 +1,187 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table users {
+  id Int [pk, increment]
+  email String [unique, not null]
+  isVerified Boolean [not null, default: false]
+  createdAt DateTime [default: `now()`, not null]
+  profile profiles
+  password passwords
+  refreshTokens refresh_tokens [not null]
+  verifyCodes verify_codes [not null]
+  SocialLogin social_logins
+}
+
+Table profiles {
+  id Int [pk, increment]
+  name String [not null]
+  imageUrl String
+  user users [not null]
+  userId Int [unique, not null]
+  updatedAt DateTime [not null]
+}
+
+Table social_logins {
+  id Int [pk, increment]
+  provider String [not null]
+  externalId String [unique, not null]
+  email String [not null]
+  name String [not null]
+  picture String [not null]
+  accessToken String [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  user users [not null]
+  userId Int [unique, not null]
+}
+
+Table passwords {
+  id Int [pk, increment]
+  password String [not null]
+  user users [not null]
+  userId Int [unique, not null]
+  updatedAt DateTime [not null]
+}
+
+Table refresh_tokens {
+  id Int [pk, increment]
+  refreshToken String [not null]
+  isActivate Boolean [not null, default: false]
+  ip String [not null]
+  userAgent String
+  expiresIn DateTime [not null]
+  user users [not null]
+  userId Int [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table verify_codes {
+  id Int [pk, increment]
+  type VerifyType [not null]
+  code String [unique, not null]
+  expiresIn DateTime [not null]
+  isActivate Boolean [not null, default: false]
+  user users [not null]
+  userId Int [not null]
+  verifiedAt DateTime
+  createdAt DateTime [default: `now()`, not null]
+}
+
+Table companies {
+  id Int [pk, increment]
+  name String [not null]
+  url String [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  vtubers vtubers [not null]
+}
+
+Table vtubers {
+  id Int [pk, increment]
+  name String [not null]
+  company companies
+  companyId Int
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  stream streams [not null]
+  youtube youtubes [not null]
+}
+
+Table youtubes {
+  id Int [pk, increment]
+  status YoutubeStatus [not null]
+  url String [not null]
+  name String
+  handle String
+  channelId String [unique]
+  image String
+  description String
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  crawledAt DateTime [not null]
+  vtuber vtubers [not null]
+  vtuberId Int [not null]
+  stream streams [not null]
+}
+
+Table streams {
+  id Int [pk, increment]
+  type StreamType
+  name String [not null]
+  url String [not null]
+  duration String
+  streamId String [unique, not null]
+  vtuber vtubers [not null]
+  vtuberId Int [not null]
+  game games
+  gameId Int
+  youtube youtubes
+  youtubeId Int
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table games {
+  id Int [pk, increment]
+  name String [not null]
+  url String
+  image String
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  Streams streams [not null]
+  keywords game_keywords [not null]
+}
+
+Table game_keywords {
+  id Int [pk, increment]
+  word String [not null]
+  game games [not null]
+  gameId Int [not null]
+}
+
+Enum VerifyType {
+  new_account
+}
+
+Enum VtuberStatus {
+  new
+  active
+}
+
+Enum YoutubeStatus {
+  new
+  activated
+  disabled
+}
+
+Enum StreamType {
+  game
+  singing
+  talking
+  etc
+}
+
+Ref: profiles.userId - users.id [delete: Cascade]
+
+Ref: social_logins.userId - users.id [delete: Cascade]
+
+Ref: passwords.userId - users.id [delete: Cascade]
+
+Ref: refresh_tokens.userId > users.id [delete: Cascade]
+
+Ref: verify_codes.userId > users.id
+
+Ref: vtubers.companyId > companies.id
+
+Ref: youtubes.vtuberId > vtubers.id
+
+Ref: streams.vtuberId > vtubers.id
+
+Ref: streams.gameId > games.id
+
+Ref: streams.youtubeId > youtubes.id
+
+Ref: game_keywords.gameId > games.id
