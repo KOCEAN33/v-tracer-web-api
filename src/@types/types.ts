@@ -65,10 +65,9 @@ export type SocialLogin = {
 export type Stream = {
     id: Generated<number>;
     type: StreamType | null;
-    name: string;
-    url: string;
+    title: string;
     duration: string | null;
-    streamId: string;
+    stream_id: string;
     vtuber_id: number;
     game_id: number | null;
     youtube_id: number | null;

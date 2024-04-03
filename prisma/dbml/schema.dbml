@@ -110,8 +110,7 @@ Table youtubes {
 Table streams {
   id Int [pk, increment]
   type StreamType
-  name String [not null]
-  url String [not null]
+  title String [not null]
   duration String
   streamId String [unique, not null]
   vtuber vtubers [not null]
