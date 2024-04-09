@@ -109,10 +109,11 @@ Table youtubes {
 
 Table streams {
   id Int [pk, increment]
-  type StreamType
   title String [not null]
-  duration String
+  duration Int
+  livedAt DateTime
   streamId String [unique, not null]
+  isFinished Boolean
   vtuber vtubers [not null]
   vtuberId Int [not null]
   game games
@@ -125,9 +126,9 @@ Table streams {
 
 Table games {
   id Int [pk, increment]
-  name String [not null]
-  url String
+  title String [not null]
   image String
+  youtubeId String
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
   Streams streams [not null]
@@ -154,13 +155,6 @@ Enum YoutubeStatus {
   new
   activated
   disabled
-}
-
-Enum StreamType {
-  game
-  singing
-  talking
-  etc
 }
 
 Ref: profiles.userId - users.id [delete: Cascade]
