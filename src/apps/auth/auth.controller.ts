@@ -99,7 +99,7 @@ export class AuthController {
     @Ip() ip: string,
   ) {
     const userAgent = req.headers['user-agent'];
-    const refreshToken = req.cookies['token'];
+    const refreshToken = req.cookies['token'] as string;
     const { userId } = dto;
     const command = new UserLogoutCommand(
       res,
