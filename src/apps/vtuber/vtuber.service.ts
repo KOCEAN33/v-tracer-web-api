@@ -34,4 +34,8 @@ export class VtuberService {
     const company = await this.vtuberRepository.addNewCompany(name, url);
     return { message: 'success', company: Number(company.insertId) };
   }
+
+  async getAllVtubers() {
+    return await this.vtuberRepository.getAllVtubers();
+  }
 }

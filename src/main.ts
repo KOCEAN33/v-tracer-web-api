@@ -22,7 +22,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new ResponseInterceptor());
 
-  // app.use(cookieParser(`${process.env.APP_SECRET}`));
+  app.use(cookieParser(`${process.env.APP_SECRET}`));
 
   app.enableCors({
     origin: process.env.CLIENT_URL,

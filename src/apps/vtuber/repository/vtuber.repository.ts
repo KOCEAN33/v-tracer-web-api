@@ -8,16 +8,7 @@ export class VtuberRepository {
 
   async addNewVtuber(name: string, companyId: number, youtubeUrl: string) {
     return await this.db.transaction().execute(async (trx) => {
-      const youtube = await trx
-        .insertInto('youtubes')
-        .values({
-          status: 'new',
-          url: youtubeUrl,
-          updated_at: new Date(),
-        })
-        .executeTakeFirstOrThrow();
-
-      return await trx
+      const newVtuber = await trx
         .insertInto('vtubers')
         .values({
           name: name,
@@ -25,7 +16,26 @@ export class VtuberRepository {
           updated_at: new Date(),
         })
         .executeTakeFirstOrThrow();
+
+      return await trx
+        .insertInto('youtubes')
+        .values({
+          status: 'new',
+          url: youtubeUrl,
+          name: name,
+          updated_at: new Date(),
+          vtuber_id: Number(newVtuber.insertId),
+        })
+        .executeTakeFirstOrThrow();
     });
+  }
+
+  async getAllVtubers() {
+    return await this.db
+      .selectFrom('vtubers')
+      .leftJoin('youtubes', 'youtubes.vtuber_id', 'vtubers.id')
+      .select(['vtubers.id', 'vtubers.name', 'youtubes.status', 'youtubes.url'])
+      .execute();
   }
 
   async getYoutubeUrl(youtubeUrl: string) {

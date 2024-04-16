@@ -15,9 +15,14 @@ export class VtuberController {
     return await this.vtuberService.addNewCompany(name, url);
   }
 
-  @Post('/add-vtuber')
+  @Post('/vtuber')
   async addVtuber(@Body() dto: AddVtuberDto) {
     const { name, companyId, youtubeUrl } = dto;
     return await this.vtuberService.addNewVtuber(name, companyId, youtubeUrl);
+  }
+
+  @Get('/vtuber')
+  async getAllVtuber() {
+    return await this.vtuberService.getAllVtubers();
   }
 }

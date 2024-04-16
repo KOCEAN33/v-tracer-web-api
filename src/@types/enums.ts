@@ -13,10 +13,3 @@ export const YoutubeStatus = {
     disabled: "disabled"
 } as const;
 export type YoutubeStatus = (typeof YoutubeStatus)[keyof typeof YoutubeStatus];
-export const StreamType = {
-    game: "game",
-    singing: "singing",
-    talking: "talking",
-    etc: "etc"
-} as const;
-export type StreamType = (typeof StreamType)[keyof typeof StreamType];
