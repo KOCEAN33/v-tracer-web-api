@@ -16,7 +16,7 @@ export class GetGameRankingHandler
       return {
         gameId: ranking.game_id,
         gameTitle: ranking.title,
-        duration: this.converTimeToHours(ranking.total_duration),
+        duration: this.convertTimeToHours(ranking.total_duration),
       };
     });
 
@@ -26,7 +26,7 @@ export class GetGameRankingHandler
     };
   }
 
-  private converTimeToHours(time: number): number {
+  private convertTimeToHours(time: number): number {
     const hours = time / 3600;
     return Number(hours.toFixed(1));
   }
