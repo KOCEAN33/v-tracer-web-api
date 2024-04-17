@@ -1,6 +1,8 @@
 import { Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { GetTotalStreamTimeQuery } from './queries/get-total-stream-time.query';
+import { GetStreamsCountQuery } from './queries/get-streams-count.query';
+import { GetGameStreamRatioQuery } from './queries/get-game-stream-ratio.query';
 
 @Controller('/api/streams')
 export class StreamController {
@@ -14,8 +16,15 @@ export class StreamController {
     const query = new GetTotalStreamTimeQuery();
     return this.queryBus.execute(query);
   }
+  @Get('/count')
+  async streamsCount() {
+    const query = new GetStreamsCountQuery();
+    return this.queryBus.execute(query);
+  }
 
-  // @Get('/ratio/game')
-  //
-  // @Get('/count')
+  @Get('/ratio/game')
+  async gameRatio() {
+    const query = new GetGameStreamRatioQuery();
+    return this.queryBus.execute(query);
+  }
 }
