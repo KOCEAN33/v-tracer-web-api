@@ -23,7 +23,7 @@ export class StreamRepository {
     return streamsCount.num_streams;
   }
 
-  async getGameStreamRatio() {
+  async getGameStreamRatio(): Promise<number> {
     const nonGameStream = await this.db
       .selectFrom('streams')
       .select((eb) => eb.fn.count<number>('game_id').as('num_streams'))

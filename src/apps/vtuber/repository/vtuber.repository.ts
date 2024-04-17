@@ -60,4 +60,13 @@ export class VtuberRepository {
       .where('url', '=', url)
       .executeTakeFirst();
   }
+
+  async getVtuberCount(): Promise<number> {
+    const vtuber = await this.db
+      .selectFrom('vtubers')
+      .select((eb) => eb.fn.count<number>('id').as('num_vtuber'))
+      .executeTakeFirst();
+
+    return vtuber.num_vtuber;
+  }
 }

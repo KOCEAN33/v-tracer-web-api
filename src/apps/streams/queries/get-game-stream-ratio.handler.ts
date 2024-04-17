@@ -25,7 +25,7 @@ export class GetGameStreamRatioHandler
     };
   }
 
-  private calculatePercentage(total, part) {
+  private calculatePercentage(total: number, part: number): string {
     const percent = (part / total) * 100;
 
     return percent.toFixed(2);
