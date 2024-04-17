@@ -5,7 +5,7 @@ import { TokenExpiredError } from 'jsonwebtoken';
 import { SecurityConfig } from '../../config/config.interface';
 
 @Injectable()
-export class StreamsService {
+export class StreamService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,

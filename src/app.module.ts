@@ -12,7 +12,7 @@ import { UsersModule } from './apps/users/users.module';
 import { EmailModule } from './apps/email/email.module';
 import { AppController } from './app.controller';
 import { VtuberModule } from './apps/vtuber/vtuber.module';
-import { StreamsModule } from './apps/streams/streams.module';
+import { StreamModule } from './apps/streams/stream.module';
 import { ExceptionModule } from './libs/nestjs/exception/exception.module';
 import { LoggerModule } from './libs/modules/logger/logger.module';
 
@@ -71,7 +71,7 @@ const genSecret = () => {
     EmailModule,
     ExceptionModule,
     VtuberModule,
-    StreamsModule,
+    StreamModule,
   ],
   controllers: [AppController],
   providers: [],

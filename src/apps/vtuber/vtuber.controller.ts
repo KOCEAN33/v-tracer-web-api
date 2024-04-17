@@ -25,4 +25,6 @@ export class VtuberController {
   async getAllVtuber() {
     return await this.vtuberService.getAllVtubers();
   }
+
+  // @Get('/count')
 }
