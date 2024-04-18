@@ -39,6 +39,8 @@ export class StreamRepository {
       .where('is_finished', 'is not', null)
       .leftJoin('vtubers', 'vtubers.id', 'streams.vtuber_id')
       .select(['vtubers.name'])
+      .leftJoin('youtubes', 'youtubes.vtuber_id', 'streams.vtuber_id')
+      .select(['youtubes.image'])
       .limit(15)
       .execute();
   }
