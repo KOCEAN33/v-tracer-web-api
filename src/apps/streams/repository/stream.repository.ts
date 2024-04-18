@@ -31,4 +31,15 @@ export class StreamRepository {
       .executeTakeFirst();
     return nonGameStream.num_streams;
   }
+
+  async getRecentStreams() {
+    return this.db
+      .selectFrom('streams')
+      .select(['title', 'lived_at'])
+      .where('is_finished', 'is not', null)
+      .leftJoin('vtubers', 'vtubers.id', 'streams.vtuber_id')
+      .select(['vtubers.name'])
+      .limit(15)
+      .execute();
+  }
 }
