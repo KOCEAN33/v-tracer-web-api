@@ -12,22 +12,17 @@ export class GetGameRankingHandler
   async execute() {
     const ranking = await this.gamesRepository.getPlayedGameRanking();
 
-    const rankingDuration = ranking.map((ranking) => {
+    return ranking.map((ranking) => {
       return {
         gameId: ranking.game_id,
         gameTitle: ranking.title,
         duration: this.convertTimeToHours(ranking.total_duration),
       };
     });
-
-    return {
-      message: 'success',
-      data: rankingDuration,
-    };
   }
 
-  private convertTimeToHours(time: number): number {
+  private convertTimeToHours(time: number): string {
     const hours = time / 3600;
-    return Number(hours.toFixed(1));
+    return hours.toFixed(1);
   }
 }
