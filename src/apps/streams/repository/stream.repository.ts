@@ -31,4 +31,17 @@ export class StreamRepository {
       .executeTakeFirst();
     return nonGameStream.num_streams;
   }
+
+  async getRecentStreams() {
+    return this.db
+      .selectFrom('streams')
+      .select(['stream_id', 'streams.title as stream_title'])
+      .where('is_finished', 'is not', null)
+      .leftJoin('youtubes', 'youtubes.vtuber_id', 'streams.vtuber_id')
+      .select(['youtubes.image'])
+      .leftJoin('games', 'games.id', 'streams.game_id')
+      .select(['games.title as game_title'])
+      .limit(10)
+      .execute();
+  }
 }

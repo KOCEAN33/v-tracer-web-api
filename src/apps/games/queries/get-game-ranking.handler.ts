@@ -22,7 +22,7 @@ export class GetGameRankingHandler
 
     return {
       message: 'success',
-      ranking: rankingDuration,
+      data: rankingDuration,
     };
   }
 

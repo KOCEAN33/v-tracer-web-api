@@ -3,6 +3,7 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { GetTotalStreamTimeQuery } from './queries/get-total-stream-time.query';
 import { GetStreamsCountQuery } from './queries/get-streams-count.query';
 import { GetGameStreamRatioQuery } from './queries/get-game-stream-ratio.query';
+import { GetRecentStreamsQuery } from './queries/get-recent-streams.query';
 
 @Controller('/api/streams')
 export class StreamController {
@@ -25,6 +26,12 @@ export class StreamController {
   @Get('/ratio/game')
   async gameRatio() {
     const query = new GetGameStreamRatioQuery();
+    return this.queryBus.execute(query);
+  }
+
+  @Get('/recent')
+  async recentStreams() {
+    const query = new GetRecentStreamsQuery();
     return this.queryBus.execute(query);
   }
 }
