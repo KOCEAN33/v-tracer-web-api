@@ -10,12 +10,18 @@ export class GetRecentStreamsHandler
   constructor(private readonly streamRepository: StreamRepository) {}
 
   async execute() {
-    const recentStreamsWithName =
-      await this.streamRepository.getRecentStreams();
+    const recentStreams = await this.streamRepository.getRecentStreams();
+    return recentStreams.map((recentStream) => {
+      return {
+        streamId: recentStream.stream_id,
+        streamTitle: this.removeAngle(recentStream.stream_title),
+        image: recentStream.image,
+        gameTitle: recentStream.game_title,
+      };
+    });
+  }
 
-    return {
-      message: 'success',
-      result: recentStreamsWithName,
-    };
+  private removeAngle(text: string): string {
+    return text.replace(/【[^】]*】/g, '');
   }
 }

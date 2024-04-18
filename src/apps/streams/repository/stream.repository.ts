@@ -35,13 +35,13 @@ export class StreamRepository {
   async getRecentStreams() {
     return this.db
       .selectFrom('streams')
-      .select(['title', 'lived_at'])
+      .select(['stream_id', 'streams.title as stream_title'])
       .where('is_finished', 'is not', null)
-      .leftJoin('vtubers', 'vtubers.id', 'streams.vtuber_id')
-      .select(['vtubers.name'])
       .leftJoin('youtubes', 'youtubes.vtuber_id', 'streams.vtuber_id')
       .select(['youtubes.image'])
-      .limit(15)
+      .leftJoin('games', 'games.id', 'streams.game_id')
+      .select(['games.title as game_title'])
+      .limit(10)
       .execute();
   }
 }
