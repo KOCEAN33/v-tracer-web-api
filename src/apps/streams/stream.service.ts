@@ -1,37 +1,52 @@
 import { Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
-import { TokenExpiredError } from 'jsonwebtoken';
-import { SecurityConfig } from '../../config/config.interface';
+import { StreamRepository } from './repository/stream.repository';
 
 @Injectable()
 export class StreamService {
-  constructor(
-    private readonly jwtService: JwtService,
-    private readonly configService: ConfigService,
-  ) {}
+  constructor(private readonly streamRepository: StreamRepository) {}
 
-  extractUserIdFromToken(token: string) {
-    try {
-      return this.jwtService.verify(token, {
-        secret: this.configService.get('JWT_REFRESH_SECRET'),
-      });
-    } catch (e) {
-      if (e instanceof TokenExpiredError) {
-        return false;
-      }
-    }
+  async getTotalStreamTime() {
+
+    const convertHours = totalStreamTime / (60 * 60);
+    return convertHours.toFixed(1);
   }
 
-  private generateAccessToken(payload: { userId: number }): string {
-    return this.jwtService.sign(payload);
+  async getGameStreamRatio() {
+    const totalStreamsCount = await this.streamRepository.getStreamsCount();
+    const gameStreamsCount = await this.streamRepository.getGameStreamRatio();
+
+    return this.calculatePercentage(totalStreamsCount, gameStreamsCount);
   }
 
-  private generateRefreshToken(payload: { userId: number }): string {
-    const securityConfig = this.configService.get<SecurityConfig>('security');
-    return this.jwtService.sign(payload, {
-      secret: this.configService.get('JWT_REFRESH_SECRET'),
-      expiresIn: securityConfig.refreshIn,
+  async getRecentStreams() {
+    const recentStreams = await this.streamRepository.getRecentStreams();
+    return recentStreams.map((recentStream) => {
+      return {
+        streamId: recentStream.stream_id,
+        streamTitle: this.removeAngle(recentStream.stream_title),
+        image: recentStream.image,
+        gameTitle: recentStream.game_title,
+      };
     });
+  }
+
+  async getStreamsCount() {
+    const streamsCount = await this.streamRepository.getStreamsCount();
+    return streamsCount;
+  }
+
+  private calculatePercentage(total: number, part: number): string {
+    const percent = (part / total) * 100;
+    return percent.toFixed(2);
+  }
+
+  private removeAngle(text: string): string {
+    return text.replace(/【[^】]*】/g, '');
+  }
+
+  private oneMonthAgo() {
+    const today = new Date();
+    const oneMonthAgo = new Date(today);
+    return new Date(oneMonthAgo.setMonth(today.getMonth() - 1));
   }
 }
