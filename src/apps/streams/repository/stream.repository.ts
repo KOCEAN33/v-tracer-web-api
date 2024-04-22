@@ -67,6 +67,7 @@ export class StreamRepository {
       .select(['youtubes.image'])
       .leftJoin('games', 'games.id', 'streams.game_id')
       .select(['games.title as game_title'])
+      .orderBy('lived_at', 'desc')
       .limit(10)
       .execute();
   }
