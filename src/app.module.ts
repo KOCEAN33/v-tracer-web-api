@@ -18,6 +18,7 @@ import { GamesModule } from './apps/games/games.module';
 
 import { ExceptionModule } from './libs/nestjs/exception/exception.module';
 import { LoggerModule } from './libs/modules/logger/logger.module';
+import { CacheManagerModule } from './libs/modules/cache-manager/cache-manager.module';
 
 const genSecret = () => {
   const databaseUrl = process.env.DATABASE_URL as string;
@@ -59,7 +60,7 @@ const genSecret = () => {
         }),
       }),
       plugins: [new ParseJSONResultsPlugin()],
-      // log: ['query', 'error'],
+      log: ['query', 'error'],
     }),
     ClsModule.forRoot({
       global: true,
@@ -69,6 +70,7 @@ const genSecret = () => {
         idGenerator: (req: Request) => req.headers['x-correlation-id'] ?? v4(),
       },
     }),
+    CacheManagerModule,
     AuthModule,
     UsersModule,
     EmailModule,
