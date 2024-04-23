@@ -1,9 +1,9 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
-import { QueryBus } from '@nestjs/cqrs';
 
 import { AddVtuberDto } from './dto/add-vtuber.dto';
 import { VtuberService } from './vtuber.service';
 import { AddCompanyDto } from './dto/add-company.dto';
+import { CacheTTL } from '@nestjs/cache-manager';
 
 @Controller('/api/vtubers')
 export class VtuberController {
@@ -22,11 +22,13 @@ export class VtuberController {
   }
 
   @Get('/vtuber')
+  @CacheTTL(60 * 60 * 1000)
   async getAllVtuber() {
     return await this.vtuberService.getAllVtubers();
   }
 
   @Get('/count')
+  @CacheTTL(60 * 60 * 1000)
   async vtuberCount() {
     return this.vtuberService.getVtuberCount();
   }

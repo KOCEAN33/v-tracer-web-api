@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { StreamRepository } from './repository/stream.repository';
+import { StreamsRepository } from './repository/streams.repository';
 
 @Injectable()
-export class StreamService {
-  constructor(private readonly streamRepository: StreamRepository) {}
+export class StreamsService {
+  constructor(private readonly streamRepository: StreamsRepository) {}
 
   async getTotalStreamTime() {
     const prevtotalTime = await this.streamRepository.getTotalStreamTime(

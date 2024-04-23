@@ -13,7 +13,7 @@ import { UsersModule } from './apps/users/users.module';
 import { EmailModule } from './apps/email/email.module';
 import { AppController } from './app.controller';
 import { VtuberModule } from './apps/vtuber/vtuber.module';
-import { StreamModule } from './apps/streams/stream.module';
+import { StreamsModule } from './apps/streams/streams.module';
 import { GamesModule } from './apps/games/games.module';
 
 import { ExceptionModule } from './libs/nestjs/exception/exception.module';
@@ -36,6 +36,7 @@ const genSecret = () => {
 @Module({
   imports: [
     LoggerModule,
+    CacheManagerModule,
     ConfigModule.forRoot({
       envFilePath: [`.${process.env.NODE_ENV}.env`],
       load: [config],
@@ -70,13 +71,12 @@ const genSecret = () => {
         idGenerator: (req: Request) => req.headers['x-correlation-id'] ?? v4(),
       },
     }),
-    CacheManagerModule,
     AuthModule,
     UsersModule,
     EmailModule,
     ExceptionModule,
     VtuberModule,
-    StreamModule,
+    StreamsModule,
     GamesModule,
   ],
   controllers: [AppController],

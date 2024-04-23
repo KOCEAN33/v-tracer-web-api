@@ -1,28 +1,32 @@
-import { Controller, Get, UseInterceptors } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 
-import { StreamService } from './stream.service';
-import { CacheInterceptor } from '@nestjs/cache-manager';
+import { StreamsService } from './streams.service';
+import { CacheTTL } from '@nestjs/cache-manager';
 
-@UseInterceptors(CacheInterceptor)
 @Controller('/api/streams')
-export class StreamController {
-  constructor(private streamService: StreamService) {}
+export class StreamsController {
+  constructor(private streamService: StreamsService) {}
 
   @Get('/count/total-time')
+  @CacheTTL(60 * 60 * 1000)
   async totalStreamTime() {
     return this.streamService.getTotalStreamTime();
   }
+
   @Get('/count')
+  @CacheTTL(60 * 60 * 1000)
   async streamsCount() {
     return this.streamService.getStreamsCount();
   }
 
   @Get('/ratio/game')
+  @CacheTTL(60 * 60 * 1000)
   async gameRatio() {
     return this.streamService.getGameStreamRatio();
   }
 
   @Get('/recent')
+  @CacheTTL(60 * 60 * 1000)
   async recentStreams() {
     return this.streamService.getRecentStreams();
   }

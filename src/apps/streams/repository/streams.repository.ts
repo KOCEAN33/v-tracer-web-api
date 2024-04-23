@@ -5,7 +5,7 @@ import { InjectKysely } from 'nestjs-kysely';
 import { DB } from '../../../@types';
 
 @Injectable()
-export class StreamRepository {
+export class StreamsRepository {
   constructor(@InjectKysely() private readonly db: DB) {}
 
   async getTotalStreamTime(

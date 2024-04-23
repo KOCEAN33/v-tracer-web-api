@@ -7,10 +7,10 @@ import { ClsService } from 'nestjs-cls';
 
 @Injectable({ scope: Scope.TRANSIENT })
 export default class LoggerService implements Logger {
-  private sourceClass: string;
-  private organization: string;
-  private context: string;
-  private app: string;
+  private readonly sourceClass: string;
+  private readonly organization: string;
+  private readonly context: string;
+  private readonly app: string;
 
   public constructor(
     private readonly cls: ClsService,

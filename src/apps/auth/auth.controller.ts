@@ -146,17 +146,4 @@ export class AuthController {
     const command = new SocialLoginCommand(req, res, ip, userAgent);
     return this.commandBus.execute(command);
   }
-
-  @ApiOperation({ summary: 'Logout from every device' })
-  @Post('/logout-all')
-  async purgeToken() {
-    return;
-  }
-
-  @UseGuards(AuthGuard('jwt'))
-  @Get('test')
-  async test(@User() userId: number) {
-    console.log('accepted', userId);
-    return 'success';
-  }
 }
