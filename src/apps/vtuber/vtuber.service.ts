@@ -1,5 +1,5 @@
 import { ConflictException, Inject, Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+
 import { VtuberRepository } from './repository/vtuber.repository';
 import Logger, { LoggerKey } from '../../libs/modules/logger/domain/logger';
 
@@ -8,7 +8,6 @@ export class VtuberService {
   constructor(
     @Inject(LoggerKey) private logger: Logger,
     private readonly vtuberRepository: VtuberRepository,
-    private readonly configService: ConfigService,
   ) {}
 
   async addNewVtuber(name: string, companyId: number, youtubeUrl: string) {
@@ -37,5 +36,25 @@ export class VtuberService {
 
   async getAllVtubers() {
     return await this.vtuberRepository.getAllVtubers();
+  }
+
+  async getVtuberCount() {
+    const prevVtuberCount = await this.vtuberRepository.getVtuberCount(
+      this.oneMonthAgo(),
+      '<=',
+    );
+    const afterVtuberCount = await this.vtuberRepository.getVtuberCount(
+      this.oneMonthAgo(),
+      '>',
+    );
+    const totalCount = prevVtuberCount + afterVtuberCount;
+    const percent = (totalCount / afterVtuberCount) * 100;
+    return { total: totalCount.toFixed(0), percent: percent.toFixed(1) };
+  }
+
+  private oneMonthAgo(): Date {
+    const today = new Date();
+    const oneMonthAgo = new Date(today);
+    return new Date(oneMonthAgo.setMonth(today.getMonth() - 1));
   }
 }

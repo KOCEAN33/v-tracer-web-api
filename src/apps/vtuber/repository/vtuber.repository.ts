@@ -1,3 +1,4 @@
+import { ComparisonOperatorExpression } from 'kysely/dist/cjs/parser/binary-operation-parser';
 import { Injectable } from '@nestjs/common';
 import { InjectKysely } from 'nestjs-kysely';
 import { DB } from '../../../@types';
@@ -61,10 +62,14 @@ export class VtuberRepository {
       .executeTakeFirst();
   }
 
-  async getVtuberCount(): Promise<number> {
+  async getVtuberCount(
+    date: Date,
+    op: ComparisonOperatorExpression,
+  ): Promise<number> {
     const vtuber = await this.db
       .selectFrom('vtubers')
       .select((eb) => eb.fn.count<number>('id').as('num_vtuber'))
+      .where('created_at', op, date)
       .executeTakeFirst();
 
     return vtuber.num_vtuber;

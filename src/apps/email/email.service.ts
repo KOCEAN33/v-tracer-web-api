@@ -4,7 +4,6 @@ import * as path from 'path';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { MailgunService } from 'nestjs-mailgun';
-import { MailgunMessageData } from 'mailgun.js';
 
 import { EmailConfig } from '../../config/config.interface';
 import { SendEmail } from './interface/send-email.interface';
@@ -21,7 +20,7 @@ export class EmailService {
     const domain = emailConfig.domain;
     const sender = emailConfig.verifySender;
 
-    const options: MailgunMessageData = {
+    const options = {
       from: sender,
       to: setup.receiver,
       subject: setup.subject,
