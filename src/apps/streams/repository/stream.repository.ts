@@ -1,20 +1,21 @@
+import { ComparisonOperatorExpression } from 'kysely/dist/cjs/parser/binary-operation-parser';
+
 import { Injectable } from '@nestjs/common';
 import { InjectKysely } from 'nestjs-kysely';
 import { DB } from '../../../@types';
-import { ComparisonOperatorExpression } from 'kysely/dist/cjs/parser/binary-operation-parser';
 
 @Injectable()
 export class StreamRepository {
   constructor(@InjectKysely() private readonly db: DB) {}
 
   async getTotalStreamTime(
-    oneMonthAgo: Date,
+    date: Date,
     operation: ComparisonOperatorExpression,
   ): Promise<number> {
     const totalDuration = await this.db
       .selectFrom('streams')
       .select((eb) => eb.fn.sum<number>('duration').as('total_duration'))
-      .where('lived_at', operation, oneMonthAgo)
+      .where('lived_at', operation, date)
       .executeTakeFirst();
     return totalDuration.total_duration;
   }
@@ -32,7 +33,7 @@ export class StreamRepository {
   }
 
   async getNonGameStreamsCount(
-    oneMonthAgo: Date,
+    date: Date,
     op: ComparisonOperatorExpression,
   ): Promise<number> {
     const streamsCount = await this.db
@@ -40,20 +41,20 @@ export class StreamRepository {
       .select((eb) => eb.fn.count<number>('id').as('num_streams'))
       .where('duration', 'is not', null)
       .where('game_id', 'is', null)
-      .where('lived_at', op, oneMonthAgo)
+      .where('lived_at', op, date)
       .executeTakeFirst();
     return streamsCount.num_streams;
   }
 
   async getGameStreamCount(
-    oneMonthAgo: Date,
+    date: Date,
     op: ComparisonOperatorExpression,
   ): Promise<number> {
     const nonGameStream = await this.db
       .selectFrom('streams')
       .select((eb) => eb.fn.count<number>('game_id').as('num_streams'))
       .where('duration', 'is not', null)
-      .where('lived_at', op, oneMonthAgo)
+      .where('lived_at', op, date)
       .executeTakeFirst();
     return nonGameStream.num_streams;
   }

@@ -21,7 +21,7 @@ export class StreamService {
       (Number(prevtotalTime) + Number(afterStreamTime)) / (60 * 60);
     return {
       total: convertHours.toFixed(1),
-      increased: percent.toFixed(1),
+      percent: percent.toFixed(1),
     };
   }
 
@@ -92,7 +92,7 @@ export class StreamService {
     );
 
     return {
-      total: totalCount,
+      total: totalCount.toFixed(0),
       percent: percent.toFixed(1),
     };
   }

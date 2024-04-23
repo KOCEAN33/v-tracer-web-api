@@ -1,13 +1,13 @@
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { useContainer } from 'class-validator';
+import * as cookieParser from 'cookie-parser';
 
 import { AppModule } from './app.module';
-import { SwaggerConfig } from './config/config.interface';
 
-import * as cookieParser from 'cookie-parser';
+import { SwaggerConfig } from './config/config.interface';
 
 import { ResponseInterceptor } from './libs/nestjs/interceptor/response.interceptor';
 import LoggerServiceAdapter from './libs/modules/logger/logger.service.adapter';
