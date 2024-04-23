@@ -61,7 +61,7 @@ const genSecret = () => {
         }),
       }),
       plugins: [new ParseJSONResultsPlugin()],
-      log: ['query', 'error'],
+      // log: ['query', 'error'],
     }),
     ClsModule.forRoot({
       global: true,
