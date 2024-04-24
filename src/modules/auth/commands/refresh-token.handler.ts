@@ -43,6 +43,7 @@ export class RefreshTokenHandler
     // new token generation
     const { accessToken, refreshToken } = this.tokenService.generateTokens({
       userId: payload.userId,
+      role: payload.role,
     });
 
     // get expired time

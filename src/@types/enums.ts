@@ -1,3 +1,8 @@
+export const Role = {
+    USER: "USER",
+    ADMIN: "ADMIN"
+} as const;
+export type Role = (typeof Role)[keyof typeof Role];
 export const VerifyType = {
     new_account: "new_account"
 } as const;

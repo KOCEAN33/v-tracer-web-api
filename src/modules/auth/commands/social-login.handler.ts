@@ -28,6 +28,7 @@ export class SocialLoginHandler implements ICommandHandler<SocialLoginCommand> {
       throw new ForbiddenException('can not verified');
     }
 
+    // login fail logic
     if (userData == 'conflict') {
       const fail = {
         statusCode: HttpStatus.CONFLICT,
@@ -43,14 +44,21 @@ export class SocialLoginHandler implements ICommandHandler<SocialLoginCommand> {
 
     // successful login logic
     const { accessToken, refreshToken } = this.tokenService.generateTokens({
-      userId: userData,
+      userId: userData.userId,
+      role: userData.role,
     });
 
     const decodeJWT = this.jwtService.decode(refreshToken);
     const expiresIn = new Date(decodeJWT['exp'] * 1000);
 
     this.eventBus.publish(
-      new SaveTokenEvent(userData, refreshToken, ip, userAgent, expiresIn),
+      new SaveTokenEvent(
+        userData.userId,
+        refreshToken,
+        ip,
+        userAgent,
+        expiresIn,
+      ),
     );
 
     const token = {
