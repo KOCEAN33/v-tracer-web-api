@@ -127,7 +127,11 @@ export class AuthRepository {
         })
         .executeTakeFirst();
 
-      return Number(newUser.insertId);
+      return trx
+        .selectFrom('users')
+        .where('id', '=', Number(newUser.insertId))
+        .select(['id', 'role'])
+        .executeTakeFirstOrThrow();
     });
   }
 
@@ -137,22 +141,8 @@ export class AuthRepository {
       .select(['user_id', 'external_id', 'provider'])
       .where('external_id', '=', externalId)
       .where('provider', '=', provider)
-      .executeTakeFirst();
-  }
-
-  async getUserByAccessToken(
-    userId: number,
-    socId: string,
-    externalId: string,
-    accessToken: string,
-  ) {
-    return await this.db
-      .selectFrom('social_logins')
-      .select(['user_id', 'provider', 'external_id', 'access_token'])
-      .where('user_id', '=', userId)
-      .where('provider', '=', socId)
-      .where('external_id', '=', externalId)
-      .where('access_token', '=', accessToken)
+      .innerJoin('users', 'users.id', 'social_logins.user_id')
+      .select(['role'])
       .executeTakeFirst();
   }
 

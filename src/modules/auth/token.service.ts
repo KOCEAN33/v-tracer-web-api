@@ -16,7 +16,7 @@ export class TokenService {
     private readonly configService: ConfigService,
   ) {}
 
-  generateTokens(payload: { userId: number }): Token {
+  generateTokens(payload: { userId: number; role: string }): Token {
     return {
       accessToken: this.generateAccessToken(payload),
       refreshToken: this.generateRefreshToken(payload),

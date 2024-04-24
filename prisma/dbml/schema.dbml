@@ -4,6 +4,7 @@
 
 Table users {
   id Int [pk, increment]
+  role Role [not null, default: 'USER']
   email String [unique, not null]
   isVerified Boolean [not null, default: false]
   createdAt DateTime [default: `now()`, not null]
@@ -140,6 +141,11 @@ Table game_keywords {
   word String [not null]
   game games [not null]
   gameId Int [not null]
+}
+
+Enum Role {
+  USER
+  ADMIN
 }
 
 Enum VerifyType {

@@ -49,6 +49,7 @@ export class UserLoginHandler implements ICommandHandler<UserLoginCommand> {
     // successful login logic
     const { accessToken, refreshToken } = this.tokenService.generateTokens({
       userId: user.user_id,
+      role: user.role,
     });
 
     const decodeJWT = this.jwtService.decode(refreshToken);

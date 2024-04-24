@@ -4,7 +4,7 @@ export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
   : ColumnType<T, T | undefined, T>;
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
-import type { VerifyType, VtuberStatus, YoutubeStatus } from "./enums";
+import type { Role, VerifyType, VtuberStatus, YoutubeStatus } from "./enums";
 
 export type Company = {
     id: Generated<number>;
@@ -77,6 +77,7 @@ export type Stream = {
 };
 export type User = {
     id: Generated<number>;
+    role: Generated<Role>;
     email: string;
     is_verified: Generated<number>;
     created_at: Generated<Timestamp>;

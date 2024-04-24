@@ -21,7 +21,7 @@ export class SocialAuthService {
         return 'conflict';
       }
 
-      return await this.authRepository.createSocialAccount(
+      const newUser = await this.authRepository.createSocialAccount(
         email,
         name,
         picture,
@@ -29,8 +29,9 @@ export class SocialAuthService {
         externalId,
         accessToken,
       );
+      return { userId: newUser.id, role: newUser.role };
     }
 
-    return findUser.user_id;
+    return { userId: findUser.user_id, role: findUser.role };
   }
 }
