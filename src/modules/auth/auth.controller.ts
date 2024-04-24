@@ -27,6 +27,9 @@ import { RefreshTokenCommand } from './commands/refresh-token.command';
 import { UserVerifyEmailCommand } from './commands/verify-email.command';
 import { UserLogoutCommand } from './commands/logout.command';
 import { SocialLoginCommand } from './commands/social-login.command';
+import { RolesGuard } from './guards/role.guard';
+import { HasRole } from '../../common/decorators/role.decorator';
+import { AuthAdmin } from '../../common/decorators/auth.decorator';
 
 @ApiTags('Auth API')
 @Controller('/api/auth')
@@ -145,5 +148,11 @@ export class AuthController {
     const userAgent = req.headers['user-agent'] as string;
     const command = new SocialLoginCommand(req, res, ip, userAgent);
     return this.commandBus.execute(command);
+  }
+
+  @AuthAdmin()
+  @Post('/role')
+  async guardTest() {
+    return HttpStatus.OK;
   }
 }

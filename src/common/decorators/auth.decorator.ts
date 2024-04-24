@@ -1,6 +1,12 @@
 import { applyDecorators, UseGuards } from '@nestjs/common';
-import { JwtGuard } from '../../modules/auth/guards/jwt.guard';
+import { AuthGuard } from '@nestjs/passport';
 
-export function Auth() {
-  return applyDecorators(UseGuards(JwtGuard));
+import { HasRole } from './role.decorator';
+import { RolesGuard } from '../../modules/auth/guards/role.guard';
+
+export function AuthAdmin() {
+  return applyDecorators(
+    HasRole('ADMIN'),
+    UseGuards(AuthGuard('jwt'), RolesGuard),
+  );
 }
