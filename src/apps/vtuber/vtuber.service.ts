@@ -1,7 +1,7 @@
 import { ConflictException, Inject, Injectable } from '@nestjs/common';
 
 import { VtuberRepository } from './repository/vtuber.repository';
-import Logger, { LoggerKey } from '../../libs/modules/logger/domain/logger';
+import Logger, { LoggerKey } from '../../libs/logger/domain/logger';
 
 @Injectable()
 export class VtuberService {

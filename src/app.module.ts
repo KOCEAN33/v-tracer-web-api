@@ -16,9 +16,9 @@ import { VtuberModule } from './apps/vtuber/vtuber.module';
 import { StreamsModule } from './apps/streams/streams.module';
 import { GamesModule } from './apps/games/games.module';
 
-import { ExceptionModule } from './libs/nestjs/exception/exception.module';
-import { LoggerModule } from './libs/modules/logger/logger.module';
-import { CacheManagerModule } from './libs/modules/cache-manager/cache-manager.module';
+import { ExceptionModule } from './common/exception/exception.module';
+import { LoggerModule } from './libs/logger/logger.module';
+import { CacheManagerModule } from './libs/cache-manager/cache-manager.module';
 
 const genSecret = () => {
   const databaseUrl = process.env.DATABASE_URL as string;

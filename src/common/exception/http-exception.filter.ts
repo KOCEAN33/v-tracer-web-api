@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 
-import { LoggerKey } from '../../modules/logger/domain/logger';
+import { LoggerKey } from '../../libs/logger/domain/logger';
 
 interface ErrorResponse {
   statusCode: number;

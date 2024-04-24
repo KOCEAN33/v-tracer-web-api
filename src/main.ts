@@ -9,8 +9,8 @@ import { AppModule } from './app.module';
 
 import { SwaggerConfig } from './config/config.interface';
 
-import { ResponseInterceptor } from './libs/nestjs/interceptor/response.interceptor';
-import LoggerServiceAdapter from './libs/modules/logger/logger.service.adapter';
+import { ResponseInterceptor } from './common/interceptor/response.interceptor';
+import LoggerServiceAdapter from './libs/logger/logger.service.adapter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
