@@ -146,22 +146,6 @@ export class AuthRepository {
       .executeTakeFirst();
   }
 
-  async getUserByAccessToken(
-    userId: number,
-    socId: string,
-    externalId: string,
-    accessToken: string,
-  ) {
-    return await this.db
-      .selectFrom('social_logins')
-      .select(['user_id', 'provider', 'external_id', 'access_token'])
-      .where('user_id', '=', userId)
-      .where('provider', '=', socId)
-      .where('external_id', '=', externalId)
-      .where('access_token', '=', accessToken)
-      .executeTakeFirst();
-  }
-
   async getRefreshToken(userId: number, refreshToken: string) {
     return await this.db
       .selectFrom('refresh_tokens')
