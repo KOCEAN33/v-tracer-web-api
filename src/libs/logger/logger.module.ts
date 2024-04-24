@@ -1,5 +1,5 @@
 import { Global, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { LoggerMiddleware } from '../../nestjs/middleware/logger.middleware';
+import { LoggerMiddleware } from '../../common/middleware/logger.middleware';
 import Logger, { LoggerBaseKey, LoggerKey } from './domain/logger';
 import WinstonLogger, {
   WinstonLoggerTransportsKey,

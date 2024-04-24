@@ -8,17 +8,17 @@ import { v4 } from 'uuid';
 
 import config from './config/config';
 
-import { AuthModule } from './apps/auth/auth.module';
-import { UsersModule } from './apps/users/users.module';
-import { EmailModule } from './apps/email/email.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { UsersModule } from './modules/users/users.module';
+import { EmailModule } from './modules/email/email.module';
 import { AppController } from './app.controller';
-import { VtuberModule } from './apps/vtuber/vtuber.module';
-import { StreamsModule } from './apps/streams/streams.module';
-import { GamesModule } from './apps/games/games.module';
+import { VtuberModule } from './modules/vtuber/vtuber.module';
+import { StreamsModule } from './modules/streams/streams.module';
+import { GamesModule } from './modules/games/games.module';
 
-import { ExceptionModule } from './libs/nestjs/exception/exception.module';
-import { LoggerModule } from './libs/modules/logger/logger.module';
-import { CacheManagerModule } from './libs/modules/cache-manager/cache-manager.module';
+import { ExceptionModule } from './common/exception/exception.module';
+import { LoggerModule } from './libs/logger/logger.module';
+import { CacheManagerModule } from './libs/cache-manager/cache-manager.module';
 
 const genSecret = () => {
   const databaseUrl = process.env.DATABASE_URL as string;
