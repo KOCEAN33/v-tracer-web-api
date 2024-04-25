@@ -57,6 +57,7 @@ export class VtuberController {
 
   @ApiOperation({ summary: 'Get V-Tuber count' })
   @ApiResponse({
+    status: 200,
     type: VtuberCountResDTO,
     description: 'success',
   })
@@ -68,6 +69,7 @@ export class VtuberController {
 
   @ApiOperation({ summary: 'Get all V-Tubers' })
   @ApiResponse({
+    status: 200,
     type: GetAllVtuberResDTO,
     description: 'list of all V-Tubers',
   })

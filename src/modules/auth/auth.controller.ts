@@ -69,7 +69,11 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Get new access-token, using refresh-token' })
-  @ApiResponse({ description: 'Success', type: RefreshTokenResDTO })
+  @ApiResponse({
+    status: 200,
+    description: 'Success',
+    type: RefreshTokenResDTO,
+  })
   @ApiUnauthorizedResponse({ description: 'invalid refresh-token' })
   @ApiForbiddenResponse({
     description: 'Not allow to refresh by token some reason',
@@ -110,7 +114,7 @@ export class AuthController {
 
   @ApiOperation({ summary: 'Email verify' })
   @ApiBody({ description: 'Send verify code', type: VerifyEmailReqDTO })
-  @ApiResponse({ description: 'Success', type: 'message' })
+  @ApiCreatedResponse({ description: 'Success', type: 'message' })
   @ApiForbiddenResponse({ description: 'verify code is invalid' })
   @Post('/verify/email')
   async verifyEmail(
@@ -123,7 +127,7 @@ export class AuthController {
 
   @ApiOperation({ summary: 'Logout' })
   @ApiBody({ description: 'logout user id', type: LogoutReqDTO })
-  @ApiResponse({ description: 'Success', type: 'message' })
+  @ApiResponse({ status: 201, description: 'Success' })
   @Post('/logout')
   async logout(
     @Ip() ip: string,
@@ -145,7 +149,7 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Google Login URL' })
-  @ApiResponse({ description: 'Google Login URL' })
+  @ApiResponse({ status: 200, description: 'Google Login URL' })
   @Get('/google')
   @UseGuards(AuthGuard('google'))
   async googleAuth(): Promise<HttpStatus> {
@@ -153,7 +157,7 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Google OAuth' })
-  @ApiResponse({ description: 'access token' })
+  @ApiResponse({ status: 200, description: 'access token' })
   @ApiForbiddenResponse({ description: 'Not authorized from provider' })
   @ApiConflictResponse({ description: 'already exist e-mail' })
   @Get('/google/redirect')
@@ -169,7 +173,7 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Github OAuth login URL' })
-  @ApiResponse({ description: 'Github OAuth login URL' })
+  @ApiResponse({ status: 200, description: 'Github OAuth login URL' })
   @Get('/github')
   @UseGuards(AuthGuard('github'))
   async githubAuth(): Promise<HttpStatus> {
@@ -177,7 +181,7 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Github callback' })
-  @ApiResponse({ description: 'access token' })
+  @ApiResponse({ status: 200, description: 'access token' })
   @ApiForbiddenResponse({ description: 'Not authorized from provider' })
   @ApiConflictResponse({ description: 'already exist e-mail' })
   @Get('/github/callback')
