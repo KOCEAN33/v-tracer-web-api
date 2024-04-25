@@ -11,6 +11,7 @@ import { SwaggerConfig } from './config/config.interface';
 
 import { ResponseInterceptor } from './common/interceptor/response.interceptor';
 import LoggerServiceAdapter from './libs/logger/logger.service.adapter';
+import * as process from 'node:process';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -35,7 +36,7 @@ async function bootstrap() {
 
   // Swagger Api
   const swaggerConfig = configService.get<SwaggerConfig>('swagger');
-  if (swaggerConfig.enabled) {
+  if (process.env.NODE_ENV === 'development') {
     const options = new DocumentBuilder()
       .setTitle(swaggerConfig.title)
       .setDescription(swaggerConfig.description)
