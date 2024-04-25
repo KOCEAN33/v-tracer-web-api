@@ -1,7 +1,7 @@
 import { IsString, IsUrl } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class AddCompanyDto {
+export class AddCompanyReqDTO {
   @IsString()
   @ApiProperty({ example: 'vspo', description: 'name of company' })
   name: string;
