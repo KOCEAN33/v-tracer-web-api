@@ -17,8 +17,8 @@ const commandHandler = [SendVerifyEmailHandler];
           username: 'api',
           key: process.env.MAILGUN_API_KEY as string,
           timeout: 100000, // OPTIONAL, in milliseconds
-        }
-      }
+        };
+      },
     }),
   ],
   controllers: [EmailController],

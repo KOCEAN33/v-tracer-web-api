@@ -13,7 +13,7 @@ import { JwtGuard } from '../auth/guards/jwt.guard';
 import { GetmeResDto } from './dto/getme.res.dto';
 
 @ApiTags('Users')
-@Controller('/api/users')
+@Controller('/api/v1/users')
 export class UsersController {
   constructor(private queryBus: QueryBus) {}
 

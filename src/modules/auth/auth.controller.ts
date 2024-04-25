@@ -1,27 +1,27 @@
 import type { Response, Request } from 'express';
-import { CommandBus } from '@nestjs/cqrs';
 import { AuthGuard } from '@nestjs/passport';
+import { CommandBus } from '@nestjs/cqrs';
 import {
   Body,
   Controller,
   Get,
   Post,
-  UseGuards,
   Req,
   Res,
   Ip,
+  UseGuards,
   HttpStatus,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
-  ApiBody,
+  ApiUnauthorizedResponse,
   ApiConflictResponse,
   ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiOperation,
   ApiResponse,
+  ApiBody,
   ApiTags,
-  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
 import { SignUpReqDTO } from './dto/signup.req.dto';
@@ -38,8 +38,8 @@ import { UserVerifyEmailCommand } from './commands/verify-email.command';
 import { UserLogoutCommand } from './commands/logout.command';
 import { SocialLoginCommand } from './commands/social-login.command';
 
-@ApiTags('Auth')
-@Controller('/api/auth')
+@ApiTags('Auth v1')
+@Controller('/api/v1/auth')
 export class AuthController {
   constructor(private commandBus: CommandBus) {}
 

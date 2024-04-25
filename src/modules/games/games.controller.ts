@@ -6,8 +6,8 @@ import { QueryBus } from '@nestjs/cqrs';
 import { GameRankingResDTO } from './dto/game-ranking.res.dto';
 import { GetGameRankingQuery } from './queries/get-game-ranking.query';
 
-@ApiTags('Games')
-@Controller('/api/games')
+@ApiTags('Games v1')
+@Controller('/api/v1/games')
 export class GamesController {
   constructor(private queryBus: QueryBus) {}
 
