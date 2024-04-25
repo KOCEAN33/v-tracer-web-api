@@ -1,4 +1,6 @@
 import type { Response, Request } from 'express';
+import { CommandBus } from '@nestjs/cqrs';
+import { AuthGuard } from '@nestjs/passport';
 import {
   Body,
   Controller,
@@ -10,8 +12,6 @@ import {
   Ip,
   HttpStatus,
 } from '@nestjs/common';
-import { CommandBus } from '@nestjs/cqrs';
-import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBadRequestResponse,
   ApiBody,
@@ -25,12 +25,10 @@ import {
 } from '@nestjs/swagger';
 
 import { SignUpReqDTO } from './dto/signup.req.dto';
-import { SignupResDTO } from './dto/signup.res.dto';
 import { UserLoginReqDTO } from './dto/login.req.dto';
 import { UserLoginResDTO } from './dto/login.res.dto';
 import { LogoutReqDTO } from './dto/logout.req.dto';
 import { VerifyEmailReqDTO } from './dto/verify-email.req.dto';
-import { VerifyEmailResDTO } from './dto/verify-email.res.dto';
 import { RefreshTokenResDTO } from './dto/refresh-token.res.dto';
 
 import { UserSignUpCommand } from './commands/signup.command';
@@ -97,13 +95,13 @@ export class AuthController {
   @ApiOperation({ summary: 'User Signup' })
   @ApiCreatedResponse({
     description: 'Need to verify email',
-    type: SignUpReqDTO,
+    type: 'message',
   })
   @ApiConflictResponse({
     description: 'email is already used',
-    type: SignUpReqDTO,
+    type: 'message',
   })
-  async signUp(@Body() dto: SignUpReqDTO): Promise<SignupResDTO> {
+  async signUp(@Body() dto: SignUpReqDTO): Promise<{ message: string }> {
     dto.email = dto.email.toLowerCase();
     const { name, email, password } = dto;
     const command = new UserSignUpCommand(name, email, password);
@@ -112,12 +110,12 @@ export class AuthController {
 
   @ApiOperation({ summary: 'Email verify' })
   @ApiBody({ description: 'Send verify code', type: VerifyEmailReqDTO })
-  @ApiResponse({ description: 'Success', type: VerifyEmailResDTO })
+  @ApiResponse({ description: 'Success', type: 'message' })
   @ApiForbiddenResponse({ description: 'verify code is invalid' })
   @Post('/verify/email')
   async verifyEmail(
     @Body() dto: VerifyEmailReqDTO,
-  ): Promise<VerifyEmailResDTO> {
+  ): Promise<{ message: string }> {
     const { verifyCode } = dto;
     const command = new UserVerifyEmailCommand(verifyCode);
     return this.commandBus.execute(command);

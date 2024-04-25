@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsString } from 'class-validator';
+import { IsString } from 'class-validator';
 
 export class RefreshTokenResDTO {
   @IsString()
-  @ApiProperty({ description: 'password' })
+  @ApiProperty({ description: 'access-token', example: 'some jwt' })
   accessToken: string;
 }
