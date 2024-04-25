@@ -8,11 +8,6 @@ import { TokenService } from '../token.service';
 import { UserLoginCommand } from './login.command';
 import { SaveTokenEvent } from '../events/save-token.event';
 
-interface LoginResponse {
-  message: string;
-  accessToken: string;
-}
-
 @CommandHandler(UserLoginCommand)
 export class UserLoginHandler implements ICommandHandler<UserLoginCommand> {
   constructor(
@@ -23,7 +18,7 @@ export class UserLoginHandler implements ICommandHandler<UserLoginCommand> {
     private readonly eventBus: EventBus,
   ) {}
 
-  async execute(command: UserLoginCommand): Promise<LoginResponse> {
+  async execute(command: UserLoginCommand) {
     const { email, password, response, ip, userAgent } = command;
 
     const user = await this.authRepository.getPasswordByEmail(email);

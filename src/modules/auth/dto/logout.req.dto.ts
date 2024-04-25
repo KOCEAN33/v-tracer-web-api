@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsMongoId, IsNumber, IsOptional } from 'class-validator';
+import { IsNumber, IsOptional } from 'class-validator';
 
-export class LogoutDto {
+export class LogoutReqDTO {
   @ApiProperty({ description: 'userId' })
   @IsNumber()
   @IsOptional()
