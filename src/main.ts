@@ -6,12 +6,9 @@ import { useContainer } from 'class-validator';
 import * as cookieParser from 'cookie-parser';
 
 import { AppModule } from './app.module';
-
 import { SwaggerConfig } from './config/config.interface';
-
 import { ResponseInterceptor } from './common/interceptor/response.interceptor';
 import LoggerServiceAdapter from './libs/logger/logger.service.adapter';
-import * as process from 'node:process';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
