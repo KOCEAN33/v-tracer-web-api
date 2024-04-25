@@ -1,20 +1,30 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
-import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { QueryBus } from '@nestjs/cqrs';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
 import { JwtGuard } from '../auth/guards/jwt.guard';
 import { User } from '../../common/decorators/get-user.decorator';
 import { GetMyProfileQuery } from './queries/get-my-profile.query';
+import { GetmeResDto } from './dto/getme.res.dto';
 
+@ApiTags('Users')
 @Controller('/api/users')
 export class UsersController {
-  constructor(
-    private commandBus: CommandBus,
-    private queryBus: QueryBus,
-  ) {}
+  constructor(private queryBus: QueryBus) {}
 
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Get user profile info',
+  })
+  @ApiResponse({ status: 200, type: GetmeResDto })
   @UseGuards(JwtGuard)
   @Get('/getme')
-  async getMyInfo(@User() userId: number) {
+  async getMyInfo(@User() userId: number): Promise<GetmeResDto> {
     const query = new GetMyProfileQuery(userId);
     return this.queryBus.execute(query);
   }
