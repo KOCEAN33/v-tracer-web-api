@@ -3,7 +3,7 @@ import { CacheTTL } from '@nestjs/cache-manager';
 import { Controller, Get } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 
-import { GameRankingResDto } from './game-ranking.res.dto';
+import { GameRankingResDTO } from './dto/game-ranking.res.dto';
 import { GetGameRankingQuery } from './queries/get-game-ranking.query';
 
 @ApiTags('Games')
@@ -17,11 +17,11 @@ export class GamesController {
   @ApiResponse({
     status: 200,
     isArray: true,
-    type: GameRankingResDto,
+    type: GameRankingResDTO,
   })
   @Get('/ranking')
   @CacheTTL(60 * 60 * 1000)
-  async gameRanking(): Promise<GameRankingResDto[]> {
+  async gameRanking(): Promise<GameRankingResDTO[]> {
     const query = new GetGameRankingQuery();
     return await this.queryBus.execute(query);
   }
