@@ -1,8 +1,8 @@
 import { Controller, Get } from '@nestjs/common';
-
-import { StreamsService } from './streams.service';
 import { CacheTTL } from '@nestjs/cache-manager';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+
+import { StreamsService } from './streams.service';
 import { CountResDTO } from './dto/count.res.dto';
 import { RecentResDTO } from './dto/recent.res.dto';
 

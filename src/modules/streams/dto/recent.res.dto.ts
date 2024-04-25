@@ -3,18 +3,18 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class RecentResDTO {
   @IsString()
-  @ApiProperty({ description: 'total number' })
+  @ApiProperty({ description: 'streamId from youtube', example: 'kpGONDy0Qk0' })
   streamId: string;
 
   @IsString()
-  @ApiProperty({ description: 'changed percentage' })
+  @ApiProperty({ description: 'stream title' })
   streamTitle: string;
 
   @IsString()
-  @ApiProperty({ description: 'changed percentage' })
+  @ApiProperty({ description: 'youtube thumbnail', example: 'google url' })
   image: string;
 
   @IsString()
-  @ApiProperty({ description: 'changed percentage' })
+  @ApiProperty({ description: 'game title', example: 'APEX' })
   gameTitle: string;
 }
