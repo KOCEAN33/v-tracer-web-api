@@ -15,6 +15,7 @@ import { GoogleGuard } from './guards/google.guard';
 
 import { AuthRepository } from './repository/auth.repository';
 
+import { SocialAuthService } from './social-auth.service';
 import { PasswordService } from './password.service';
 import { TokenService } from './token.service';
 import { EmailModule } from '../email/email.module';
@@ -26,11 +27,10 @@ import { UserLoginHandler } from './commands/login.handler';
 import { RefreshTokenHandler } from './commands/refresh-token.handler';
 import { UserVerifyEmailHandler } from './commands/verify-email.handler';
 import { UserLogoutHandler } from './commands/logout.handler';
+import { SocialLoginHandler } from './commands/social-login.handler';
 import { SaveTokenEventHandler } from './events/save-token.event.handler';
 import { UpdateTokenEventHandler } from './events/update-token.event.handler';
 import { SendVerifyEmailEventHandler } from './events/send-verify-email.event.handler';
-import { SocialAuthService } from './social-auth.service';
-import { SocialLoginHandler } from './commands/social-login.handler';
 
 const commandHandlers = [
   UserSignUpHandler,

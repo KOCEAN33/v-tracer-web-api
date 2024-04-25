@@ -6,8 +6,8 @@ import { StreamsService } from './streams.service';
 import { CountResDTO } from './dto/count.res.dto';
 import { RecentResDTO } from './dto/recent.res.dto';
 
-@ApiTags('Streams')
-@Controller('/api/streams')
+@ApiTags('Streams v1')
+@Controller('/api/v1/streams')
 export class StreamsController {
   constructor(private streamService: StreamsService) {}
 
