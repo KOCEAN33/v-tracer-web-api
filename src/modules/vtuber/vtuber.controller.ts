@@ -21,7 +21,7 @@ import { GetAllVtuberResDTO } from './dto/get-all-vtuber.res.dto';
 import { VtuberCountResDTO } from './dto/vtuber-count.res.dto';
 
 @ApiTags('V-Tuber')
-@Controller('/api/vtubers')
+@Controller('/api/v1/vtubers')
 export class VtuberController {
   constructor(private vtuberService: VtuberService) {}
 
