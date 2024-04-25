@@ -3,15 +3,18 @@ import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class GetmeResDto {
   @IsNumber()
-  @ApiProperty({ description: 'game ID from DB' })
+  @ApiProperty({ description: 'user id' })
   id: number;
 
   @IsString()
-  @ApiProperty({ description: 'Game Title' })
+  @ApiProperty({ description: 'user name' })
   name: string;
 
   @IsString()
   @IsOptional()
-  @ApiProperty({ description: 'Total played duration', nullable: true })
+  @ApiProperty({
+    description: 'user profile image cloud be undefined',
+    nullable: true,
+  })
   image: string;
 }
