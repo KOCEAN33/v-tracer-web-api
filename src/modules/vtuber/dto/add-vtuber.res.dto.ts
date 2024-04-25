@@ -3,10 +3,10 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class AddVtuberResDTO {
   @IsString()
-  @ApiProperty({ description: 'Information Message' })
+  @ApiProperty({ description: 'Status message' })
   message: string;
 
   @IsNumber()
-  @ApiProperty({ description: 'Add V-Tuber ID' })
+  @ApiProperty({ description: 'Added V-Tuber ID' })
   vtuberId: number;
 }

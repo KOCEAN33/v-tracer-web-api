@@ -7,6 +7,6 @@ export class VtuberCountResDTO {
   total: string;
 
   @IsString()
-  @ApiProperty({ description: 'changer percentage' })
+  @ApiProperty({ description: 'changed percentage' })
   percent: string;
 }

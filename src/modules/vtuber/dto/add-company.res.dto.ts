@@ -1,4 +1,4 @@
-import { IsString, IsUrl } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class AddCompanyResDTO {
@@ -6,8 +6,7 @@ export class AddCompanyResDTO {
   @ApiProperty({ example: 'vspo', description: 'name of company' })
   message: string;
 
-  @IsString()
-  @IsUrl()
-  @ApiProperty({ description: 'company URL' })
+  @IsNumber()
+  @ApiProperty({ description: 'company ID' })
   companyId: number;
 }
