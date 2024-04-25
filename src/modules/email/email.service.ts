@@ -4,6 +4,7 @@ import * as path from 'path';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { MailgunService } from 'nestjs-mailgun';
+import { MessagesSendResult } from 'mailgun.js';
 
 import { EmailConfig } from '../../config/config.interface';
 import { SendEmail } from './interface/send-email.interface';
@@ -15,7 +16,7 @@ export class EmailService {
     private readonly mailgunService: MailgunService,
   ) {}
 
-  public async sendEmail(setup: SendEmail, html) {
+  public async sendEmail(setup: SendEmail, html): Promise<MessagesSendResult> {
     const emailConfig = this.configService.get<EmailConfig>('email');
     const domain = emailConfig.domain;
     const sender = emailConfig.verifySender;
@@ -30,7 +31,7 @@ export class EmailService {
     return await this.mailgunService.createEmail(domain, options);
   }
 
-  public async compileVerifyEmail(data) {
+  public async compileVerifyEmail(data): Promise<string> {
     const source = await this.getEmailTemplate('email-verify.handlebars');
     const template = handlebars.compile(source);
     return template(data);
@@ -50,7 +51,7 @@ export class EmailService {
   }
 
   // get email template from ./template folder
-  private async getEmailTemplate(templateName: string) {
+  private async getEmailTemplate(templateName: string): Promise<string> {
     const templatePath = path.join(
       __dirname,
       '..',

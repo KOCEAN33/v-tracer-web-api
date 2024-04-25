@@ -6,9 +6,7 @@ import { useContainer } from 'class-validator';
 import * as cookieParser from 'cookie-parser';
 
 import { AppModule } from './app.module';
-
 import { SwaggerConfig } from './config/config.interface';
-
 import { ResponseInterceptor } from './common/interceptor/response.interceptor';
 import LoggerServiceAdapter from './libs/logger/logger.service.adapter';
 
@@ -35,7 +33,7 @@ async function bootstrap() {
 
   // Swagger Api
   const swaggerConfig = configService.get<SwaggerConfig>('swagger');
-  if (swaggerConfig.enabled) {
+  if (process.env.NODE_ENV === 'development') {
     const options = new DocumentBuilder()
       .setTitle(swaggerConfig.title)
       .setDescription(swaggerConfig.description)

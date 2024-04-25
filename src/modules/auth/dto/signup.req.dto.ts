@@ -1,8 +1,7 @@
 import { IsEmail, IsString, MaxLength, MinLength } from 'class-validator';
-
 import { ApiProperty } from '@nestjs/swagger';
 
-export class UserSignUpDto {
+export class SignUpReqDTO {
   @IsString()
   @MinLength(2)
   @MaxLength(30)

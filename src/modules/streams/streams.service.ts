@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+
 import { StreamsRepository } from './repository/streams.repository';
 
 @Injectable()
@@ -101,7 +102,7 @@ export class StreamsService {
     return text.replace(/【[^】]*】/g, '');
   }
 
-  private oneMonthAgo() {
+  private oneMonthAgo(): Date {
     const today = new Date();
     const oneMonthAgo = new Date(today);
     return new Date(oneMonthAgo.setMonth(today.getMonth() - 1));

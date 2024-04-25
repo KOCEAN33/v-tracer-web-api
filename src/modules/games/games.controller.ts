@@ -1,18 +1,28 @@
-import { Controller, Get, UseInterceptors } from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { CacheTTL } from '@nestjs/cache-manager';
+import { Controller, Get } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 
+import { GameRankingResDTO } from './dto/game-ranking.res.dto';
 import { GetGameRankingQuery } from './queries/get-game-ranking.query';
-import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 
-@UseInterceptors(CacheInterceptor)
+@ApiTags('Games')
 @Controller('/api/games')
 export class GamesController {
   constructor(private queryBus: QueryBus) {}
 
+  @ApiOperation({
+    summary: 'Get game ranking',
+  })
+  @ApiResponse({
+    status: 200,
+    isArray: true,
+    type: GameRankingResDTO,
+  })
   @Get('/ranking')
   @CacheTTL(60 * 60 * 1000)
-  async gameRanking() {
+  async gameRanking(): Promise<GameRankingResDTO[]> {
     const query = new GetGameRankingQuery();
-    return this.queryBus.execute(query);
+    return await this.queryBus.execute(query);
   }
 }

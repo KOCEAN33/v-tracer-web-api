@@ -22,7 +22,7 @@ export class VtuberService {
       youtubeUrl,
     );
 
-    return { message: 'success', vtuber: Number(vtuber.insertId) };
+    return { message: 'success', vtuberId: Number(vtuber.insertId) };
   }
 
   async addNewCompany(name: string, url: string) {
@@ -31,7 +31,7 @@ export class VtuberService {
       throw new ConflictException('this company is already exists');
     }
     const company = await this.vtuberRepository.addNewCompany(name, url);
-    return { message: 'success', company: Number(company.insertId) };
+    return { message: 'success', companyId: Number(company.insertId) };
   }
 
   async getAllVtubers() {
