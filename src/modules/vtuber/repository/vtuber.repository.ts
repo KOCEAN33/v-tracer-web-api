@@ -1,6 +1,8 @@
 import { ComparisonOperatorExpression } from 'kysely/dist/cjs/parser/binary-operation-parser';
 import { Injectable } from '@nestjs/common';
 import { InjectKysely } from 'nestjs-kysely';
+import { InsertResult } from 'kysely';
+
 import { DB } from '../../../@types';
 
 @Injectable()
@@ -8,27 +10,29 @@ export class VtuberRepository {
   constructor(@InjectKysely() private readonly db: DB) {}
 
   async addNewVtuber(name: string, companyId: number, youtubeUrl: string) {
-    return await this.db.transaction().execute(async (trx) => {
-      const newVtuber = await trx
-        .insertInto('vtubers')
-        .values({
-          name: name,
-          company_id: companyId,
-          updated_at: new Date(),
-        })
-        .executeTakeFirstOrThrow();
+    return await this.db
+      .transaction()
+      .execute(async (trx): Promise<InsertResult> => {
+        const newVtuber = await trx
+          .insertInto('vtubers')
+          .values({
+            name: name,
+            company_id: companyId,
+            updated_at: new Date(),
+          })
+          .executeTakeFirstOrThrow();
 
-      return await trx
-        .insertInto('youtubes')
-        .values({
-          status: 'new',
-          url: youtubeUrl,
-          name: name,
-          updated_at: new Date(),
-          vtuber_id: Number(newVtuber.insertId),
-        })
-        .executeTakeFirstOrThrow();
-    });
+        return await trx
+          .insertInto('youtubes')
+          .values({
+            status: 'new',
+            url: youtubeUrl,
+            name: name,
+            updated_at: new Date(),
+            vtuber_id: Number(newVtuber.insertId),
+          })
+          .executeTakeFirstOrThrow();
+      });
   }
 
   async getAllVtubers() {

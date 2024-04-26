@@ -16,6 +16,7 @@ export class VtuberService {
     if (!!check) {
       throw new ConflictException('this youtube channel is already exists');
     }
+
     const vtuber = await this.vtuberRepository.addNewVtuber(
       name,
       companyId,
@@ -47,8 +48,9 @@ export class VtuberService {
       this.oneMonthAgo(),
       '>',
     );
+
     const totalCount = prevVtuberCount + afterVtuberCount;
-    const percent = (totalCount / afterVtuberCount) * 100;
+    const percent = (afterVtuberCount / prevVtuberCount) * 100;
     return { total: totalCount.toFixed(0), percent: percent.toFixed(1) };
   }
 
