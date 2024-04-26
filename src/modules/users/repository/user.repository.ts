@@ -9,7 +9,7 @@ export class UserRepository {
   async getProfileByUserId(userId: number) {
     return await this.db
       .selectFrom('profiles')
-      .selectAll()
+      .select(['user_id', 'name', 'image_url'])
       .where('user_id', '=', userId)
       .executeTakeFirstOrThrow();
   }
