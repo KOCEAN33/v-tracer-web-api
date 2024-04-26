@@ -7,7 +7,7 @@ export class StreamsService {
   constructor(private readonly streamRepository: StreamsRepository) {}
 
   async getTotalStreamTime() {
-    const prevtotalTime = await this.streamRepository.getTotalStreamTime(
+    const prevTotalTime = await this.streamRepository.getTotalStreamTime(
       this.oneMonthAgo(),
       '<=',
     );
@@ -16,10 +16,10 @@ export class StreamsService {
       '>',
     );
 
-    const percent = this.calculatePercentage(afterStreamTime, prevtotalTime);
+    const percent = this.calculatePercentage(afterStreamTime, prevTotalTime);
 
     const convertHours =
-      (Number(prevtotalTime) + Number(afterStreamTime)) / (60 * 60);
+      (Number(prevTotalTime) + Number(afterStreamTime)) / (60 * 60);
     return {
       total: convertHours.toFixed(1),
       percent: percent.toFixed(1),
