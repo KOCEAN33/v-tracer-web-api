@@ -1,7 +1,7 @@
 {
   "name": "v-tracer-web-api",
   "private": true,
-  "version": "0.1.5",
+  "version": "0.2.0",
   "description": "WEB API Server for v-tracer",
   "scripts": {
     "prebuild": "rimraf dist",

@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ConflictException } from '@nestjs/common';
 import { VtuberService } from './vtuber.service';
 import { VtuberRepository } from './repository/vtuber.repository';
-import Logger, { LoggerKey } from '../../libs/logger/domain/logger';
+import { LoggerKey } from '../../libs/logger/domain/logger';
 import { YoutubeStatus } from '../../@types/enums';
 
 describe('VtuberService', () => {
