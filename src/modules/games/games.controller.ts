@@ -23,6 +23,6 @@ export class GamesController {
   @CacheTTL(60 * 60 * 1000)
   async gameRanking(): Promise<GameRankingResDTO[]> {
     const query = new GetGameRankingQuery();
-    return await this.queryBus.execute(query);
+    return this.queryBus.execute(query);
   }
 }
