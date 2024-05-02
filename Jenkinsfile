@@ -21,7 +21,7 @@ pipeline {
                         env.IMAGE_VERSION = packageJSONVersion
                         echo "Build Image Version: ${env.IMAGE_VERSION}"
 
-                        sh "docker build -t ${env.REGISTRY}/${env.IMAGE_NAME}:v${env.IMAGE_VERSION} ."
+                        sh "docker build -t ${env.REGISTRY}/${env.IMAGE_NAME}:${env.IMAGE_VERSION} ."
                         }
                     }
                 }
@@ -32,7 +32,7 @@ pipeline {
                     script {
                         withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'xanny-cr-credentials', usernameVariable: 'CR_USERNAME', passwordVariable: 'CR_PASSWORD']]) {
                         sh "docker login https://sjc.vultrcr.com/xanny -u ${CR_USERNAME} -p ${CR_PASSWORD}"
-                        sh "docker push ${env.REGISTRY}/${env.IMAGE_NAME}:v${env.IMAGE_VERSION}"
+                        sh "docker push ${env.REGISTRY}/${env.IMAGE_NAME}:${env.IMAGE_VERSION}"
                         }
                     }
                 }
@@ -46,7 +46,7 @@ pipeline {
 
          stage('Git clone') {
              steps{
-               git credentialsId: 'v-tracer-gitops-jenkins-ssh', url:'git@github.com:KOCEAN33/v-tracer-gitops.git', branch: 'main'
+               git credentialsId: 'xanny-cluster-ssh', url:'git@github.com:KOCEAN33/xanny-cluster.git', branch: 'main'
              }
          }
 
@@ -54,11 +54,11 @@ pipeline {
              steps {
                  script {
 
-                     def filename = "environments/production/web-api/kustomization.yaml"
+                     def filename = "apps/v-tracer/environments/production/api/kustomization.yaml"
                      def data = readYaml file: filename
 
                      // Change Data
-                     data.images[0].newTag = "v${env.IMAGE_VERSION}"
+                     data.images[0].newTag = "${env.IMAGE_VERSION}"
 
                      sh "rm $filename"
                      writeYaml file: filename, data: data
@@ -70,11 +70,11 @@ pipeline {
          stage('Push git') {
              steps {
                 script {
-                     sshagent (credentials: ['v-tracer-gitops-jenkins-ssh']) {
+                     sshagent (credentials: ['xanny-cluster-ssh']) {
                      sh"""
 
                      git add .
-                     git commit -m "UPDATE: web-api image v${env.IMAGE_VERSION} (jenkins automatically)"
+                     git commit -m "update: v-tracer-api image version ${env.IMAGE_VERSION} (jenkins automatically)"
                      git push origin main
 
                      """
