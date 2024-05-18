@@ -6,7 +6,7 @@ import WinstonLogger, {
 } from './winston/winston-logger';
 import LoggerService from './domain/logger.service';
 import LoggerServiceAdapter from './logger.service.adapter';
-import ConsoleTransport from './winston/transports/console.development';
+
 import ConsoleTransportDevelopment from './winston/transports/console.development';
 import ConsoleTransportProduction from './winston/transports/console.production';
 

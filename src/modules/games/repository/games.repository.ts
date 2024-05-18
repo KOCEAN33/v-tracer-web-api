@@ -9,10 +9,10 @@ export class GamesRepository {
   async getPlayedGameRanking() {
     return await this.db
       .selectFrom('streams')
-      .select(['game_id'])
-      .groupBy(['game_id'])
       .select((eb) => eb.fn.sum<number>('duration').as('total_duration'))
+      .select(['game_id'])
       .where('game_id', 'is not', null)
+      .groupBy(['game_id'])
       .orderBy('total_duration', 'desc')
       .leftJoin('games', 'games.id', 'streams.game_id')
       .select(['games.title'])
